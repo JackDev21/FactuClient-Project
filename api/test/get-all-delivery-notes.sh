@@ -1,0 +1,1 @@
+curl -X GET http://localhost:7070/delivery-notes -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NmIxMjM3ZGQ1YWRmMGViNjIwZTk3YmMiLCJpYXQiOjE3MjI5NDc1MjAsImV4cCI6MTcyMzU1MjMyMH0.i1GNKDtHyokOvSn1DOAumUwzwck9hknyVvA6BAnYrYQ" -v

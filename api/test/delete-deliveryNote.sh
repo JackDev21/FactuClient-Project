@@ -1,0 +1,1 @@
+curl -X DELETE http://localhost:7070/delivery-notes/66bd06fd62443af46735f6b3 -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NmJiOTcyZjk4MDUxZjMzOTAzZTlhN2MiLCJpYXQiOjE3MjM3MDY4MjEsImV4cCI6MTcyNDMxMTYyMX0.xakHf9jk8bBISFvGJujBkR75O27SqsJDGD9gDCwMewU"

@@ -1,0 +1,17 @@
+@import url("https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap");
+@tailwind components;
+
+@layer components {
+  .ContainerFooter {
+    @apply fixed bottom-0 flex w-full justify-center;
+  }
+
+  .Footer {
+    @apply flex h-[5.5rem] w-[90%] items-center justify-center bg-custom-gradient text-[3.5rem];
+    border-top-left-radius: 50% 100%;
+    border-top-right-radius: 50% 100%;
+    font-family: "Permanent Marker", cursive;
+    font-weight: 400;
+    font-style: normal;
+  }
+}

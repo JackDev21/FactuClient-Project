@@ -1,0 +1,14 @@
+@tailwind components;
+
+@layer components {
+  .CustomerProfile {
+    @apply mt-[6.5rem] gap-0;
+  }
+  .CustomerProfile p {
+    @apply text-center text-[1.1rem] font-bold;
+  }
+
+  .CustomerButtons {
+    @apply -mt-2 w-[8.5rem] cursor-pointer;
+  }
+}

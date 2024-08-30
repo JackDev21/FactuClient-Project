@@ -1,0 +1,14 @@
+@tailwind components;
+
+@layer components {
+  .RegisterForm {
+    @apply relative flex w-full flex-col items-center justify-center gap-3 rounded-lg p-7;
+  }
+  .RegisterMain {
+    @apply relative bottom-8;
+  }
+
+  .Link-RegisterLogin {
+    @apply text-xl text-[#7f5003] underline;
+  }
+}

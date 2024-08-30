@@ -1,0 +1,21 @@
+@tailwind components;
+
+@layer components {
+  .RegisterCustomer {
+    @apply absolute top-24 z-20 flex w-full justify-center;
+  }
+  .RegisterCustomerForm {
+    @apply relative flex w-auto flex-col items-center rounded-2xl bg-[#000000c5] p-5 shadow-custom-shadow;
+  }
+
+  .RegisterCustomerForm .Button {
+    @apply mt-6 border-orange-300 bg-blue-50 bg-none;
+  }
+
+  .RegisterCustomerForm input {
+    @apply h-10 border-orange-300 pl-9 text-start text-[1rem];
+  }
+  .RegisterCustomerForm input::placeholder {
+    @apply relative bottom-2 text-start text-[0.8rem] font-black;
+  }
+}

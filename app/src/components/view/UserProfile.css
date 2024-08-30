@@ -1,0 +1,11 @@
+@tailwind components;
+
+@layer components {
+  .CompanyLogo {
+    @apply max-h-20 min-h-20 min-w-20 max-w-20 rounded-2xl;
+  }
+
+  .HeaderProfile .IconLeftHeader {
+    @apply top-[-1rem];
+  }
+}

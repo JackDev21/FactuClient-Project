@@ -1,0 +1,18 @@
+@tailwind components;
+
+@layer components {
+  .Profile {
+    @apply relative bottom-3 flex w-[95%] flex-col items-center gap-2;
+  }
+
+  .ProfileInfoContainer {
+    @apply flex w-full flex-col items-center;
+  }
+
+  .ProfileInfo {
+    @apply flex w-full flex-col items-center text-xl font-extrabold;
+  }
+  .SpanText {
+    @apply w-auto text-[1.1rem] font-bold text-orange-800 underline;
+  }
+}

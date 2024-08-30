@@ -1,0 +1,39 @@
+@tailwind components;
+
+@layer components {
+  .AddWorkButton {
+    @apply mb-4 mt-2 h-8 w-8 cursor-pointer rounded-lg text-[#924200] shadow-custom-shadow;
+  }
+
+  .FormWork {
+    @apply w-[100%];
+  }
+  .FormWorkContainer {
+    @apply fixed top-20 flex w-[90%] flex-col items-center gap-3 rounded-xl bg-[#000000c9] p-2 shadow-custom-shadow;
+  }
+
+  .FormWorkQuantity > input {
+    @apply w-[90%];
+  }
+
+  .FormWorkPrice > input {
+    @apply z-10 w-[75%];
+  }
+
+  .ContainerSaveButton {
+    @apply absolute bottom-2 z-0 mr-8 flex w-full justify-end;
+  }
+  .SaveWorkButton {
+    @apply cursor-pointer rounded-md text-5xl text-[white];
+  }
+  .SaveWorkButton:hover {
+    @apply text-[#924200];
+  }
+
+  .observationInput {
+    @apply fixed top-[30rem] flex h-auto w-[90%] flex-col items-start gap-3 rounded-xl bg-[#000000c9] p-2 shadow-custom-shadow;
+  }
+  .observationInput .ContainerSaveButton {
+    @apply absolute -left-2;
+  }
+}

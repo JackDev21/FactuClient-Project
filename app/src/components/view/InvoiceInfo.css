@@ -1,0 +1,99 @@
+@tailwind components;
+
+@layer components {
+  .InvoiceHeader {
+    @apply z-10;
+  }
+  .InvoiceHeader .IconLeftHeader {
+    @apply -top-5 text-6xl;
+  }
+  .MainInvoiceInfo {
+    @apply gap-2;
+  }
+  .TitleInvoice {
+    @apply text-xl;
+  }
+
+  .InvoiceContainer {
+    @apply flex w-[95%] flex-col justify-between;
+  }
+
+  .DataContainer {
+    @apply relative bottom-5 flex w-[95%] justify-between rounded-lg border border-gray-500 p-1 text-sm;
+  }
+
+  .CompanyData {
+    @apply ml-2 flex flex-col p-1 font-medium;
+  }
+
+  .CustomerData {
+    @apply mr-2 flex w-[16rem] flex-col p-1 font-bold;
+  }
+
+  .DataText {
+    @apply font-bold;
+  }
+  .InvoiceTable {
+    @apply relative bottom-14 flex w-[95%] flex-col justify-around rounded-t-lg p-2;
+  }
+
+  .HeaderTable {
+    @apply flex w-full justify-between rounded-md bg-gray-400 p-1 font-medium;
+  }
+  .HeaderTotal {
+    @apply mr-2 flex w-full gap-3;
+  }
+  .BodyTable {
+    @apply relative flex flex-wrap justify-between p-1;
+  }
+  .BodyInfo {
+    @apply flex w-full;
+  }
+  .Info {
+    @apply flex w-full justify-between text-[1rem];
+  }
+
+  .QuantityHeader {
+    @apply flex w-full justify-end;
+  }
+
+  .CuantityContainer {
+    @apply flex w-full;
+  }
+
+  .QuantityInfo {
+    @apply flex;
+  }
+  .QuantityBody {
+    @apply w-full;
+  }
+  .PriceWork {
+    @apply ml-4;
+  }
+
+  .NumberDateContainer {
+    @apply ml-2 flex w-full justify-between;
+  }
+
+  .InvoiceDate {
+    @apply mr-4 flex justify-between gap-1;
+  }
+  .NumberDateContainer .InvoiceNumber {
+    @apply text-xl font-semibold text-orange-900;
+  }
+
+  .InvoiceNumber {
+    @apply text-sm font-semibold text-orange-700;
+  }
+
+  .InvoiceDate time {
+    @apply font-medium;
+  }
+
+  .InvoiceTotal {
+    @apply -mb-2 flex w-[90%] justify-end text-[1.1rem] font-semibold text-orange-900;
+  }
+  .PaymentType {
+    @apply relative mt-1 flex w-[90%] flex-col items-center text-sm font-bold;
+  }
+}

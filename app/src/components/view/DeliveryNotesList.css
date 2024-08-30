@@ -1,0 +1,20 @@
+@tailwind components;
+
+@layer components {
+  .DeliveryList {
+    @apply flex w-[95%] flex-col items-start gap-3;
+  }
+
+  .DeliveryLink {
+    @apply flex items-center;
+  }
+
+  .DeliveryNote {
+    @apply flex cursor-pointer p-1 text-[1.2rem] font-medium;
+    text-shadow: 1px 1px 5px rgba(255, 132, 0, 0.5);
+  }
+
+  .DeliveryNote:hover {
+    @apply text-orange-500;
+  }
+}

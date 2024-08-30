@@ -1,0 +1,19 @@
+@tailwind components;
+
+@layer components {
+  .Confirm {
+    @apply absolute mx-auto w-auto flex-1 flex-col items-center rounded-lg bg-[#e4e4e4] p-4 shadow-custom-shadow;
+  }
+
+  .Confirm h2 {
+    @apply text-center text-2xl font-bold;
+  }
+
+  .Confirm p {
+    @apply mt-4 text-center;
+  }
+
+  .Confirm-Buttons {
+    @apply flex w-auto gap-10;
+  }
+}

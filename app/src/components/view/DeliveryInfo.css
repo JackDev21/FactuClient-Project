@@ -1,0 +1,74 @@
+@tailwind components;
+
+@layer components {
+  .MainDeliveryInfo {
+    @apply relative bottom-7;
+  }
+  .HeaderDeliveryInfo .IconLeftHeader {
+    @apply top-6 text-6xl;
+  }
+
+  .HeaderDeliveryInfo .IconUser {
+    @apply relative top-5;
+  }
+
+  .DeliveryWork {
+    @apply relative flex w-[90%] flex-col;
+  }
+  .DeliveryWorkInfo {
+    @apply mt-2 flex justify-between;
+  }
+  .DeliveryWorkConcept {
+    @apply ml-1 font-normal;
+  }
+  .DeliveryInfoCustomer {
+    @apply flex w-[80%] flex-col items-center font-bold;
+  }
+
+  .DeliveryNumber {
+    @apply text-xl;
+  }
+
+  .TitleDateContainer {
+    @apply ml-2 mr-2 flex justify-between;
+  }
+  .DeliveryTitleInfo {
+    @apply flex justify-between rounded-md border border-gray-400 bg-slate-300 p-1 font-medium;
+  }
+  .DeliveryTitleQuantityPrice {
+    @apply mr-1 flex gap-5;
+  }
+  .DeliveryQuantityPrice {
+    @apply mr-3 flex gap-3;
+  }
+  .TotalContainer {
+    @apply w-[3rem] text-right;
+  }
+
+  .PriceContainer {
+    @apply w-[3rem] text-right;
+  }
+
+  .QuantityContainer {
+    @apply flex w-[2.3rem];
+  }
+
+  .DeliveryTotal {
+    @apply flex w-full justify-end p-1 font-extrabold;
+  }
+
+  .ObservationsContainer {
+    @apply ml-3 mt-5 flex w-[90%] flex-col p-1 font-medium;
+  }
+
+  .DeliveryDate {
+    @apply font-bold;
+  }
+
+  .PDFDownloadLink {
+    @apply flex w-[85%] items-start text-3xl;
+  }
+  .PDFDownloadLink:hover {
+    @apply text-orange-500;
+  }
+}

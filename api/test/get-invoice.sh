@@ -1,0 +1,1 @@
+curl -X GET http://localhost:7070/invoices/66b79aa87a52e317f23a0394 -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NmIxMjM3ZGQ1YWRmMGViNjIwZTk3YmMiLCJpYXQiOjE3MjI5NjUxMzMsImV4cCI6MTcyMzU2OTkzM30.0cbilWSSePrwKXi1SSIgtSbPdg_aBUwidFcPHpOpAlg" -v

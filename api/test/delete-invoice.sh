@@ -1,0 +1,1 @@
+curl -X DELETE http://localhost:7070/invoices/66bf72e787d93f6fb9c03a91 -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NmJkYjllMjg1OWMwNmM2NTM1Y2ZiMTQiLCJpYXQiOjE3MjM5NjcwNDMsImV4cCI6MTcyNDU3MTg0M30.ZdtdpFB1_AoAy7Wnbr9Y-Ws-jRCMExdGPsvrk-B8st0" -v
