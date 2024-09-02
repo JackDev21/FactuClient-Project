@@ -8,7 +8,7 @@ const router = express.Router()
 router.post("/users", jsonBodyParser, routes.registerUserHandler)
 router.post("/users/auth", jsonBodyParser, routes.authenticateUserHandler)
 router.get("/users/:targetUserId", routes.getUserNameHandler)
-router.patch("/users/:userId/update", jsonBodyParser, routes.updateProfileHandler)
+router.patch("/users/update", jsonBodyParser, routes.updateProfileHandler)
 
 router.get("/users/:targetUserId/profile", routes.getProfileUserHandler)
 

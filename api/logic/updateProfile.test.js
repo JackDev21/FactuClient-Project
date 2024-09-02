@@ -23,7 +23,6 @@ mongoose.connect(MONGODB_URL)
       //   }
       // )
       updateProfile(
-        "66ab9387e2e5e2ef52b61603",
         {
           username: "Jack"
         }

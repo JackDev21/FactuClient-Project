@@ -52,7 +52,7 @@ export default function UpdateProfileForm({ onUpdateProfile }) {
 
     try {
       // prettier-ignore
-      logic.updateProfile(userId, updates)
+      logic.updateProfile(updates)
         .then(() => {
           onUpdateProfile()
         })

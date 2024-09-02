@@ -1,8 +1,7 @@
 import errors, { SystemError } from "com/errors"
 import validate from "com/validate"
 
-const updateProfile = (userId, updates) => {
-  validate.id(userId, "userId")
+const updateProfile = (updates) => {
 
   if (updates.username) validate.username(updates.username)
   if (updates.email) validate.email(updates.email)
@@ -14,7 +13,7 @@ const updateProfile = (userId, updates) => {
   if (updates.bankAccount) validate.iban(updates.bankAccount)
   if (updates.companyLogo) validate.url(updates.companyLogo, "companyLogo")
 
-  return fetch(`${import.meta.env.VITE_API_URL}/users/${userId}/update`, {
+  return fetch(`${import.meta.env.VITE_API_URL}/users/update`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
