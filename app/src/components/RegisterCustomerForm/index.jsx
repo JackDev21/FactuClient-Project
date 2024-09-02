@@ -36,7 +36,7 @@ export default function RegisterCustomer({ onCloseRegisterCustomer }) {
           if (error instanceof SystemError) {
             alert(error.message)
           }
-          alert("Username ya existe.")
+          alert(error.message)
         })
     } catch (error) {
       alert(error.message)
