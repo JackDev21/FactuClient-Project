@@ -6,7 +6,7 @@
   }
 
   .MainHome .Button {
-    @apply flex h-auto w-4/5 justify-start border-gray-500 bg-[#D2CBC2] bg-none text-gray-700;
+    @apply flex h-auto w-[20rem] justify-start border-gray-500 bg-[#D2CBC2] bg-none text-gray-700;
   }
 
   .MainHome .Button:hover {
