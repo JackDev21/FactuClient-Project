@@ -1,5 +1,5 @@
 import validate from "com/validate.js"
-import { User, Invoice } from "../model/index.js"
+import { User, Invoice, DeliveryNote } from "../model/index.js"
 import { NotFoundError, SystemError } from "com/errors.js"
 
 const createInvoice = (userId, customerId, deliveryNoteIds) => {
@@ -50,8 +50,12 @@ const createInvoice = (userId, customerId, deliveryNoteIds) => {
               return Invoice.create(newInvoice)
                 .catch(error => { throw new SystemError(error.message) })
                 .then((invoice) => {
-                  return Invoice.findById(invoice.id).select("-__v").populate("customer").populate("company").populate("deliveryNotes").lean()
-                    .then((invoice) => invoice)
+                  return DeliveryNote.updateMany({ _id: { $in: deliveryNoteIds } }, { $set: { isInvoiced: true } })
+                    .catch(error => { throw new SystemError(error.message) })
+                    .then(() => {
+                      return Invoice.findById(invoice.id).select("-__v").populate("customer").populate("company").populate("deliveryNotes").lean()
+                        .then((invoice) => invoice)
+                    })
                 })
             })
         })

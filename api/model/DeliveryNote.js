@@ -30,6 +30,10 @@ const deliveryNote = new Schema({
   observations: {
     type: String,
     required: false
+  },
+  isInvoiced: {
+    type: Boolean,
+    default: false
   }
 })
 
