@@ -9,15 +9,19 @@
     @apply w-[100%];
   }
   .FormWorkContainer {
-    @apply fixed top-20 flex w-[90%] flex-col items-center gap-3 rounded-xl bg-[#000000c9] p-2 shadow-custom-shadow;
+    @apply fixed top-20 flex w-[90%] max-w-[30rem] flex-col items-center gap-3 rounded-xl bg-[#000000c9] p-2 shadow-custom-shadow;
+  }
+
+  .FormWorkConcept > input {
+    @apply w-[125%];
   }
 
   .FormWorkQuantity > input {
-    @apply w-[90%];
+    @apply w-[70%];
   }
 
   .FormWorkPrice > input {
-    @apply z-10 w-[75%];
+    @apply z-10 w-[65%];
   }
 
   .ContainerSaveButton {
