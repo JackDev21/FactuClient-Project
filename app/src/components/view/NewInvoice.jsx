@@ -165,7 +165,9 @@ export default function NewInvoice() {
               {filteredDeliveryNotes.map((deliveryNote) => (
                 <li
                   key={deliveryNote.id}
-                  className="mb-4 flex cursor-pointer flex-wrap gap-2 rounded-lg bg-blue-50 p-2 shadow-md transition duration-300 hover:bg-blue-100"
+                  className={`mb-4 flex cursor-pointer flex-wrap gap-2 rounded-lg p-2 shadow-md transition duration-300 ${
+                    deliveryNote.isInvoiced ? "bg-orange-300" : "bg-blue-50"
+                  }`}
                 >
                   <input
                     className="h-6 w-6 cursor-pointer rounded border-gray-400 text-blue-600 focus:ring-blue-500"

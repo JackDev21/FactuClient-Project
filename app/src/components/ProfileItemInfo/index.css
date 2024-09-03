@@ -6,11 +6,11 @@
   }
 
   .ProfileInfoContainer {
-    @apply flex w-full flex-col items-center;
+    @apply relative flex w-full flex-col items-center;
   }
 
   .ProfileInfo {
-    @apply flex w-full flex-col items-center text-xl font-extrabold;
+    @apply flex w-full flex-col items-center text-center text-xl font-extrabold;
   }
   .SpanText {
     @apply w-auto text-[1.1rem] font-bold text-orange-800 underline;
