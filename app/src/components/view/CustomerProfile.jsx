@@ -128,10 +128,10 @@ export default function CustomerProfile() {
       <Main className="CustomerProfile">
         {showCustomerData === "Data" && (
           <>
-            <FiEdit3
-              onClick={handleUpdateProfile}
-              className="relative left-[4rem] top-[1.5rem] cursor-pointer text-3xl hover:text-orange-400"
-            />
+            <div className="relative left-[4rem] top-[1.5rem] z-30 w-auto cursor-pointer">
+              <FiEdit3 onClick={handleUpdateProfile} className="text-3xl hover:text-orange-400" />
+            </div>
+
             <div className="ProfileInfoContainer">
               <ProfileInfoItem label="UserName " value={customer?.username} />
               <ProfileInfoItem label="Nombre " value={customer?.fullName} />

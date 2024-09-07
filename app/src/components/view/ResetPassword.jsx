@@ -57,7 +57,7 @@ export default function ResetPassword() {
           <PasswordField id="password" type="password" placeholder="Password" />
           <PasswordField id="confirmPassword" type="password" placeholder="Repite tu Password" />
           <Button className="mt-10" type="submit">
-            Reset Password
+            Enviar
           </Button>
         </form>
       </Main>
