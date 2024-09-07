@@ -1,0 +1,1 @@
+curl -X POST http://localhost:7070/request-password-reset -H "Content-Type: application/json" -d '{"email":"jose.a.c.lopez@gmail.com"}' -v

@@ -66,8 +66,12 @@ export default function Login() {
         <form className="LoginForm" onSubmit={handleLoginSubmit}>
           <Field id="username" type="text" placeholder="Username"></Field>
           <PasswordField id="password" placeholder="Password"></PasswordField>
+          <Link to="/request-password-reset">
+            <span className="-mt-8 w-[16rem] text-right font-medium">
+              <em>Olvidé mi contraseña</em>
+            </span>
+          </Link>
           <Button type="submit">Login</Button>
-
           <div className="Link">
             <p>
               ¿No tienes cuenta?

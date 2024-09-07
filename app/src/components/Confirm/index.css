@@ -2,7 +2,7 @@
 
 @layer components {
   .Confirm {
-    @apply absolute mx-auto w-auto flex-1 flex-col items-center rounded-lg bg-[#e4e4e4] p-4 shadow-custom-shadow;
+    @apply absolute mx-auto w-[20rem] flex-1 flex-col items-center rounded-lg bg-[#e4e4e4] p-4 shadow-custom-shadow;
   }
 
   .Confirm h2 {

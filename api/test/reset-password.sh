@@ -1,0 +1,1 @@
+curl -X POST http://localhost:7070/reset-password/66cddd1cda2e8a2e8682ee70/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3MjU2MTgzNjQsImV4cCI6MTcyNjIyMzE2NH0.S9Qlr1y4EFHp1w9AWfp_JR36sX3wDFZbBDinn6CFINA -H "Content-Type: application/json" -d '{"password":"1234","passwordRepeat":"1234"}' -v

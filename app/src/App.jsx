@@ -17,10 +17,12 @@ import InvoiceInfo from "./components/view/InvoiceInfo"
 import NewInvoice from "./components/view/NewInvoice"
 import Alert from "./components/Alert"
 import CustomerInfo from "./components/view/CustomerInfo"
+import RequestPassword from "./components/view/RequestPassword"
 
 import logic from "./logic/index"
 
 import "./global.css"
+import ResetPassword from "./components/view/ResetPassword"
 
 function App() {
   const [message, setMessage] = useState(null)
@@ -52,6 +54,9 @@ function App() {
 
           <Route path="/delivery-notes" element={<DeliveryNoteList />} />
           <Route path="/delivery-notes/:deliveryNoteId" element={<DeliveryInfo />} />
+
+          <Route path="/request-password-reset" element={<RequestPassword />} />
+          <Route path="/reset-password/:userId/:token" element={<ResetPassword />} />
         </Routes>
 
         {message && <Alert message={message} onAccept={handleAlertAccepted} />}

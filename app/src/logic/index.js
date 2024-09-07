@@ -29,6 +29,11 @@ import updateCustomerProfile from "./updateCustomerProfile.js"
 
 import addNewObservation from "./addNewObservation.js"
 
+import requestPasswordReset from "./requestPasswordReset.js"
+import resetPassword from "./resetPassword.js"
+
+
+
 
 const logic = {
   isUserLoggedIn,
@@ -61,7 +66,11 @@ const logic = {
   deleteInvoice,
   getAllInvoicesCustomer,
 
-  addNewObservation
+  addNewObservation,
+
+  requestPasswordReset,
+  resetPassword,
+
 }
 
 export default logic

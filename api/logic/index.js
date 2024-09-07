@@ -26,6 +26,9 @@ import getAllInvoicesCustomer from "./getAllInvoicesCustomer.js"
 
 import addNewObservation from "./addNewObservation.js"
 
+import requestPasswordReset from "./requestPasswordReset.js"
+import resetPassword from "./resetPassword.js"
+
 const logic = {
   registerUser,
   authenticateUser,
@@ -53,7 +56,10 @@ const logic = {
   deleteInvoice,
   getAllInvoicesCustomer,
 
-  addNewObservation
+  addNewObservation,
+
+  requestPasswordReset,
+  resetPassword,
 }
 
 export default logic

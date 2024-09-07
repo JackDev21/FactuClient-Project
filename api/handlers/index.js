@@ -25,6 +25,8 @@ import getAllInvoicesCustomerHandler from "./getAllInvoicesCustomerHandler.js"
 
 import addNewObservation from "./addNewObservationHandler.js"
 
+import requestPasswordResetHandler from "./requestPasswordResetHandler.js"
+import resetPasswordHandler from "./resetPasswordHandler.js"
 
 
 export default {
@@ -55,4 +57,7 @@ export default {
   getAllInvoicesCustomerHandler,
 
   addNewObservation,
+
+  requestPasswordResetHandler,
+  resetPasswordHandler,
 }

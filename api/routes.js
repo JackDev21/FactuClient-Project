@@ -34,5 +34,8 @@ router.get("/:customerId/invoices", routes.getAllInvoicesCustomerHandler)
 
 router.patch("/observation/delivery-note/:deliveryNoteId", jsonBodyParser, routes.addNewObservation)
 
+router.post("/request-password-reset", jsonBodyParser, routes.requestPasswordResetHandler)
+
+router.post("/reset-password/:userId/:token", jsonBodyParser, routes.resetPasswordHandler)
 
 export default router
