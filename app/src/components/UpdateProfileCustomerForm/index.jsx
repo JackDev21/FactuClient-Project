@@ -11,7 +11,7 @@ export default function UpdateCustomerProfileForm({ onUpdateProfile, customer })
 
     const target = event.target
 
-    const username = target.username.value
+    const username = target.username.value.trim()
     const password = target.password.value
     const fullName = target.fullName.value
     const email = target.email.value

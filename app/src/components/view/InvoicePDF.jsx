@@ -51,7 +51,13 @@ const styles = StyleSheet.create({
     marginBottom: 10
   },
   column: {
-    width: "45%"
+    flex: 1,
+    paddingRight: 5
+  },
+  rightColumn: {
+    flex: 1,
+    paddingRight: 5,
+    alignItems: "flex-end"
   },
   logo: {
     width: 100,
@@ -102,7 +108,8 @@ const styles = StyleSheet.create({
   },
   clientText: {
     fontSize: 12,
-    color: "#333333"
+    color: "#333333",
+    whiteSpace: "nowrap"
   },
   invoiceText: {
     fontSize: 12,
@@ -111,7 +118,8 @@ const styles = StyleSheet.create({
   clientDataText: {
     fontSize: 10,
     fontWeight: "extrabold",
-    color: "#333333"
+    color: "#333333",
+    whiteSpace: "nowrap"
   },
   paymentText: {
     fontSize: 10,
@@ -137,7 +145,7 @@ const InvoicePDF = ({ invoice, total, iva }) => {
         <View style={styles.section}>
           <View style={styles.row}>
             {invoice?.company?.companyLogo && <Image style={styles.logo} src={invoice.company.companyLogo} />}
-            <View style={styles.column}>
+            <View style={styles.rightColumn}>
               {invoice?.company && (
                 <>
                   <Text style={styles.companyText}>{invoice.company.companyName}</Text>
@@ -163,7 +171,7 @@ const InvoicePDF = ({ invoice, total, iva }) => {
                 </>
               )}
             </View>
-            <View style={styles.column}>
+            <View style={styles.rightColumn}>
               <Text style={styles.invoiceText}>Fra.Nº: {invoice.number}</Text>
               <Text style={styles.invoiceText}>Fecha Factura: {formatDate(invoice.date)}</Text>
             </View>
