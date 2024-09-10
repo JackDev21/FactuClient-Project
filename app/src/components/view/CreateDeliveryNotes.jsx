@@ -22,6 +22,7 @@ export default function CreateDeliveryNotes() {
   const [showFormWork, setShowFormWork] = useState(false)
   const [deliveryNoteUpdated, setDeliveryNoteUpdated] = useState(null)
   const [showObservationInput, setShowObservationInput] = useState(false)
+  const [isEditingDate, setIsEditingDate] = useState(false)
 
   useEffect(() => {
     try {
@@ -96,6 +97,44 @@ export default function CreateDeliveryNotes() {
     setShowObservationInput(!showObservationInput)
   }
 
+  const handleDateChange = (event) => {
+    const newDate = event.target.value
+    setDeliveryNote((prevState) => ({
+      ...prevState,
+      date: newDate
+    }))
+  }
+
+  const handleUpdateDeliveryNoteDate = (event) => {
+    event.preventDefault()
+
+    const target = event.target
+    const date = target.date.value
+
+    const convertToISODate = (date) => {
+      const [day, month, year] = date.split("-")
+      return `${year}/${month}/${day}`
+    }
+
+    try {
+      //prettier-ignore
+      logic.updateDeliveryNoteDate(customerId, deliveryNote.id, convertToISODate(date))
+        .then((deliveryNoteUpdated) => {
+          setDeliveryNoteUpdated(deliveryNoteUpdated)
+          setIsEditingDate(false)
+        })
+        .catch((error) => {
+          alert(error.message)
+        })
+    } catch (error) {
+      alert(error.message)
+    }
+  }
+
+  const toggleEditDate = () => {
+    setIsEditingDate(!isEditingDate)
+  }
+
   return (
     <>
       <Header>{deliveryNote?.company?.companyName && deliveryNote.company.companyName}</Header>
@@ -108,7 +147,18 @@ export default function CreateDeliveryNotes() {
         <div className="DeliveryWork">
           <div className="TitleDateContainer">
             {deliveryNote?.number && <p className="DeliveryNumber">Albarán nº:{deliveryNote.number}</p>}
-            {deliveryNote?.date && <Time className={"DeliveryDate"}>{deliveryNote.date}</Time>}
+            {isEditingDate ? (
+              <form onSubmit={handleUpdateDeliveryNoteDate}>
+                <input type="date" id="date" value={deliveryNote?.date || ""} onChange={handleDateChange} />
+                <button type="submit" className="SaveDateButton">
+                  <TfiSave />
+                </button>
+              </form>
+            ) : (
+              <p onClick={toggleEditDate} className="DeliveryDate">
+                {deliveryNote?.date ? new Date(deliveryNote.date).toLocaleDateString() : "Sin fecha"}
+              </p>
+            )}
           </div>
           <div className="DeliveryTitleInfo">
             <h6>Concepto</h6>

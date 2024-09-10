@@ -8,7 +8,7 @@ const updateDeliveryNoteDate = (customerId, deliveryNoteId, date) => {
 
   const body = { date }
 
-  return fetch(`${import.meta.env.VITE_API_URL}/update-date/:${customerId}/:${deliveryNoteId}`, {
+  return fetch(`${import.meta.env.VITE_API_URL}/update-date/${customerId}/${deliveryNoteId}`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
