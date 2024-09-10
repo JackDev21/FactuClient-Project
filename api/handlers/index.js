@@ -7,12 +7,13 @@ import registerCustomHandler from "./registerCustomerHandler.js"
 import getAllCustomersHandler from "./getAllCustomersHandler.js"
 import getProfileUserHandler from "./getProfileUserHandler.js"
 import deleteCustomerHandler from "./deleteCustomerHandler.js"
+import updateCustomerProfileHandler from "./updateCustomerProfileHandler.js"
 
 import getAllDeliveryNotesHandler from "./getAlldeliveryNotesHandler.js"
 import getDeliveryNoteHandler from "./getDeliveryNoteHandler.js"
 import deleteDeliveryNoteHandler from "./deleteDeliveryNoteHandler.js"
 import getAllDeliveryNotesCustomerHandler from "./getAllDeliveryNotesCustomerHandler.js"
-import updateCustomerProfileHandler from "./updateCustomerProfileHandler.js"
+import updateDateDeliveryNoteHandler from "./updateDeliveryNoteDateHandler.js"
 
 import createDeliveryNoteHandler from "./createDeliveryNoteHandler.js"
 import createWorkHandler from "./createWorkHandler.js"
@@ -39,12 +40,13 @@ export default {
   registerCustomHandler,
   getAllCustomersHandler,
   deleteCustomerHandler,
+  updateCustomerProfileHandler,
 
   getAllDeliveryNotesCustomerHandler,
   getAllDeliveryNotesHandler,
   getDeliveryNoteHandler,
   deleteDeliveryNoteHandler,
-  updateCustomerProfileHandler,
+  updateDateDeliveryNoteHandler,
 
   createDeliveryNoteHandler,
 

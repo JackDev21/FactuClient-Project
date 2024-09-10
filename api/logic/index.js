@@ -23,11 +23,13 @@ import getInvoice from "./getInvoice.js"
 import createInvoice from "./createInvoice.js"
 import deleteInvoice from "./deleteInvoice.js"
 import getAllInvoicesCustomer from "./getAllInvoicesCustomer.js"
+import updateDeliveryNoteDate from "./updateDeliveryNoteDate.js"
 
 import addNewObservation from "./addNewObservation.js"
 
 import requestPasswordReset from "./requestPasswordReset.js"
 import resetPassword from "./resetPassword.js"
+
 
 const logic = {
   registerUser,
@@ -46,6 +48,7 @@ const logic = {
   getDeliveryNote,
   deleteDeliveryNote,
   getAllDeliveryNotesCustomer,
+  updateDeliveryNoteDate,
 
   createDeliveryNote,
   createWork,
