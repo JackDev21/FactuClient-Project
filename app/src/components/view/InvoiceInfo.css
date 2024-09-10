@@ -19,7 +19,7 @@
   }
 
   .DataContainer {
-    @apply relative bottom-5 flex w-full justify-between rounded-lg border border-gray-500 p-1 text-sm;
+    @apply relative bottom-5 flex w-[95%] justify-between rounded-lg border border-gray-500 p-1 text-sm;
   }
 
   .CompanyData {
