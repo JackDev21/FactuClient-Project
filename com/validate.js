@@ -11,6 +11,7 @@ export const COMPANY_NAME_REGEX = /^[a-zA-Z0-9 ,.&áéíóúÁÉÍÓÚñÑ]+$/
 export const ADDRESS_REGEX = /^[a-zA-Z0-9 ,.áéíóúÁÉÍÓÚñÑ/ºª]+$/
 export const IBANREGEX = /^[A-Z]{2}\d{2}\s?\d{4}\s?\d{4}\s?\d{2}\s?\d{10}$/i
 export const NUMBERREGEX = /^\d+(\.\d{1,2})?$/
+export const dateRegex = /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/\d{4}$/
 
 function validateName(name, explain = "name") {
   if (typeof name !== "string" || !NAME_REGEX.test(name)) {
@@ -93,6 +94,18 @@ function validateNumber(number, explain = "Number") {
   }
 }
 
+export function validateDate(date, explain = "date") {
+  if (typeof date !== "string" || !dateRegex.test(date)) {
+    throw new ContentError(`${explain} is not valid`);
+  }
+
+  const [day, month, year] = date.split('/').map(Number);
+  const parsedDate = new Date(year, month - 1, day);
+  if (parsedDate.getFullYear() !== year || parsedDate.getMonth() !== month - 1 || parsedDate.getDate() !== day) {
+    throw new ContentError(`${explain} is not a valid date`);
+  }
+}
+
 const validate = {
   name: validateName,
   username: validateUsername,
@@ -107,7 +120,8 @@ const validate = {
   companyName: validateCompanyName,
   address: validateAddress,
   iban: validateIban,
-  number: validateNumber
+  number: validateNumber,
+  date: validateDate
 }
 
 export default validate

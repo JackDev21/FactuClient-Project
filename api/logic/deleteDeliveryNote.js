@@ -1,5 +1,5 @@
 import validate from "com/validate.js"
-import { User, DeliveryNote } from "../model/index.js"
+import { User, DeliveryNote, Work } from "../model/index.js"
 import { MatchError, NotFoundError, SystemError } from "com/errors.js"
 
 const deleteDeliveryNote = (userId, deliveryNoteId) => {
@@ -24,9 +24,13 @@ const deleteDeliveryNote = (userId, deliveryNoteId) => {
             throw new MatchError("Can not delete Delivery Note from another company")
           }
 
-          return DeliveryNote.deleteOne({ _id: deliveryNoteId })
+          return Work.deleteMany({ _id: { $in: deliveryNote.works } })
             .catch(error => { throw new SystemError(error.message) })
-            .then(() => { })
+            .then(() => {
+              return DeliveryNote.deleteOne({ _id: deliveryNoteId })
+                .catch(error => { throw new SystemError(error.message) })
+                .then(() => { })
+            })
         })
     })
 }

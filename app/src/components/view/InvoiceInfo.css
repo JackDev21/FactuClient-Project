@@ -23,11 +23,11 @@
   }
 
   .CompanyData {
-    @apply ml-2 flex flex-col p-1 font-medium;
+    @apply flex flex-col p-1 font-medium;
   }
 
   .CustomerData {
-    @apply mr-2 flex w-[16rem] flex-col p-1 font-bold;
+    @apply flex w-full flex-col font-bold;
   }
 
   .DataText {

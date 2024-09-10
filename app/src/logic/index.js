@@ -16,6 +16,7 @@ import getAllDeliveryNotesCustomer from "./getAllDeliveryNotesCustomer.js"
 import getAllDeliveryNotes from "./getAllDeliveryNotes.js"
 import getDeliveryNote from "./getDeliveryNote.js"
 import deleteDeliveryNote from "./deleteDeliveryNote.js"
+import updateDeliveryNoteDate from "./updateDeliveryNoteDate.js"
 
 import createDeliveryNote from "./createDeliveryNote.js"
 import createWork from "./createWork.js"
@@ -55,6 +56,7 @@ const logic = {
   getAllDeliveryNotes,
   getDeliveryNote,
   deleteDeliveryNote,
+  updateDeliveryNoteDate,
 
 
   createDeliveryNote,
