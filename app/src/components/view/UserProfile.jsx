@@ -15,15 +15,7 @@ import "./UserProfile.css"
 export default function UserProfile() {
   const [user, setUser] = useState(null)
 
-  let payload
-  try {
-    if (sessionStorage.token) {
-      payload = extractPayloadJwt(sessionStorage.token)
-    }
-  } catch (error) {
-    alert(error.message)
-  }
-  const { sub: userId } = payload
+  const { sub: userId } = extractPayloadJwt(sessionStorage.token)
 
   useEffect(() => {
     try {
