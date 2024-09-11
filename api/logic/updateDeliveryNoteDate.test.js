@@ -10,8 +10,8 @@ mongoose.connect(MONGODB_URL)
 
     try {
       updateDeliveryNoteDate(
-        "66cddd1cda2e8a2e8682ee70", "66cdde45da2e8a2e8683466d", "66debaeb996c3e147553826f",
-        "13/09/2024"
+        "66cddd1cda2e8a2e8682ee70", "66e15bda2e27acebef8f345b",
+        "25/09/2024"
       )
         .then(() => {
           console.log("Delivery note date updated")

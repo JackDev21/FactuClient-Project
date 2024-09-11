@@ -1,14 +1,13 @@
 import errors, { SystemError } from "com/errors"
 import validate from "com/validate"
 
-const updateDeliveryNoteDate = (customerId, deliveryNoteId, date) => {
-  validate.id(customerId, "customerId")
+const updateDeliveryNoteDate = (deliveryNoteId, date) => {
   validate.id(deliveryNoteId, "deliveryNoteId")
   validate.date(date, "date")
 
   const body = { date }
 
-  return fetch(`${import.meta.env.VITE_API_URL}/update-date/${customerId}/${deliveryNoteId}`, {
+  return fetch(`${import.meta.env.VITE_API_URL}/update-date/${deliveryNoteId}`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",

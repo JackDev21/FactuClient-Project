@@ -11,13 +11,13 @@ export default ((req, res, next) => {
     const token = req.headers.authorization.slice(7)
     const { date } = req.body
     const { deliveryNoteId } = req.params
-    const { customerId } = req.params
+
 
     jwt.verify(token, JWT_SECRET)
       .then(payload => {
         const { sub: userId } = payload
         try {
-          logic.updateDeliveryNoteDate(userId, customerId, deliveryNoteId, date)
+          logic.updateDeliveryNoteDate(userId, deliveryNoteId, date)
             .then(() => res.status(200).send())
             .catch(error => next(error))
 

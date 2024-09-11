@@ -3,9 +3,8 @@ import { User, DeliveryNote } from "../model/index.js"
 import { NotFoundError, SystemError } from "com/errors.js"
 
 
-const updateDateDeliveryNote = (userId, customerId, deliveryNoteId, date) => {
+const updateDateDeliveryNote = (userId, deliveryNoteId, date) => {
   validate.id(userId, "userId")
-  validate.id(customerId, "customerId")
   validate.id(deliveryNoteId, "deliveryNoteId")
   validate.date(date, "date")
 
@@ -20,24 +19,16 @@ const updateDateDeliveryNote = (userId, customerId, deliveryNoteId, date) => {
         throw new NotFoundError("User not found")
       }
 
-
-      return User.findById(customerId).select("-__v").lean()
+      return DeliveryNote.findByIdAndUpdate(deliveryNoteId, { date: dateObj }, { new: true }).select("-__v").lean()
         .catch(error => { throw new SystemError(error.message) })
-        .then(customer => {
-          if (!customer) {
-            throw new NotFoundError("Customer not found")
+        .then(updatedDeliveryNote => {
+          if (!updatedDeliveryNote) {
+            throw new NotFoundError("Delivery note not found")
           }
 
-          return DeliveryNote.findByIdAndUpdate(deliveryNoteId, { date: dateObj }, { new: true }).select("-__v").lean()
-            .catch(error => { throw new SystemError(error.message) })
-            .then(updatedDeliveryNote => {
-              if (!updatedDeliveryNote) {
-                throw new NotFoundError("Delivery note not found")
-              }
-
-              return updateDateDeliveryNote
-            })
+          return updateDateDeliveryNote
         })
+
     })
 
 }

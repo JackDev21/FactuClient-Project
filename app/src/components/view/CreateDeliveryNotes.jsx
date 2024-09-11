@@ -116,17 +116,21 @@ export default function CreateDeliveryNotes() {
       return `${year}/${month}/${day}`
     }
 
+    const isoDate = convertToISODate(date)
+
     try {
       //prettier-ignore
-      logic.updateDeliveryNoteDate(customerId, deliveryNote.id, convertToISODate(date))
-        .then((deliveryNoteUpdated) => {
-          setDeliveryNoteUpdated(deliveryNoteUpdated)
-          setIsEditingDate(false)
-        })
-        .catch((error) => {
-          alert(error.message)
-        })
+      logic.updateDeliveryNoteDate(deliveryNote.id, isoDate)
+      .then((deliveryNoteUpdated) => {
+        setDeliveryNoteUpdated(deliveryNoteUpdated)
+        setIsEditingDate(false)
+      })
+      .catch((error) => {
+        console.error("Error en la actualización:", error.message)
+        alert(error.message)
+      })
     } catch (error) {
+      console.error("Error en el try-catch:", error.message)
       alert(error.message)
     }
   }
@@ -149,14 +153,14 @@ export default function CreateDeliveryNotes() {
             {deliveryNote?.number && <p className="DeliveryNumber">Albarán nº:{deliveryNote.number}</p>}
             {isEditingDate ? (
               <form onSubmit={handleUpdateDeliveryNoteDate}>
-                <input type="date" id="date" value={deliveryNote?.date || ""} onChange={handleDateChange} />
-                <button type="submit" className="SaveDateButton">
+                <input type="date" id="date" value={deliveryNote?.date} onChange={handleDateChange} />
+                <button type="submit">
                   <TfiSave />
                 </button>
               </form>
             ) : (
               <p onClick={toggleEditDate} className="DeliveryDate">
-                {deliveryNote?.date ? new Date(deliveryNote.date).toLocaleDateString() : "Sin fecha"}
+                {deliveryNote?.date && <Time>{deliveryNote.date}</Time>}
               </p>
             )}
           </div>

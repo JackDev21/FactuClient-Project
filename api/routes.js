@@ -22,7 +22,7 @@ router.patch("/customers/:customerId/update", jsonBodyParser, routes.updateCusto
 router.get("/delivery-notes", routes.getAllDeliveryNotesHandler)
 router.get("/delivery-notes/:deliveryNoteId", routes.getDeliveryNoteHandler)
 router.delete("/delivery-notes/:deliveryNoteId", routes.deleteDeliveryNoteHandler)
-router.patch("/update-date/:customerId/:deliveryNoteId", jsonBodyParser, routes.updateDateDeliveryNoteHandler)
+router.patch("/update-date/:deliveryNoteId", jsonBodyParser, routes.updateDateDeliveryNoteHandler)
 
 router.post("/create/delivery-notes/:customerId", jsonBodyParser, routes.createDeliveryNoteHandler)
 router.patch("/create/work/delivery-notes/:deliveryNoteId", jsonBodyParser, routes.createWorkHandler)
