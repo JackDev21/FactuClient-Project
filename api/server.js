@@ -11,7 +11,23 @@ const { PORT, MONGODB_URL } = process.env
 mongoose.connect(MONGODB_URL)
   .then(() => {
     const api = express()
-    api.use(cors())
+
+    // Configurar CORS con opciones específicas
+    const allowedOrigins = ['http://localhost:5173', 'https://factuclient.netlify.app']
+
+    const corsOptions = {
+      origin: (origin, callback) => {
+        if (!origin || allowedOrigins.includes(origin)) {
+          callback(null, true)
+        } else {
+          callback(new Error('Not allowed by CORS'))
+        }
+      },
+      methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
+      allowedHeaders: ['Authorization', 'Content-Type']
+    }
+
+    api.use(cors(corsOptions))
 
     api.get("/", (req, res) => {
       res.send("hellow world")
