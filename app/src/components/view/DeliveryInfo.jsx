@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom"
 import { PDFDownloadLink } from "@react-pdf/renderer"
 import { FaRegFilePdf } from "react-icons/fa6"
 import { FaSpinner } from "react-icons/fa"
+import { TfiSave } from "react-icons/tfi"
 
 import { GiStabbedNote } from "react-icons/gi"
 import { MdDeleteForever } from "react-icons/md"
@@ -29,6 +30,7 @@ export default function DeliveryInfo() {
   const [deliveryNote, setDeliveryNote] = useState(null)
   const [total, setTotal] = useState(0)
   const [showConfirmDelete, setShowConfirmDelete] = useState(false)
+  const [isEditingDate, setIsEditingDate] = useState(false)
 
   useEffect(() => {
     try {
@@ -74,6 +76,50 @@ export default function DeliveryInfo() {
     setShowConfirmDelete(!showConfirmDelete)
   }
 
+  const handleDateChange = (event) => {
+    const newDate = event.target.value
+    setDeliveryNote((prevState) => ({
+      ...prevState,
+      date: newDate
+    }))
+  }
+
+  const handleUpdateDeliveryNoteDate = (event) => {
+    event.preventDefault()
+
+    const target = event.target
+    const date = target.date.value
+
+    const convertToISODate = (date) => {
+      const [day, month, year] = date.split("-")
+      return `${year}/${month}/${day}`
+    }
+
+    const isoDate = convertToISODate(date)
+
+    try {
+      //prettier-ignore
+      logic.updateDeliveryNoteDate(deliveryNote.id, isoDate)
+      .then((deliveryNoteUpdated) => {
+        setDeliveryNote(deliveryNoteUpdated)
+        setIsEditingDate(false)
+        navigate(-1)
+
+      })
+      .catch((error) => {
+        console.error("Error en la actualización:", error.message)
+        alert(error.message)
+      })
+    } catch (error) {
+      console.error("Error en el try-catch:", error.message)
+      alert(error.message)
+    }
+  }
+
+  const toggleEditDate = () => {
+    setIsEditingDate(!isEditingDate)
+  }
+
   return (
     <>
       <Header
@@ -96,7 +142,18 @@ export default function DeliveryInfo() {
         <div className="DeliveryWork">
           <div className="TitleDateContainer">
             {deliveryNote?.number && <p className="DeliveryNumber">Albarán nº: {deliveryNote.number}</p>}
-            {deliveryNote?.date && <Time className={"DeliveryDate"}>{deliveryNote.date}</Time>}
+            {isEditingDate ? (
+              <form onSubmit={handleUpdateDeliveryNoteDate}>
+                <input type="date" id="date" value={deliveryNote?.date} onChange={handleDateChange} />
+                <button type="submit">
+                  <TfiSave />
+                </button>
+              </form>
+            ) : (
+              <p onClick={toggleEditDate} className="DeliveryDate">
+                {deliveryNote?.date && <Time>{deliveryNote.date}</Time>}
+              </p>
+            )}
           </div>
           <div className="DeliveryTitleInfo">
             <h6>Concepto</h6>
