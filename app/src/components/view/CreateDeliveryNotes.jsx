@@ -116,21 +116,17 @@ export default function CreateDeliveryNotes() {
       return `${year}/${month}/${day}`
     }
 
-    const isoDate = convertToISODate(date)
-
     try {
       //prettier-ignore
-      logic.updateDeliveryNoteDate(deliveryNote.id, isoDate)
-      .then((deliveryNoteUpdated) => {
-        setDeliveryNoteUpdated(deliveryNoteUpdated)
-        setIsEditingDate(false)
-      })
-      .catch((error) => {
-        console.error("Error en la actualización:", error.message)
-        alert(error.message)
-      })
+      logic.updateDeliveryNoteDate( deliveryNote.id, convertToISODate(date) )
+        .then((deliveryNoteUpdated) => {
+          setDeliveryNoteUpdated(deliveryNoteUpdated)
+          setIsEditingDate(false)
+        })
+        .catch((error) => {
+          alert(error.message)
+        })
     } catch (error) {
-      console.error("Error en el try-catch:", error.message)
       alert(error.message)
     }
   }
