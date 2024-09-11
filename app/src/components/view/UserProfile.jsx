@@ -30,7 +30,7 @@ export default function UserProfile() {
     } catch (error) {
       alert(error.message)
     }
-  }, [user])
+  }, [userId])
 
   return (
     <>
