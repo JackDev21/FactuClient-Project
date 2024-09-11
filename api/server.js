@@ -24,10 +24,14 @@ mongoose.connect(MONGODB_URL)
         }
       },
       methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
-      allowedHeaders: ['Authorization', 'Content-Type']
+      allowedHeaders: ['Authorization', 'Content-Type'],
+      credentials: true // Permitir el envío de credenciales
     }
 
     api.use(cors(corsOptions))
+
+    // Manejar solicitudes preflight (OPTIONS)
+    api.options('*', cors(corsOptions))
 
     api.get("/", (req, res) => {
       res.send("hellow world")
