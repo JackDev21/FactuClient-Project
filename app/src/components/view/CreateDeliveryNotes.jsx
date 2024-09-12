@@ -120,7 +120,7 @@ export default function CreateDeliveryNotes() {
       //prettier-ignore
       logic.updateDeliveryNoteDate( deliveryNote.id, convertToISODate(date) )
         .then((deliveryNoteUpdated) => {
-          setDeliveryNoteUpdated(deliveryNoteUpdated)
+          setDeliveryNoteUpdated((prevState) => ({ ...prevState,  deliveryNoteUpdated }))
           setIsEditingDate(false)
         })
         .catch((error) => {
