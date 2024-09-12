@@ -86,7 +86,7 @@ export default function DeliveryInfo() {
       <Main className={"MainDeliveryInfo"}>
         <div className="DeliveryInfoCustomer">
           {deliveryNote?.customer && (
-            <ul className="flex flex-col items-center">
+            <ul className="flex flex-col items-center text-center">
               <li>{deliveryNote.customer.companyName}</li>
               <li>{deliveryNote.customer.address}</li>
               <li>{deliveryNote.customer.taxId}</li>

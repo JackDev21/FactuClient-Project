@@ -22,7 +22,7 @@
     @apply ml-1 font-normal;
   }
   .DeliveryInfoCustomer {
-    @apply flex w-[80%] flex-col items-center font-bold;
+    @apply flex w-[80%] flex-col items-center text-center font-bold;
   }
 
   .DeliveryNumber {
