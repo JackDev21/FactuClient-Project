@@ -41,7 +41,7 @@ export default function CreateDeliveryNotes() {
     event.preventDefault()
 
     const target = event.target
-    const concept = target.concept.value
+    const concept = target.concept.value.trim()
     const quantity = parseFloat(target.quantity.value)
     const price = parseFloat(target.price.value)
 
@@ -69,7 +69,7 @@ export default function CreateDeliveryNotes() {
     event.preventDefault()
 
     const target = event.target
-    const observation = target.observation.value
+    const observation = target.observation.value.trim()
 
     try {
       //prettier-ignore
