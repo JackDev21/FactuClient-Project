@@ -41,9 +41,11 @@ export default function CreateDeliveryNotes() {
     event.preventDefault()
 
     const target = event.target
-    const concept = target.concept.value.trim()
+    let concept = target.concept.value.trim()
     const quantity = parseFloat(target.quantity.value)
     const price = parseFloat(target.price.value)
+
+    concept = concept.replace(/\s+/g, ' ')
 
     try {
       //prettier-ignore
