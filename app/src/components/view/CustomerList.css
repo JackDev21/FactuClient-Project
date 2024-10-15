@@ -2,14 +2,18 @@
 
 @layer components {
   .CustomerList {
-    @apply flex flex-col gap-1;
+    @apply flex w-full flex-col font-medium;
   }
 
   .Customer {
-    @apply cursor-pointer rounded-2xl p-1 text-[1.3rem] font-medium;
+    @apply mb-2 ml-2 cursor-pointer p-1 text-center text-[1.1rem];
     text-shadow: 1px 1px 5px rgba(255, 132, 0, 0.5);
   }
   .Customer:hover {
     @apply text-orange-500;
+  }
+
+  .CustomerLink {
+    @apply cursor-pointer items-center rounded-2xl p-1 font-medium;
   }
 }

@@ -11,4 +11,8 @@
   .CustomerButtons {
     @apply -mt-2 w-[8.5rem] cursor-pointer;
   }
+
+  .CustomerName {
+    @apply w-[90%] text-center text-[1.1rem] font-bold;
+  }
 }

@@ -128,7 +128,7 @@ export default function CustomerProfile() {
       <Main className="CustomerProfile">
         {showCustomerData === "Data" && (
           <>
-            <div className="relative left-[4rem] top-[1.5rem] z-30 w-auto cursor-pointer">
+            <div className="relative left-[4rem] top-[2rem] z-30 w-auto cursor-pointer text-violet-700">
               <FiEdit3 onClick={handleUpdateProfile} className="text-3xl hover:text-orange-400" />
             </div>
 

@@ -64,7 +64,7 @@ export default function CustomerList() {
         <SearchFilter searchTerm={searchTerm} setSearchTerm={setSearchTerm} placeholder="Busca nombre de cliente" />
         <ul className="CustomerList">
           {filterCustomers().map((customer) => (
-            <Link to={`/customers/profile/${customer.id}`} key={customer.id}>
+            <Link to={`/customers/profile/${customer.id}`} key={customer.id} className="CustomerLink">
               {customer?.companyName && <li className="Customer">{customer.companyName}</li>}
             </Link>
           ))}

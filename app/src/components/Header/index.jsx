@@ -129,7 +129,7 @@ export default function Header({
               {iconLeftHeader}
             </div>
             <div className="IconUser">{iconUser}</div>
-            <div className="Children">{children}</div>
+            <div className="CustomerName">{children}</div>
           </div>
         )}
 

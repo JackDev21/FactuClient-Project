@@ -6,7 +6,7 @@
   }
 
   .ProfileInfoContainer {
-    @apply relative flex w-full flex-col items-center;
+    @apply relative mt-1 flex w-full flex-col items-center p-1;
   }
 
   .ProfileInfo {

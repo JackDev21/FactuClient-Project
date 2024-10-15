@@ -2,15 +2,15 @@
 
 @layer components {
   .DeliveryList {
-    @apply flex w-[95%] flex-col items-start gap-3;
+    @apply flex w-full flex-col items-center gap-2;
   }
 
   .DeliveryLink {
-    @apply flex items-center;
+    @apply flex w-full px-2;
   }
 
   .DeliveryNote {
-    @apply flex cursor-pointer p-1 text-[1.2rem] font-medium;
+    @apply flex w-full cursor-pointer p-1 text-[1.1rem] font-medium;
     text-shadow: 1px 1px 5px rgba(255, 132, 0, 0.5);
   }
 
