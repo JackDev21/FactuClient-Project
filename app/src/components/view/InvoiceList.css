@@ -2,11 +2,11 @@
 
 @layer components {
   .InvoiceList {
-    @apply flex w-[95%] flex-col items-start gap-2;
+    @apply flex w-[95%] flex-col gap-2;
   }
 
   .InvoiceLink {
-    @apply flex;
+    @apply flex items-start;
   }
 
   .Invoice {
