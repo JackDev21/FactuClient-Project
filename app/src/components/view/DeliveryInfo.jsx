@@ -146,8 +146,6 @@ export default function DeliveryInfo() {
           </PDFDownloadLink>
         )}
       </Main>
-
-      <Footer>FactuClient</Footer>
     </>
   )
 }

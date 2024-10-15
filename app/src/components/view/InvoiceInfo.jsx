@@ -173,8 +173,6 @@ export default function InvoiceInfo() {
           </PDFDownloadLink>
         )}
       </Main>
-
-      <Footer>FactuClient</Footer>
     </>
   )
 }
