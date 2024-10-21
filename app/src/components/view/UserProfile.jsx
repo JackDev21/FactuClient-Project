@@ -52,7 +52,7 @@ export default function UserProfile() {
           <ProfileInfoItem label="Nº Móvil" value={user?.phone} />
           <ProfileInfoItem label="Email" value={user?.email} />
           <ProfileInfoItem label="IBAN" value={user?.bankAccount} />
-          <ProfileInfoItem label="IRPF" value={`${user?.irpf} %`} />
+          <ProfileInfoItem label="IRPF" value={`${user?.irpf} %` || 0} />
         </div>
       </Main>
       <Footer>FactuClient</Footer>
