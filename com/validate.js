@@ -10,7 +10,6 @@ export const PHONE_REGEX = /^(6|7|8|9)\d{8}$/
 export const COMPANY_NAME_REGEX = /^[a-zA-Z0-9 ,.&áéíóúÁÉÍÓÚñÑ]+$/
 export const ADDRESS_REGEX = /^[\w\s,.áéíóúÁÉÍÓÚñÑ/ºª\-]+$/u
 export const IBANREGEX = /^[A-Z]{2}\d{2}\s?\d{4}\s?\d{4}\s?\d{2}\s?\d{10}$/i
-export const NUMBERREGEX = /^\d+(\.\d{1,2})?$/
 export const dateRegex = /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/\d{4}$/
 
 function validateName(name, explain = "name") {
@@ -89,11 +88,10 @@ function validateIban(iban, explain = "IBAN") {
 }
 
 function validateNumber(number, explain = "Number") {
-  if (typeof number !== "number" || !NUMBERREGEX.test(number)) {
-    throw new ContentError(`${explain} is not valid`)
+  if (typeof number !== "number" || isNaN(number)) {
+    throw new ContentError(`${explain} is not valid`);
   }
 }
-
 export function validateDate(date, explain = "date") {
   if (typeof date !== "string" || !dateRegex.test(date)) {
     throw new ContentError(`${explain} is not valid`);

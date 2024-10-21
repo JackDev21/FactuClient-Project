@@ -44,7 +44,11 @@ const user = new Schema({
   active: {
     type: Boolean,
     default: true
-  }
+  },
+  irpf: {
+    type: Number,
+  },
+
 })
 
 const User = model("User", user)

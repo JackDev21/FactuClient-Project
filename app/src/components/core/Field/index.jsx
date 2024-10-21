@@ -8,6 +8,7 @@ import { MdWorkOutline } from "react-icons/md"
 import { FaRegUser } from "react-icons/fa"
 import { CiBank } from "react-icons/ci"
 import { TiImage } from "react-icons/ti"
+import { HiOutlineReceiptTax } from "react-icons/hi"
 
 import "./index.css"
 
@@ -37,6 +38,8 @@ export default function Field({ className, id, type, placeholder, required = tru
               <CiBank />
             ) : id === "companyLogo" ? (
               <TiImage />
+            ) : id === "irpf" ? (
+              <HiOutlineReceiptTax />
             ) : null}
           </span>
         </div>

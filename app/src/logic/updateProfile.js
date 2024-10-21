@@ -12,6 +12,7 @@ const updateProfile = (updates) => {
   if (updates.phone) validate.phone(updates.phone)
   if (updates.bankAccount) validate.iban(updates.bankAccount)
   if (updates.companyLogo) validate.url(updates.companyLogo, "companyLogo")
+  if (updates.irpf) validate.number(updates.irpf, "irpf")
 
   return fetch(`${import.meta.env.VITE_API_URL}/users/update`, {
     method: "PATCH",

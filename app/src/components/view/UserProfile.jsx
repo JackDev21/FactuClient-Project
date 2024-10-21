@@ -34,7 +34,7 @@ export default function UserProfile() {
 
   return (
     <>
-      <Header className="HeaderProfile" iconLeftHeader={<LiaUserEditSolid />}>
+      <Header className="HeaderProfile z-10" iconLeftHeader={<LiaUserEditSolid />}>
         {user?.companyLogo ? (
           <img className="CompanyLogo" src={user.companyLogo} alt="Company Logo" />
         ) : (
@@ -52,6 +52,7 @@ export default function UserProfile() {
           <ProfileInfoItem label="Nº Móvil" value={user?.phone} />
           <ProfileInfoItem label="Email" value={user?.email} />
           <ProfileInfoItem label="IBAN" value={user?.bankAccount} />
+          <ProfileInfoItem label="IRPF" value={`${user?.irpf} %`} />
         </div>
       </Main>
       <Footer>FactuClient</Footer>

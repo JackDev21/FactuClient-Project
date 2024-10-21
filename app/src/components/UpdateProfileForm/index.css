@@ -2,7 +2,7 @@
 
 @layer components {
   .UpdateProfile {
-    @apply absolute top-24 z-20 flex w-full justify-center;
+    @apply absolute top-20 z-20 flex w-full justify-center;
   }
   .UpdateProfileForm {
     @apply relative mb-5 flex w-auto flex-col items-center rounded-2xl bg-[#000000c5] p-2 shadow-custom-shadow;

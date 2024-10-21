@@ -10,7 +10,6 @@ import { MdDeleteForever } from "react-icons/md"
 
 import Header from "../Header"
 import Main from "../core/Main"
-import Footer from "../core/Footer"
 import Title from "../Title"
 import Confirm from "../Confirm"
 import InvoicePDF from "./InvoicePDF"
@@ -69,6 +68,9 @@ export default function InvoiceInfo() {
   const handleShowConfirmDelete = () => {
     setShowConfirmDelete(!showConfirmDelete)
   }
+
+  const irpfPercentage = invoice?.company.irpf || 0 // Porcentaje de IRPF del perfil del usuario
+  const irpfAmount = total * (irpfPercentage / 100) // Cálculo del IRPF
 
   return (
     <>
@@ -154,7 +156,12 @@ export default function InvoiceInfo() {
         </div>
         <p className="InvoiceTotal">TOTAL: {total.toFixed(2)} € </p>
         <p className="InvoiceTotal">21% IVA: {iva.toFixed(2)} € </p>
-        <p className="InvoiceTotal">TOTAL con IVA: {(total + iva).toFixed(2)} € </p>
+        {irpfAmount > 0 && (
+          <p className="InvoiceTotal">
+            {irpfPercentage}% IRPF: {irpfAmount.toFixed(2)} €
+          </p>
+        )}
+        <p className="InvoiceTotal">TOTAL con IVA: {(total + iva - irpfAmount).toFixed(2)} € </p>
         <div className="PaymentType">
           {invoice?.paymentType && <p>Forma de pago: {invoice.paymentType} </p>}
           {invoice?.company && <p>{invoice.company.bankAccount}</p>}
@@ -166,7 +173,15 @@ export default function InvoiceInfo() {
         {invoice && (
           <PDFDownloadLink
             className="PDFDownloadLink"
-            document={<InvoicePDF invoice={invoice} total={total} iva={iva} />}
+            document={
+              <InvoicePDF
+                invoice={invoice}
+                total={total}
+                iva={iva}
+                irpfAmount={irpfAmount}
+                irpfPercentage={irpfPercentage}
+              />
+            }
             fileName={`invoice-${invoice.number}.pdf`}
           >
             {({ loading }) => (loading ? <FaSpinner /> : <FaRegFilePdf />)}

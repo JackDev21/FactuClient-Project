@@ -34,8 +34,6 @@ import requestPasswordReset from "./requestPasswordReset.js"
 import resetPassword from "./resetPassword.js"
 
 
-
-
 const logic = {
   isUserLoggedIn,
   loginUser,

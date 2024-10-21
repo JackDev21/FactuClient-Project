@@ -44,13 +44,16 @@ const updateProfile = (userId, updates) => {
     updateFields.companyLogo = updates.companyLogo
   }
 
+  if (updates.irpf !== null && updates.irpf !== undefined) {
+    validate.number(updates.irpf, "irpf")
+    updateFields.irpf = updates.irpf
+  }
   return User.findByIdAndUpdate(userId, updateFields, { new: true }).select("-__v").lean()
     .catch(error => { throw new SystemError(error.message) })
     .then(user => {
       if (!user) {
         throw new NotFoundError("User not found")
       }
-      return
     })
 }
 

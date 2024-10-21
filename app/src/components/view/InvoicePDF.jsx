@@ -138,7 +138,7 @@ const formatDate = (dateString) => {
   return new Date(dateString).toLocaleDateString("es-ES", options)
 }
 
-const InvoicePDF = ({ invoice, total, iva }) => {
+const InvoicePDF = ({ invoice, total, iva, irpfAmount, irpfPercentage }) => {
   return (
     <Document>
       <Page size="A4" style={styles.page}>
@@ -201,7 +201,12 @@ const InvoicePDF = ({ invoice, total, iva }) => {
           <View style={styles.totalContainer}>
             <Text style={styles.total}>TOTAL: {total.toFixed(2)} €</Text>
             <Text style={styles.total}>21% IVA: {iva.toFixed(2)} €</Text>
-            <Text style={styles.totalWithIva}>TOTAL con IVA: {(total + iva).toFixed(2)} €</Text>
+            {irpfAmount > 0 && (
+              <Text style={styles.total}>
+                {irpfPercentage}% IRPF: {irpfAmount.toFixed(2)} €
+              </Text>
+            )}
+            <Text style={styles.totalWithIva}>TOTAL con IVA: {(total + iva - irpfAmount).toFixed(2)} €</Text>
           </View>
           <View>
             {invoice?.paymentType && <Text style={styles.paymentText}>Forma de pago: {invoice.paymentType}</Text>}

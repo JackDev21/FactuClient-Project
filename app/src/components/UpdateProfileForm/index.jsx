@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import { useNavigate } from "react-router-dom"
 
 import Field from "../core/Field"
 import Button from "../core/Button"
@@ -9,6 +10,7 @@ import logic from "../../logic"
 import extractPayloadJwt from "../../../utils/extractPayloadJwt"
 
 export default function UpdateProfileForm({ onUpdateProfile }) {
+  const navigate = useNavigate()
   const [userId, setUserId] = useState(null)
 
   useEffect(() => {
@@ -37,6 +39,7 @@ export default function UpdateProfileForm({ onUpdateProfile }) {
     const phone = target.phone.value
     const bankAccount = target.bankAccount.value
     const companyLogo = target.companyLogo.value
+    const irpf = parseFloat(target.irpf.value)
 
     const updates = {
       username,
@@ -47,14 +50,16 @@ export default function UpdateProfileForm({ onUpdateProfile }) {
       taxId,
       phone,
       bankAccount,
-      companyLogo
+      companyLogo,
+      irpf
     }
 
     try {
       // prettier-ignore
       logic.updateProfile(updates)
         .then(() => {
-          onUpdateProfile()
+          onUpdateProfile() // Llama a la función de actualización pasada como prop
+          navigate("/")
         })
         .catch((error) => {
           alert(error.message)
@@ -76,6 +81,7 @@ export default function UpdateProfileForm({ onUpdateProfile }) {
         <Field id="address" type="text" placeholder="Dirección" required={false}></Field>
         <Field id="phone" type="text" placeholder="Número de Móvil" required={false}></Field>
         <Field id="bankAccount" type="text" placeholder="IBAN" required={false}></Field>
+        <Field id="irpf" type="number" placeholder="IRPF" required={false}></Field>
 
         <Button type="submit">Actualizar</Button>
       </form>
