@@ -2,7 +2,7 @@ import validate from "com/validate.js"
 import { User, Invoice, DeliveryNote } from "../model/index.js"
 import { NotFoundError, SystemError } from "com/errors.js"
 
-const createInvoice = (userId, customerId, deliveryNoteIds) => {
+const createInvoice = (userId, customerId, deliveryNoteIds, invoiceDate) => {
   validate.id(userId, "userId")
   validate.id(customerId, "customerId")
 
@@ -38,7 +38,7 @@ const createInvoice = (userId, customerId, deliveryNoteIds) => {
           return Invoice.findOne({ number: invoiceNumber, company: userId }).select("-__v").lean()
             .then(() => {
               const newInvoice = {
-                date: new Date(),
+                date: invoiceDate ? new Date(invoiceDate) : new Date(),
                 number: invoiceNumber,
                 company: userId,
                 customer: customerId,

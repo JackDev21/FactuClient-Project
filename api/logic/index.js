@@ -24,6 +24,7 @@ import createInvoice from "./createInvoice.js"
 import deleteInvoice from "./deleteInvoice.js"
 import getAllInvoicesCustomer from "./getAllInvoicesCustomer.js"
 import updateDeliveryNoteDate from "./updateDeliveryNoteDate.js"
+import updateInvoiceDate from "./updateInvoiceDate.js"
 
 import addNewObservation from "./addNewObservation.js"
 
@@ -58,6 +59,7 @@ const logic = {
   createInvoice,
   deleteInvoice,
   getAllInvoicesCustomer,
+  updateInvoiceDate,
 
   addNewObservation,
 

@@ -27,6 +27,8 @@ export default function NewInvoice() {
   const [customerId, setCustomerId] = useState(null)
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedMonth, setSelectedMonth] = useState("")
+  const today = new Date().toISOString().split("T")[0]
+  const [invoiceDate, setInvoiceDate] = useState(today)
 
   const filterCustomers = () =>
     customers.filter((customer) => customer.companyName.toLowerCase().includes(searchTerm.toLowerCase()))
@@ -95,7 +97,7 @@ export default function NewInvoice() {
     try {
       //prettier-ignore
       logic
-        .createInvoice(customerId, selectedDeliveryNotes)
+        .createInvoice(customerId, selectedDeliveryNotes, invoiceDate)
         .then(() => {
           navigate(-1)
           alert("Factura creada correctamente")
@@ -160,6 +162,18 @@ export default function NewInvoice() {
           </>
         ) : (
           <div className="relative top-7 -mt-16 flex flex-col items-center rounded-lg p-6">
+            <div className="mb-4 w-full max-w-xs text-sm">
+              <label htmlFor="invoiceDate" className="mb-1 block">
+                Fecha factura:
+              </label>
+              <input
+                id="invoiceDate"
+                type="date"
+                value={invoiceDate}
+                onChange={(e) => setInvoiceDate(e.target.value)}
+                className="w-full rounded border p-1"
+              />
+            </div>
             <MonthFilter selectedMonth={selectedMonth} handleMonthChange={handleMonthChange} />
             <ul className="w-full text-[0.9rem]">
               {filteredDeliveryNotes.map((deliveryNote) => (

@@ -1,5 +1,6 @@
 import express from "express"
 import routes from "./handlers/index.js"
+import updateInvoiceDateHandler from "./handlers/updateInvoiceDateHandler.js"
 
 const jsonBodyParser = express.json({ strict: true, type: "application/json" })
 
@@ -31,6 +32,7 @@ router.post("/create/invoices/:customerId", jsonBodyParser, routes.createInvoice
 router.get("/invoices", routes.getAllInvoicesHandler)
 router.get("/invoices/:invoiceId", routes.getInvoiceHandler)
 router.delete("/invoices/:invoiceId", routes.deleteInvoiceHandler)
+router.patch("/invoices/:invoiceId/date", jsonBodyParser, updateInvoiceDateHandler)
 router.get("/:customerId/invoices", routes.getAllInvoicesCustomerHandler)
 
 router.patch("/observation/delivery-note/:deliveryNoteId", jsonBodyParser, routes.addNewObservation)

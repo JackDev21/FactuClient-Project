@@ -1,14 +1,14 @@
 import errors, { SystemError } from "com/errors"
 import validate from "com/validate"
 
-const createInvoice = (customerId, deliveryNotesId) => {
+const createInvoice = (customerId, deliveryNotesId, invoiceDate) => {
   validate.id(customerId, "customerId")
 
   deliveryNotesId.forEach((deliveryNoteId) => {
     validate.id(deliveryNoteId, "deliveryNoteId")
   })
 
-  const body = { deliveryNotesId }
+  const body = { deliveryNotesId, invoiceDate }
 
   return fetch(`${import.meta.env.VITE_API_URL}/create/invoices/${customerId}`, {
     method: "POST",

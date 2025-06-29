@@ -27,6 +27,14 @@ export default function InvoiceInfo() {
   const [total, setTotal] = useState(0)
   const [showConfirmDelete, setShowConfirmDelete] = useState(false)
   const [iva, setIva] = useState(0)
+  const [isEditingDate, setIsEditingDate] = useState(false)
+  const [editedDate, setEditedDate] = useState("")
+
+  useEffect(() => {
+    if (invoice?.date) {
+      setEditedDate(new Date(invoice.date).toISOString().split("T")[0])
+    }
+  }, [invoice])
 
   useEffect(() => {
     try {
@@ -117,8 +125,40 @@ export default function InvoiceInfo() {
             {invoice?.number && <p className="InvoiceNumber">Fra.Nº: {invoice.number}</p>}
             {invoice?.date && (
               <div className="InvoiceDate">
-                <p>Fecha Factura:</p>
-                <Time>{invoice.date}</Time>
+                {isEditingDate ? (
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="date"
+                      value={editedDate}
+                      onChange={(e) => setEditedDate(e.target.value)}
+                      className="rounded border p-1"
+                    />
+                    <button
+                      onClick={() => {
+                        logic
+                          .updateInvoiceDate(invoiceId, editedDate)
+                          .then((updated) => {
+                            setInvoice((prev) => ({ ...prev, date: updated.date }))
+                            setIsEditingDate(false)
+                          })
+                          .catch((error) => alert(error.message))
+                      }}
+                      className="text-sm text-blue-600"
+                    >
+                      Guardar
+                    </button>
+                    <button onClick={() => setIsEditingDate(false)} className="text-sm text-gray-600">
+                      Cancelar
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <Time>{invoice.date}</Time>
+                    <button onClick={() => setIsEditingDate(true)} className="text-sm text-blue-600">
+                      Editar
+                    </button>
+                  </div>
+                )}
               </div>
             )}
           </div>

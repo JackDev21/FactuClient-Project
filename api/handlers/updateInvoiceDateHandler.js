@@ -8,23 +8,18 @@ const { JWT_SECRET } = process.env;
 export default ((req, res, next) => {
   try {
     const token = req.headers.authorization.slice(7);
-    const { customerId } = req.params;
-    const { deliveryNotesId, invoiceDate } = req.body;
+    const { invoiceId } = req.params;
+    const { invoiceDate } = req.body;
+    console.log('updateInvoiceDateHandler: params=', req.params, 'body=', req.body);
 
     jwt.verify(token, JWT_SECRET)
-      .then(payload => {
-        const { sub: userId } = payload
-
-        logic.createInvoice(userId, customerId, deliveryNotesId, invoiceDate)
-          .then(() => {
-            res.status(201).send();
-          })
+      .then(({ sub: userId }) => {
+        logic.updateInvoiceDate(userId, invoiceId, invoiceDate)
+          .then((invoice) => res.status(200).json(invoice))
           .catch(error => next(error));
       })
-      .catch(error => {
-        next(new CredentialsError(error.message))
-      })
+      .catch(error => next(new CredentialsError(error.message)));
   } catch (error) {
-    next(error)
+    next(error);
   }
-})
+});

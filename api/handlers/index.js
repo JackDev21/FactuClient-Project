@@ -21,6 +21,7 @@ import createWorkHandler from "./createWorkHandler.js"
 import getAllInvoicesHandler from "./getAllInvoicesHandler.js"
 import getInvoiceHandler from "./getInvoiceHandler.js"
 import createInvoiceHandler from "./createInvoiceHandler.js"
+import updateInvoiceDateHandler from "./updateInvoiceDateHandler.js"
 import deleteInvoiceHandler from "./deleteInvoiceHandler.js"
 import getAllInvoicesCustomerHandler from "./getAllInvoicesCustomerHandler.js"
 
@@ -55,6 +56,7 @@ export default {
   getAllInvoicesHandler,
   getInvoiceHandler,
   createInvoiceHandler,
+  updateInvoiceDateHandler,
   deleteInvoiceHandler,
   getAllInvoicesCustomerHandler,
 
