@@ -60,8 +60,12 @@ const styles = StyleSheet.create({
     alignItems: "flex-end"
   },
   logo: {
-    width: 100,
-    height: 50,
+    width: 120,
+    objectFit: "contain",
+    borderWidth: 1,
+    borderColor: "#CCCCCC",
+    borderRadius: 5,
+    padding: 5,
     marginBottom: 10
   },
   separator: {
