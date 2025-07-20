@@ -24,6 +24,8 @@ export default function InvoiceInfo() {
 
   const { invoiceId } = useParams()
   const [invoice, setInvoice] = useState(null)
+  const [isEditingPaymentType, setIsEditingPaymentType] = useState(false)
+  const [editedPaymentType, setEditedPaymentType] = useState("")
   const [total, setTotal] = useState(0)
   const [showConfirmDelete, setShowConfirmDelete] = useState(false)
   const [iva, setIva] = useState(0)
@@ -203,7 +205,48 @@ export default function InvoiceInfo() {
         )}
         <p className="InvoiceTotal">TOTAL con IVA: {(total + iva - irpfAmount).toFixed(2)} € </p>
         <div className="PaymentType">
-          {invoice?.paymentType && <p>Forma de pago: {invoice.paymentType} </p>}
+          {isEditingPaymentType ? (
+            <div className="flex items-center gap-2">
+              <select
+                value={editedPaymentType}
+                onChange={(e) => setEditedPaymentType(e.target.value)}
+                className="rounded border p-1"
+              >
+                <option value="Transferencia">Transferencia</option>
+                <option value="Efectivo">Efectivo</option>
+              </select>
+              <button
+                onClick={() => {
+                  logic
+                    .updateInvoicePaymentType(invoiceId, editedPaymentType)
+                    .then((updated) => {
+                      setInvoice((prev) => ({ ...prev, paymentType: updated.paymentType }))
+                      setIsEditingPaymentType(false)
+                    })
+                    .catch((error) => alert(error.message))
+                }}
+                className="text-sm text-blue-600"
+              >
+                Guardar
+              </button>
+              <button onClick={() => setIsEditingPaymentType(false)} className="text-sm text-gray-600">
+                Cancelar
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <p>Forma de pago: {invoice?.paymentType || "Transferencia"} </p>
+              <button
+                onClick={() => {
+                  setIsEditingPaymentType(true)
+                  setEditedPaymentType(invoice?.paymentType || "Transferencia")
+                }}
+                className="text-sm text-blue-600"
+              >
+                Editar
+              </button>
+            </div>
+          )}
           {invoice?.company && <p>{invoice.company.bankAccount}</p>}
         </div>
         {showConfirmDelete && (
