@@ -1,8 +1,9 @@
 export default function updateInvoicePaymentType(invoiceId, paymentType) {
-  return fetch(`/api/invoices/${invoiceId}/payment-type`, {
+  return fetch(`${import.meta.env.VITE_API_URL}/invoices/${invoiceId}/payment-type`, {
     method: "PATCH",
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${sessionStorage.token}`
     },
     body: JSON.stringify({ paymentType })
   })
