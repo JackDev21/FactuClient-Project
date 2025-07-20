@@ -22,6 +22,7 @@ import getAllInvoicesHandler from "./getAllInvoicesHandler.js"
 import getInvoiceHandler from "./getInvoiceHandler.js"
 import createInvoiceHandler from "./createInvoiceHandler.js"
 import updateInvoiceDateHandler from "./updateInvoiceDateHandler.js"
+import updateInvoicePaymentTypeHandler from "./updateInvoicePaymentTypeHandler.js"
 import deleteInvoiceHandler from "./deleteInvoiceHandler.js"
 import getAllInvoicesCustomerHandler from "./getAllInvoicesCustomerHandler.js"
 
@@ -37,9 +38,9 @@ export default {
   getUserNameHandler,
   updateProfileHandler,
 
-  getProfileUserHandler,
   registerCustomHandler,
   getAllCustomersHandler,
+  getProfileUserHandler,
   deleteCustomerHandler,
   updateCustomerProfileHandler,
 
@@ -57,6 +58,7 @@ export default {
   getInvoiceHandler,
   createInvoiceHandler,
   updateInvoiceDateHandler,
+  updateInvoicePaymentTypeHandler,
   deleteInvoiceHandler,
   getAllInvoicesCustomerHandler,
 
