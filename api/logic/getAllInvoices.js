@@ -12,7 +12,8 @@ const getAllInvoices = (userId) => {
         throw new NotFoundError("User not found")
       }
 
-      return Invoice.find({ company: userId }).populate("company").populate("customer").sort({ date: -1 }).select("-__v").lean()
+      // Ordenar por número de factura (descendente) y usar la fecha como desempate
+      return Invoice.find({ company: userId }).populate("company").populate("customer").sort({ number: -1, date: -1 }).select("-__v").lean()
         .catch(error => { throw new SystemError(error.message) })
         .then((invoices) => {
 

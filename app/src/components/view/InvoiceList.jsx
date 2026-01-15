@@ -32,7 +32,22 @@ export default function InvoiceList() {
       //prettier-ignore
       logic.getAllInvoices()
         .then((invoices) => {
-          setInvoices(invoices)
+          // Asegurar orden correlativo por `number` en formato YYYY/NNN
+          const sorted = invoices.slice().sort((a, b) => {
+            const parseNumber = (num) => {
+              if (!num) return { year: 0, seq: 0 }
+              const [y, s] = num.split("/")
+              return { year: parseInt(y, 10) || 0, seq: parseInt(s, 10) || 0 }
+            }
+
+            const na = parseNumber(a.number)
+            const nb = parseNumber(b.number)
+
+            if (na.year !== nb.year) return nb.year - na.year
+            return nb.seq - na.seq
+          })
+
+          setInvoices(sorted)
         })
         .catch((error) => {
           if (error instanceof SystemError) {
