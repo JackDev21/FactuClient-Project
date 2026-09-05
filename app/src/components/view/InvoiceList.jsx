@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
 import { LiaFileInvoiceSolid } from "react-icons/lia"
+import { FaChevronDown } from "react-icons/fa6"
 
 import useContext from "../../useContext"
 import { SystemError } from "com/errors"
@@ -14,25 +15,21 @@ import logic from "../../logic"
 import "./InvoiceList.css"
 import SearchFilter from "../SearchFilter"
 
+const PAGE_SIZE = 8
+
 export default function InvoiceList() {
   const { alert } = useContext()
 
   const [invoices, setInvoices] = useState([])
   const [searchTerm, setSearchTerm] = useState("")
-
-  const filterInvoices = () =>
-    invoices.filter(
-      (invoice) =>
-        invoice.number.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        invoice.customer.companyName.toLowerCase().includes(searchTerm.toLowerCase())
-    )
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
 
   useEffect(() => {
     try {
       //prettier-ignore
       logic.getAllInvoices()
         .then((invoices) => {
-          // Asegurar orden correlativo por `number` en formato YYYY/NNN
+          // Asegurar orden correlativo por `number`
           const sorted = invoices.slice().sort((a, b) => {
             const parseNumber = (num) => {
               if (!num) return { year: 0, seq: 0 }
@@ -60,29 +57,102 @@ export default function InvoiceList() {
     }
   }, [])
 
+  const filteredInvoices = invoices.filter(
+    (invoice) =>
+      invoice.number.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (invoice.customer?.companyName || "").toLowerCase().includes(searchTerm.toLowerCase())
+  )
+
+  useEffect(() => {
+    setVisibleCount(PAGE_SIZE)
+  }, [searchTerm])
+
+  const visibleInvoices = filteredInvoices.slice(0, visibleCount)
+
+  const handleLoadMore = () => {
+    setVisibleCount((prev) => prev + PAGE_SIZE)
+  }
+
+  const formatDate = (dateString) => {
+    if (!dateString) return ""
+    return new Date(dateString).toLocaleDateString("es-ES", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric"
+    })
+  }
+
   return (
     <>
       <Header className="HeaderInvoices" iconUser={<LiaFileInvoiceSolid />}>
         Facturas
       </Header>
       <Main>
-        <SearchFilter
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-          placeholder="Buscar por número o nombre de Factura"
-        />
-        <ul className="InvoiceList">
-          {filterInvoices().map((invoice) => (
-            <Link className="InvoiceLink" key={invoice.id} to={`/invoices/${invoice.id}`}>
-              <li className="Invoice" key={invoice.id}>
-                {invoice?.number && <p>F/Nº: {invoice.number}</p>}
-                {invoice?.customer && <p>&nbsp;{invoice.customer.companyName}</p>}
-              </li>
-            </Link>
-          ))}
-        </ul>
+        <div className="w-full max-w-xl flex flex-col items-center gap-3.5 px-3">
+          <SearchFilter
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
+            placeholder="Buscar por nº o cliente..."
+          />
+
+          <div className="flex w-full justify-between items-center px-1 text-xs sm:text-sm font-semibold text-slate-200">
+            <span className="rounded-full bg-slate-900/60 px-3.5 py-1.5 backdrop-blur">
+              Total: {invoices.length} facturas
+            </span>
+            <span className="rounded-full bg-slate-900/60 px-3.5 py-1.5 backdrop-blur">
+              Mostrando: {visibleInvoices.length}
+            </span>
+          </div>
+
+          <ul className="InvoiceList">
+            {visibleInvoices.map((invoice) => (
+              <Link className="InvoiceLink" key={invoice.id} to={`/invoices/${invoice.id}`}>
+                <li className="InvoiceCard border-l-4 border-l-blue-600">
+                  <div className="flex flex-col items-start gap-1 flex-1 pr-2">
+                    <span className="text-base font-bold text-slate-900">
+                      F/Nº: {invoice.number}
+                    </span>
+                    <span className="text-sm font-semibold text-slate-600 text-left leading-snug">
+                      {invoice.customer?.companyName || "Cliente"}
+                    </span>
+                  </div>
+                  <div className="flex flex-col items-end gap-1 shrink-0">
+                    <span className="rounded-full bg-blue-50 border border-blue-200 px-3 py-1.5 text-xs font-bold text-blue-700">
+                      {formatDate(invoice.date)}
+                    </span>
+                  </div>
+                </li>
+              </Link>
+            ))}
+
+            {filteredInvoices.length === 0 && (
+              <div className="w-full rounded-2xl border border-dashed border-slate-300 bg-white/60 p-8 text-center backdrop-blur">
+                <p className="text-base font-medium text-slate-500">
+                  No se encontraron facturas con el criterio de búsqueda.
+                </p>
+              </div>
+            )}
+          </ul>
+
+          {/* Botón Cargar Más con Contador de Alto Contraste */}
+          {visibleCount < filteredInvoices.length && (
+            <div className="flex w-full flex-col items-center gap-2.5 py-3">
+              <button
+                onClick={handleLoadMore}
+                className="flex items-center gap-2 rounded-2xl bg-orange-500 px-7 py-3 text-base font-bold text-white shadow-md transition-all active:scale-95 hover:bg-orange-600 hover:shadow-lg"
+              >
+                <span>Cargar más facturas</span>
+                <FaChevronDown className="text-xs" />
+              </button>
+              <span className="rounded-full bg-slate-900/80 px-4 py-1.5 text-xs sm:text-sm font-semibold text-slate-100 backdrop-blur shadow-sm">
+                Mostrando {visibleInvoices.length} de {filteredInvoices.length} facturas
+              </span>
+            </div>
+          )}
+        </div>
       </Main>
       <Footer>FactuClient</Footer>
     </>
   )
 }
+
