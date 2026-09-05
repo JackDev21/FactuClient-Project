@@ -77,74 +77,119 @@ export default function DeliveryInfo() {
   return (
     <>
       <Header
-        iconUser={<GiStabbedNote />}
         iconLeftHeader={logic.getInfo().role === "user" && <MdDeleteForever />}
-        className={"HeaderDeliveryInfo"}
         onDeleteDeliveryNote={handleShowConfirmDelete}
-      ></Header>
-
-      <Main className={"MainDeliveryInfo"}>
-        <div className="DeliveryInfoCustomer">
-          {deliveryNote?.customer && (
-            <ul className="flex flex-col items-center text-center">
-              <li>{deliveryNote.customer.companyName}</li>
-              <li>{deliveryNote.customer.address}</li>
-              <li>{deliveryNote.customer.taxId}</li>
-            </ul>
-          )}
+      >
+        <div className="flex flex-col items-center justify-center">
+          <span className="text-xs font-semibold text-slate-800">
+            Albarán Nº {deliveryNote?.number || ""}
+          </span>
+          <span className="text-sm sm:text-base font-extrabold text-slate-900 truncate max-w-[60vw]">
+            {deliveryNote?.customer?.companyName || deliveryNote?.customerName || "Detalle de Albarán"}
+          </span>
         </div>
-        <div className="DeliveryWork">
-          <div className="TitleDateContainer">
-            {deliveryNote?.number && <p className="DeliveryNumber">Albarán nº: {deliveryNote.number}</p>}
-            {deliveryNote?.date && <Time className={"DeliveryDate"}>{deliveryNote.date}</Time>}
-          </div>
-          <div className="DeliveryTitleInfo">
-            <h6>Concepto</h6>
-            <div className="DeliveryTitleQuantityPrice">
-              <h6>Cantidad</h6> <h6>Precio</h6> <h6>Total</h6>
-            </div>
-          </div>
-          {deliveryNote?.works &&
-            deliveryNote.works.map((work) => (
-              <div className="DeliveryWorkInfo" key={work._id}>
-                <p className="DeliveryWorkConcept">{work.concept}</p>
-                <div className="DeliveryQuantityPrice">
-                  <div className="QuantityContainer">
-                    <p className="Quantity">{work.quantity.toFixed(2)}</p>
-                  </div>
-                  <div className="PriceContainer">
-                    <p className="Price">{work.price.toFixed(2)}</p>
-                  </div>
-                  <div className="TotalContainer">
-                    <p className="Total">{(work.quantity * work.price).toFixed(2)}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          <div className="ObservationsContainer">
-            {deliveryNote?.customer && (
-              <ul>
-                <li className="Observations">Observaciones:</li>
-                <li>{deliveryNote.observations}</li>
-              </ul>
+      </Header>
+
+      <Main className="MainDeliveryInfo">
+        <div className="w-full max-w-2xl flex flex-col gap-4 px-2 sm:px-4 py-2">
+          {/* Tarjeta de Datos Cliente */}
+          <div className="flex flex-col text-left gap-1 rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 shadow-xs">
+            <span className="text-xs font-bold uppercase tracking-wider text-amber-600">
+              Datos del Cliente
+            </span>
+            {deliveryNote?.customer ? (
+              <>
+                <span className="text-sm font-extrabold text-slate-900">
+                  {deliveryNote.customer.companyName}
+                </span>
+                <span className="text-xs text-slate-600 font-medium">
+                  CIF/NIF: {deliveryNote.customer.taxId}
+                </span>
+                <span className="text-xs text-slate-600">{deliveryNote.customer.address}</span>
+              </>
+            ) : (
+              <span className="text-xs text-slate-400">Sin datos de cliente</span>
             )}
           </div>
-          <div className="DeliveryTotal">TOTAL: {total.toFixed(2)} €</div>
+
+          {/* Barra de Metadatos: A/Nº y Fecha */}
+          <div className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-4 shadow-xs">
+            <span className="rounded-xl bg-amber-100 text-amber-950 font-black text-xs sm:text-sm px-3.5 py-1.5 border border-amber-200">
+              Albarán Nº {deliveryNote?.number}
+            </span>
+            <span className="rounded-lg bg-slate-50 border border-slate-200 px-3 py-1.5 text-xs sm:text-sm font-bold text-slate-800">
+              📅 <Time>{deliveryNote?.date}</Time>
+            </span>
+          </div>
+
+          {/* Tabla de Trabajos */}
+          <div className="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 shadow-xs">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-400 text-left">
+              Líneas de Trabajo
+            </span>
+
+            <div className="flex flex-col gap-2.5">
+              {deliveryNote?.works &&
+                deliveryNote.works.map((work) => (
+                  <div key={work._id || work.id} className="flex items-start justify-between gap-3 border-b border-slate-100 pb-2.5 last:border-b-0 last:pb-0 text-xs sm:text-sm">
+                    <div className="flex flex-col text-left flex-1">
+                      <span className="font-semibold text-slate-800 leading-snug">
+                        {work.concept}
+                      </span>
+                      <span className="text-[11px] text-slate-400 font-medium">
+                        {work.quantity.toFixed(2)} ud. × {work.price.toFixed(2)} €
+                      </span>
+                    </div>
+                    <span className="font-bold text-slate-900 whitespace-nowrap pt-0.5">
+                      {(work.quantity * work.price).toFixed(2)} €
+                    </span>
+                  </div>
+                ))}
+            </div>
+
+            {deliveryNote?.observations && (
+              <div className="mt-2 rounded-xl bg-slate-50 p-3 text-left border border-slate-200/60">
+                <span className="text-xs font-bold text-slate-700">Observaciones:</span>
+                <p className="text-xs text-slate-600 mt-0.5">{deliveryNote.observations}</p>
+              </div>
+            )}
+          </div>
+
+          {/* Tarjeta de Resumen de Totales */}
+          <div className="flex justify-between items-center rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 shadow-xs text-base sm:text-lg font-black text-slate-900">
+            <span>TOTAL ALBARÁN:</span>
+            <span className="text-lg sm:text-xl text-amber-600">
+              {total.toFixed(2)} €
+            </span>
+          </div>
+
+          {/* Botón de Descarga PDF */}
+          {deliveryNote && (
+            <PDFDownloadLink
+              className="flex w-full items-center justify-center gap-2.5 rounded-2xl bg-orange-500 py-3.5 px-6 text-base font-bold text-white shadow-md transition-all active:scale-95 hover:bg-orange-600 hover:shadow-lg"
+              document={<DeliveryNotePDF deliveryNote={deliveryNote} total={total} />}
+              fileName={`Albaran-${deliveryNote.number}.pdf`}
+            >
+              {({ loading }) =>
+                loading ? (
+                  <>
+                    <FaSpinner className="animate-spin text-lg" />
+                    <span>Generando PDF...</span>
+                  </>
+                ) : (
+                  <>
+                    <FaRegFilePdf className="text-lg" />
+                    <span>Descargar Albarán en PDF</span>
+                  </>
+                )
+              }
+            </PDFDownloadLink>
+          )}
+
+          {showConfirmDelete && (
+            <Confirm handleDeleteDeliveryNote={handleDeleteDeliveryNote} setShowConfirmDelete={handleShowConfirmDelete} />
+          )}
         </div>
-
-        {showConfirmDelete && (
-          <Confirm handleDeleteDeliveryNote={handleDeleteDeliveryNote} setShowConfirmDelete={handleShowConfirmDelete} />
-        )}
-
-        {deliveryNote && (
-          <PDFDownloadLink
-            className="PDFDownloadLink"
-            document={<DeliveryNotePDF deliveryNote={deliveryNote} total={total} />}
-            fileName={`delivery-note-${deliveryNote.number}.pdf`}
-          >
-            {({ loading }) => (loading ? <FaSpinner /> : <FaRegFilePdf />)}
-          </PDFDownloadLink>
-        )}
       </Main>
     </>
   )
