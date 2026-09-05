@@ -1,15 +1,11 @@
-@tailwind components;
+.Title {
+  font-family: "Permanent Marker", cursive;
+  font-size: 3rem;
+  color: #000000;
+}
 
-@layer components {
-  .Title {
-    @apply text-5xl text-black;
-  }
-
-  .FactuClient {
-    @apply text-5xl text-black;
-  }
-
-  .Welcome {
-    @apply text-5xl text-white;
-  }
+.FactuClient {
+  font-family: "Permanent Marker", cursive;
+  font-size: 3rem;
+  color: #000000;
 }

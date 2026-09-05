@@ -1,17 +1,37 @@
 @import url("https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap");
-@tailwind components;
 
-@layer components {
-  .ContainerFooter {
-    @apply fixed bottom-0 flex w-full justify-center;
-  }
+.ContainerFooter {
+  position: fixed;
+  bottom: 0;
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  pointer-events: none;
+}
 
+.Footer {
+  display: flex;
+  height: 3rem;
+  width: 92%;
+  max-width: 32rem;
+  align-items: center;
+  justify-content: center;
+  background-image: linear-gradient(to right, #7a4902, #7f5003, #835604, #885d06, #8c6408, #946c09, #9b740b, #a37c0c, #b0870c, #bd930b, #cb9e0a, #d8aa09);
+  font-size: 1.25rem;
+  color: #0f172a;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  pointer-events: auto;
+  border-top-left-radius: 50% 100%;
+  border-top-right-radius: 50% 100%;
+  font-family: "Permanent Marker", cursive;
+  font-weight: 400;
+  font-style: normal;
+}
+
+@media (min-width: 640px) {
   .Footer {
-    @apply flex h-[5.5rem] w-[90%] items-center justify-center bg-custom-gradient text-[3.5rem];
-    border-top-left-radius: 50% 100%;
-    border-top-right-radius: 50% 100%;
-    font-family: "Permanent Marker", cursive;
-    font-weight: 400;
-    font-style: normal;
+    height: 3.5rem;
+    width: 85%;
+    font-size: 1.5rem;
   }
 }

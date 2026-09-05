@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useNavigate, useLocation, Link, matchPath } from "react-router-dom"
 import { GiExitDoor } from "react-icons/gi"
 import { TiArrowBack } from "react-icons/ti"
@@ -24,6 +24,25 @@ export default function Header({
   const location = useLocation()
   const [showRegisterCustomer, setShowRegisterCustomer] = useState(false)
   const [showUpdateProfile, setShowUpdateProfile] = useState(false)
+  const [isVisible, setIsVisible] = useState(true)
+  const [lastScrollY, setLastScrollY] = useState(0)
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY
+      // Si el usuario hace scroll hacia abajo más de 40px, ocultar la cabecera
+      if (currentScrollY > lastScrollY && currentScrollY > 40) {
+        setIsVisible(false)
+      } else {
+        // Si hace scroll hacia arriba, reaparecer inmediatamente
+        setIsVisible(true)
+      }
+      setLastScrollY(currentScrollY)
+    }
+
+    window.addEventListener("scroll", handleScroll, { passive: true })
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [lastScrollY])
 
   const handleLogout = () => {
     logic.logoutUser()
@@ -53,14 +72,18 @@ export default function Header({
   const isCustomerProfilePathInvoiceId = matchPath("/invoices/:invoiceId", location.pathname)
   const isCustomerInfoPath = matchPath("/customer/:customerId/info", location.pathname)
 
+  const visibilityClass = isVisible
+    ? "translate-y-0 opacity-100"
+    : "-translate-y-full opacity-0 pointer-events-none"
+
   return (
     <>
-      <div className={`Header ${className ? className : ""}`}>
+      <div className={`Header ${visibilityClass} transition-all duration-300 ease-in-out z-30 ${className ? className : ""}`}>
         {location.pathname === "/customers" && (
           <div className="ContainerHeader">
-            <div onClick={handleRegisterCustomer} className="IconLeftHeader">
+            <span onClick={handleRegisterCustomer} className="IconLeftHeader" title="Añadir Cliente">
               {iconLeftHeader}
-            </div>
+            </span>
             <div className="IconUser">{iconUser}</div>
             <div className="Children">{children}</div>
           </div>
@@ -68,16 +91,16 @@ export default function Header({
 
         {location.pathname === "/users/profile" && (
           <div className="ContainerHeader">
-            <div onClick={handleUpdateProfile} className="IconLeftHeader">
+            <span onClick={handleUpdateProfile} className="IconLeftHeader" title="Editar Perfil">
               {iconLeftHeader}
-            </div>
+            </span>
             <div className="IconUser">{iconUser}</div>
             <div className="Children">{children}</div>
           </div>
         )}
 
         {location.pathname === "/" && (
-          <Link to="/users/profile">
+          <Link to="/users/profile" className="w-full flex justify-center">
             <div className="ContainerHeader">
               <div className="IconUser">{iconUser}</div>
               <div className="Children">{children}</div>
@@ -94,9 +117,9 @@ export default function Header({
 
         {isCustomerProfilePathInvoiceId && (
           <div className="ContainerHeader">
-            <div onClick={onDeleteInvoice} className="IconLeftHeader">
+            <span onClick={onDeleteInvoice} className="IconLeftHeader" title="Eliminar Factura">
               {iconLeftHeader}
-            </div>
+            </span>
             <div className="IconUser">{iconUser}</div>
             <div className="Children">{children}</div>
           </div>
@@ -125,19 +148,19 @@ export default function Header({
 
         {isCustomerProfilePathCustomerId && (
           <div className="ContainerHeader">
-            <div onClick={onDeleteCustomer} className="IconLeftHeader">
+            <span onClick={onDeleteCustomer} className="IconLeftHeader" title="Eliminar Cliente">
               {iconLeftHeader}
-            </div>
+            </span>
             <div className="IconUser">{iconUser}</div>
-            <div className="CustomerName">{children}</div>
+            <div className="CustomerName Children">{children}</div>
           </div>
         )}
 
         {isCustomerProfilePathDeliveryNoteId && (
           <div className="ContainerHeader">
-            <div onClick={onDeleteDeliveryNote} className="IconLeftHeader">
+            <span onClick={onDeleteDeliveryNote} className="IconLeftHeader" title="Eliminar Albarán">
               {iconLeftHeader}
-            </div>
+            </span>
             <div className="IconUser">{iconUser}</div>
             <div className="Children">{children}</div>
           </div>
@@ -154,14 +177,14 @@ export default function Header({
           <div className="ContainerHeader">
             <div className="IconUser">{iconUser}</div>
             <div className="Children">{children}</div>
-            <div onClick={handleLogout} className="IconLeftHeader">
+            <span onClick={handleLogout} className="IconLeftHeader" title="Cerrar Sesión">
               {iconLeftHeader}
-            </div>
+            </span>
           </div>
         )}
       </div>
 
-      <span className="IconExit">
+      <span className="IconExit" title={location.pathname === "/" ? "Cerrar sesión" : "Volver atrás"}>
         {location.pathname === "/" ? (
           <GiExitDoor onClick={handleLogout} />
         ) : (
@@ -181,3 +204,4 @@ export default function Header({
     </>
   )
 }
+

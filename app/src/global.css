@@ -3,18 +3,13 @@
 @tailwind utilities;
 
 @layer base {
-  body {
-    @apply flex min-h-screen w-full flex-col bg-gradient-to-b from-white via-gray-200 to-gray-500;
-  }
-  .Main {
-    @apply flex w-full flex-grow flex-col items-center justify-center;
-  }
-
-  a {
-    @apply flex w-full flex-col items-center justify-center;
-  }
-
-  .Link {
-    @apply mt-1 font-black text-black;
+  html, body {
+    @apply min-h-screen w-full bg-slate-100 text-slate-800 antialiased overflow-x-hidden;
+    margin: 0;
+    padding: 0;
   }
 }
+
+
+
+
