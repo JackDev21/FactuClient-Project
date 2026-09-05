@@ -165,8 +165,19 @@ export default function NewInvoice() {
 
               <div className="flex flex-col gap-2.5 w-full">
                 {loading ? (
-                  <div className="py-12 text-center text-slate-400 font-medium text-sm">
-                    Cargando clientes...
+                  <div className="flex flex-col gap-2.5 w-full">
+                    {[1, 2, 3, 4].map((i) => (
+                      <div
+                        key={i}
+                        className="w-full rounded-2xl bg-white/80 p-4 border border-slate-200/70 shadow-xs animate-pulse flex items-center justify-between"
+                      >
+                        <div className="flex flex-col gap-2 flex-1 pr-4">
+                          <div className="h-4 bg-slate-200 rounded-md w-1/2"></div>
+                          <div className="h-3 bg-slate-100 rounded-md w-1/3"></div>
+                        </div>
+                        <div className="h-4 w-4 bg-slate-200 rounded-full"></div>
+                      </div>
+                    ))}
                   </div>
                 ) : filterCustomers().length === 0 ? (
                   <div className="py-12 text-center text-slate-400 font-medium text-sm bg-white rounded-2xl border border-slate-200 p-6">
@@ -202,30 +213,27 @@ export default function NewInvoice() {
           ) : (
             /* PASO 2: SELECCIONAR ALBARANES A FACTURAR */
             <>
-              {/* Tarjeta de Cliente Seleccionado */}
-              <div className="w-full flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-4 shadow-xs text-left">
-                <div className="flex items-center gap-3 min-w-0 flex-1">
-                  <div className="w-10 h-10 rounded-xl bg-blue-100 text-blue-800 font-black text-base flex items-center justify-center shrink-0">
-                    {selectedCustomer?.companyName ? selectedCustomer.companyName.charAt(0).toUpperCase() : "C"}
+              {/* PASO 2: Selección de Albaranes para Facturar */}
+              <div className="flex items-center justify-between rounded-2xl border border-blue-200 bg-blue-50/70 p-3.5 shadow-xs">
+                <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                  <div className="w-8 h-8 rounded-lg bg-blue-600 text-white font-black text-sm flex items-center justify-center shrink-0">
+                    ✓
                   </div>
-                  <div className="flex flex-col min-w-0 flex-1">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                  <div className="flex flex-col min-w-0">
+                    <span className="text-xs font-bold uppercase tracking-wider text-blue-800">
                       Cliente Seleccionado
                     </span>
-                    <span className="text-sm font-black text-slate-900 leading-tight truncate">
-                      {selectedCustomer?.companyName}
+                    <span className="text-sm font-extrabold text-slate-900 truncate">
+                      {selectedCustomer.companyName}
                     </span>
                   </div>
                 </div>
                 <button
                   type="button"
-                  onClick={() => {
-                    setShowCustomerList(true)
-                    setSelectedDeliveryNotes([])
-                  }}
-                  className="flex items-center gap-1.5 p-2 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 text-xs font-bold active:scale-95 transition-all shrink-0 ml-2"
+                  onClick={handleBackToCustomerSelect}
+                  className="flex items-center gap-1.5 rounded-xl bg-white border border-blue-200 px-3 py-1.5 text-xs font-bold text-blue-700 hover:bg-blue-100/60 active:scale-95 transition-all shrink-0 ml-2"
                 >
-                  <FaRotateLeft className="w-3 h-3" />
+                  <FaRotateLeft className="text-[10px]" />
                   <span>Cambiar</span>
                 </button>
               </div>
@@ -255,9 +263,9 @@ export default function NewInvoice() {
               {/* Cabecera de Albaranes y Selección Rápida */}
               <div className="flex items-center justify-between px-1">
                 <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                  Albaranes Disponibles ({filteredDeliveryNotes.length})
+                  Albaranes Disponibles ({loading ? "..." : filteredDeliveryNotes.length})
                 </span>
-                {filteredDeliveryNotes.length > 0 && (
+                {filteredDeliveryNotes.length > 0 && !loading && (
                   <button
                     type="button"
                     onClick={handleSelectAll}
@@ -270,7 +278,22 @@ export default function NewInvoice() {
 
               {/* Lista de Albaranes para Marcar */}
               <div className="flex flex-col gap-2.5 w-full">
-                {filteredDeliveryNotes.length === 0 ? (
+                {loading ? (
+                  <div className="flex flex-col gap-2.5 w-full">
+                    {[1, 2, 3].map((i) => (
+                      <div
+                        key={i}
+                        className="w-full rounded-2xl bg-white/80 p-4 border border-slate-200/70 shadow-xs animate-pulse flex items-center justify-between"
+                      >
+                        <div className="flex flex-col gap-2 flex-1 pr-4">
+                          <div className="h-4 bg-slate-200 rounded-md w-1/3"></div>
+                          <div className="h-3 bg-slate-100 rounded-md w-1/4"></div>
+                        </div>
+                        <div className="h-5 w-16 bg-slate-200 rounded-full"></div>
+                      </div>
+                    ))}
+                  </div>
+                ) : filteredDeliveryNotes.length === 0 ? (
                   <div className="py-12 text-center text-slate-400 font-medium text-sm bg-white rounded-2xl border border-slate-200 p-6">
                     No hay albaranes disponibles para este cliente en el periodo seleccionado.
                   </div>

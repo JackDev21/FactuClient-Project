@@ -21,6 +21,7 @@ const PAGE_SIZE = 8
 
 export default function CustomerList() {
   const [customers, setCustomers] = useState([])
+  const [loading, setLoading] = useState(true)
   const [refresh, setRefresh] = useState(0)
   const { alert } = useContext()
   const [searchTerm, setSearchTerm] = useState("")
@@ -34,20 +35,24 @@ export default function CustomerList() {
     )
 
   const loadCustomers = () => {
+    setLoading(true)
     try {
-      // prettier-ignore
       logic.getAllCustomers()
         .then((customers) => {
-          setCustomers(customers)
+          setCustomers(customers || [])
         })
         .catch((error) => {
           if (error instanceof SystemError) {
             alert(error.message)
           }
-          alert("Todavía no hay clientes, Añade tu primer cliente")
+          setCustomers([])
+        })
+        .finally(() => {
+          setLoading(false)
         })
     } catch (error) {
       console.error(error.message)
+      setLoading(false)
       alert(error.message)
     }
   }
@@ -91,43 +96,62 @@ export default function CustomerList() {
 
           <div className="flex w-full justify-between items-center px-1 text-xs sm:text-sm font-semibold text-slate-200">
             <span className="rounded-full bg-slate-900/60 px-3.5 py-1.5 backdrop-blur">
-              Total: {customers.length} clientes
+              {loading ? "Cargando clientes..." : `Total: ${customers.length} clientes`}
             </span>
             <span className="rounded-full bg-slate-900/60 px-3.5 py-1.5 backdrop-blur">
-              Mostrando: {visibleCustomers.length}
+              {loading ? "..." : `Mostrando: ${visibleCustomers.length}`}
             </span>
           </div>
 
           <ul className="CustomerList">
-            {visibleCustomers.map((customer) => (
-              <Link to={`/customers/profile/${customer.id}`} key={customer.id} className="CustomerLink">
-                <li className="CustomerCard border-l-4 border-l-orange-500">
-                  <div className="flex flex-col items-start gap-1.5 flex-1 pr-2">
-                    <span className="text-base font-bold text-slate-900 text-left leading-snug">
-                      {customer.companyName || customer.fullName || "Cliente"}
-                    </span>
-                    <div className="flex flex-wrap items-center gap-2 text-xs font-medium text-slate-500">
-                      {customer.taxId && (
-                        <span>NIF/CIF: {customer.taxId}</span>
-                      )}
-                      {customer.phone && (
-                        <span className="rounded-full bg-slate-100 border border-slate-200 px-2.5 py-0.5 text-[11px] font-bold text-slate-700">
-                          📞 {customer.phone}
-                        </span>
-                      )}
+            {loading ? (
+              <div className="flex flex-col gap-2.5 w-full">
+                {[1, 2, 3, 4].map((i) => (
+                  <div
+                    key={i}
+                    className="w-full rounded-2xl bg-white/80 p-4 border border-slate-200/70 shadow-xs animate-pulse flex items-center justify-between"
+                  >
+                    <div className="flex flex-col gap-2 flex-1 pr-4">
+                      <div className="h-4 bg-slate-200 rounded-md w-3/5"></div>
+                      <div className="h-3 bg-slate-100 rounded-md w-2/5"></div>
                     </div>
+                    <div className="h-4 w-4 bg-slate-200 rounded-full"></div>
                   </div>
-                  <FaChevronRight className="text-sm text-slate-400 shrink-0 ml-1" />
-                </li>
-              </Link>
-            ))}
-
-            {filteredCustomers.length === 0 && (
-              <div className="w-full rounded-2xl border border-dashed border-slate-300 bg-white/60 p-8 text-center backdrop-blur">
-                <p className="text-base font-medium text-slate-500">
-                  No se encontraron clientes con el criterio de búsqueda.
-                </p>
+                ))}
               </div>
+            ) : (
+              <>
+                {visibleCustomers.map((customer) => (
+                  <Link to={`/customers/profile/${customer.id}`} key={customer.id} className="CustomerLink">
+                    <li className="CustomerCard border-l-4 border-l-orange-500">
+                      <div className="flex flex-col items-start gap-1.5 flex-1 pr-2">
+                        <span className="text-base font-bold text-slate-900 text-left leading-snug">
+                          {customer.companyName || customer.fullName || "Cliente"}
+                        </span>
+                        <div className="flex flex-wrap items-center gap-2 text-xs font-medium text-slate-500">
+                          {customer.taxId && (
+                            <span>NIF/CIF: {customer.taxId}</span>
+                          )}
+                          {customer.phone && (
+                            <span className="rounded-full bg-slate-100 border border-slate-200 px-2.5 py-0.5 text-[11px] font-bold text-slate-700">
+                              📞 {customer.phone}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <FaChevronRight className="text-sm text-slate-400 shrink-0 ml-1" />
+                    </li>
+                  </Link>
+                ))}
+
+                {filteredCustomers.length === 0 && (
+                  <div className="w-full rounded-2xl border border-dashed border-slate-300 bg-white/60 p-8 text-center backdrop-blur">
+                    <p className="text-base font-medium text-slate-500">
+                      No se encontraron clientes con el criterio de búsqueda.
+                    </p>
+                  </div>
+                )}
+              </>
             )}
           </ul>
 

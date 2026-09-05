@@ -22,25 +22,30 @@ export default function DeliveryNoteList() {
   const { alert } = useContext()
 
   const [deliveryNotes, setDeliveryNotes] = useState([])
+  const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState("all") // 'all', 'pending', 'invoiced'
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
 
   useEffect(() => {
+    setLoading(true)
     try {
-      //prettier-ignore
       logic
         .getAllDeliveryNotes()
         .then((deliveryNotes) => {
-          setDeliveryNotes(deliveryNotes)
+          setDeliveryNotes(deliveryNotes || [])
         })
         .catch((error) => {
           if (error instanceof SystemError) {
             alert(error.message)
           }
-          alert("No hay Albaranes para este cliente")
+          setDeliveryNotes([])
+        })
+        .finally(() => {
+          setLoading(false)
         })
     } catch (error) {
+      setLoading(false)
       alert(error.message)
     }
   }, [])
@@ -104,7 +109,7 @@ export default function DeliveryNoteList() {
                   : "text-slate-600 hover:text-slate-900"
               }`}
             >
-              Todos ({deliveryNotes.length})
+              Todos ({loading ? "..." : deliveryNotes.length})
             </button>
             <button
               onClick={() => setStatusFilter("pending")}
@@ -114,7 +119,7 @@ export default function DeliveryNoteList() {
                   : "text-amber-700 hover:bg-amber-50/50"
               }`}
             >
-              ⏳ Pendientes ({pendingCount})
+              ⏳ Pendientes ({loading ? "..." : pendingCount})
             </button>
             <button
               onClick={() => setStatusFilter("invoiced")}
@@ -124,60 +129,79 @@ export default function DeliveryNoteList() {
                   : "text-emerald-700 hover:bg-emerald-50/50"
               }`}
             >
-              ✅ Facturados ({invoicedCount})
+              ✅ Facturados ({loading ? "..." : invoicedCount})
             </button>
           </div>
 
           {/* Lista de Tarjetas */}
           <ul className="DeliveryList">
-            {visibleDeliveryNotes.map((deliveryNote) => (
-              <Link className="DeliveryLink" to={`/delivery-notes/${deliveryNote.id}`} key={deliveryNote.id}>
-                <li
-                  className={`DeliveryNoteCard ${
-                    deliveryNote.isInvoiced
-                      ? "border-l-4 border-l-emerald-500"
-                      : "border-l-4 border-l-amber-500"
-                  }`}
-                >
-                  <div className="flex flex-col items-start gap-1 flex-1 pr-2">
-                    <div className="flex items-center gap-2">
-                      <span className="text-base font-bold text-slate-900">
-                        A/Nº: {deliveryNote.number}
-                      </span>
-                      {deliveryNote.date && (
-                        <span className="text-xs font-medium text-slate-400">
-                          · {formatDate(deliveryNote.date)}
-                        </span>
-                      )}
-                    </div>
-                    <span className="text-sm font-semibold text-slate-600 text-left leading-snug">
-                      {deliveryNote.customer?.companyName || deliveryNote.customerName || "Cliente"}
-                    </span>
-                  </div>
-
-                  <span
-                    className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-bold tracking-wider ${
-                      deliveryNote.isInvoiced
-                        ? "bg-emerald-100/90 text-emerald-800 border border-emerald-200"
-                        : "bg-amber-100/90 text-amber-800 border border-amber-200 uppercase"
-                    }`}
+            {loading ? (
+              <div className="flex flex-col gap-2.5 w-full">
+                {[1, 2, 3, 4].map((i) => (
+                  <div
+                    key={i}
+                    className="w-full rounded-2xl bg-white/80 p-4 border border-slate-200/70 shadow-xs animate-pulse flex items-center justify-between"
                   >
-                    {deliveryNote.isInvoiced
-                      ? deliveryNote.invoiceNumber
-                        ? `Fra. ${deliveryNote.invoiceNumber}`
-                        : "Facturado"
-                      : "Pendiente"}
-                  </span>
-                </li>
-              </Link>
-            ))}
-
-            {filteredDeliveryNotes.length === 0 && (
-              <div className="w-full rounded-2xl border border-dashed border-slate-300 bg-white/60 p-8 text-center backdrop-blur">
-                <p className="text-base font-medium text-slate-500">
-                  No se encontraron albaranes con el criterio seleccionado.
-                </p>
+                    <div className="flex flex-col gap-2 flex-1 pr-4">
+                      <div className="h-4 bg-slate-200 rounded-md w-1/3"></div>
+                      <div className="h-3 bg-slate-100 rounded-md w-3/5"></div>
+                    </div>
+                    <div className="h-6 w-20 bg-slate-200 rounded-full"></div>
+                  </div>
+                ))}
               </div>
+            ) : (
+              <>
+                {visibleDeliveryNotes.map((deliveryNote) => (
+                  <Link className="DeliveryLink" to={`/delivery-notes/${deliveryNote.id}`} key={deliveryNote.id}>
+                    <li
+                      className={`DeliveryNoteCard ${
+                        deliveryNote.isInvoiced
+                          ? "border-l-4 border-l-emerald-500"
+                          : "border-l-4 border-l-amber-500"
+                      }`}
+                    >
+                      <div className="flex flex-col items-start gap-1 flex-1 pr-2">
+                        <div className="flex items-center gap-2">
+                          <span className="text-base font-bold text-slate-900">
+                            A/Nº: {deliveryNote.number}
+                          </span>
+                          {deliveryNote.date && (
+                            <span className="text-xs font-medium text-slate-400">
+                              · {formatDate(deliveryNote.date)}
+                            </span>
+                          )}
+                        </div>
+                        <span className="text-sm font-semibold text-slate-600 text-left leading-snug">
+                          {deliveryNote.customer?.companyName || deliveryNote.customerName || "Cliente"}
+                        </span>
+                      </div>
+
+                      <span
+                        className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-bold tracking-wider ${
+                          deliveryNote.isInvoiced
+                            ? "bg-emerald-100/90 text-emerald-800 border border-emerald-200"
+                            : "bg-amber-100/90 text-amber-800 border border-amber-200 uppercase"
+                        }`}
+                      >
+                        {deliveryNote.isInvoiced
+                          ? deliveryNote.invoiceNumber
+                            ? `Fra. ${deliveryNote.invoiceNumber}`
+                            : "Facturado"
+                          : "Pendiente"}
+                      </span>
+                    </li>
+                  </Link>
+                ))}
+
+                {filteredDeliveryNotes.length === 0 && (
+                  <div className="w-full rounded-2xl border border-dashed border-slate-300 bg-white/60 p-8 text-center backdrop-blur">
+                    <p className="text-base font-medium text-slate-500">
+                      No se encontraron albaranes con el criterio seleccionado.
+                    </p>
+                  </div>
+                )}
+              </>
             )}
           </ul>
 
