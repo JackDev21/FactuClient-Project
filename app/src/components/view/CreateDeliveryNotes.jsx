@@ -237,9 +237,22 @@ export default function CreateDeliveryNotes() {
                   <form onSubmit={handleUpdateDeliveryNoteDate} className="flex items-center gap-1.5">
                     <input
                       type="date"
+                      ref={(el) => {
+                        if (el) {
+                          try {
+                            el.showPicker()
+                          } catch (err) {}
+                        }
+                      }}
+                      autoFocus
+                      onClick={(e) => {
+                        try {
+                          e.target.showPicker()
+                        } catch (err) {}
+                      }}
                       value={editedDate}
                       onChange={(e) => setEditedDate(e.target.value)}
-                      className="rounded-lg border border-slate-300 bg-slate-50 px-2 py-1 text-xs font-medium text-slate-800 focus:bg-white focus:outline-none focus:ring-1 focus:ring-amber-500"
+                      className="rounded-lg border border-slate-300 bg-slate-50 px-2 py-1 text-xs font-medium text-slate-800 focus:bg-white focus:outline-none focus:ring-1 focus:ring-amber-500 cursor-pointer"
                     />
                     <button
                       type="submit"

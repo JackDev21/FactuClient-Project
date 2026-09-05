@@ -238,9 +238,14 @@ export default function NewInvoice() {
                 <input
                   id="invoiceDate"
                   type="date"
+                  onClick={(e) => {
+                    try {
+                      e.target.showPicker()
+                    } catch (err) {}
+                  }}
                   value={invoiceDate}
                   onChange={(e) => setInvoiceDate(e.target.value)}
-                  className="rounded-xl border border-slate-300 bg-slate-50 px-3 py-1.5 text-xs sm:text-sm font-medium text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-inner"
+                  className="rounded-xl border border-slate-300 bg-slate-50 px-3 py-1.5 text-xs sm:text-sm font-medium text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-inner cursor-pointer"
                 />
               </div>
 

@@ -188,9 +188,22 @@ export default function InvoiceInfo() {
                   <div className="flex flex-wrap items-center justify-between sm:justify-end gap-2">
                     <input
                       type="date"
+                      ref={(el) => {
+                        if (el) {
+                          try {
+                            el.showPicker()
+                          } catch (err) {}
+                        }
+                      }}
+                      autoFocus
+                      onClick={(e) => {
+                        try {
+                          e.target.showPicker()
+                        } catch (err) {}
+                      }}
                       value={editedDate}
                       onChange={(e) => setEditedDate(e.target.value)}
-                      className="flex-1 sm:flex-initial rounded-lg border border-slate-300 bg-slate-50 px-2.5 py-1 text-xs sm:text-sm font-medium text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-inner"
+                      className="flex-1 sm:flex-initial rounded-lg border border-slate-300 bg-slate-50 px-2.5 py-1 text-xs sm:text-sm font-medium text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-inner cursor-pointer"
                     />
                     <div className="flex items-center gap-1.5">
                       <button
