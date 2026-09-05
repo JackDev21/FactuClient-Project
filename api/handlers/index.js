@@ -17,6 +17,8 @@ import updateDateDeliveryNoteHandler from "./updateDeliveryNoteDateHandler.js"
 
 import createDeliveryNoteHandler from "./createDeliveryNoteHandler.js"
 import createWorkHandler from "./createWorkHandler.js"
+import updateWorkHandler from "./updateWorkHandler.js"
+import deleteWorkHandler from "./deleteWorkHandler.js"
 
 import getAllInvoicesHandler from "./getAllInvoicesHandler.js"
 import getInvoiceHandler from "./getInvoiceHandler.js"
@@ -53,6 +55,8 @@ export default {
   createDeliveryNoteHandler,
 
   createWorkHandler,
+  updateWorkHandler,
+  deleteWorkHandler,
 
   getAllInvoicesHandler,
   getInvoiceHandler,

@@ -17,6 +17,8 @@ import updateCustomerProfile from "./updateCustomerProfile.js"
 
 import createDeliveryNote from "./createDeliveryNote.js"
 import createWork from "./createWork.js"
+import updateWork from "./updateWork.js"
+import deleteWork from "./deleteWork.js"
 
 import getAllInvoices from "./getAllInvoices.js"
 import getInvoice from "./getInvoice.js"
@@ -53,6 +55,8 @@ const logic = {
 
   createDeliveryNote,
   createWork,
+  updateWork,
+  deleteWork,
 
   getAllInvoices,
   getInvoice,

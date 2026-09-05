@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
-import { useParams, useNavigate, Link } from "react-router-dom"
-import { FaPlus, FaCheck, FaXmark, FaPencil, FaReceipt, FaCommentDots, FaArrowRight } from "react-icons/fa6"
+import { useParams, Link } from "react-router-dom"
+import { FaPlus, FaCheck, FaXmark, FaPencil, FaTrashCan, FaCommentDots, FaArrowRight } from "react-icons/fa6"
 
 import logic from "../../logic/index"
 import Header from "../Header"
@@ -10,7 +10,6 @@ import Time from "../core/Time"
 
 export default function CreateDeliveryNotes() {
   const { customerId } = useParams()
-  const navigate = useNavigate()
   const [deliveryNote, setDeliveryNote] = useState(null)
   const [total, setTotal] = useState(0)
   const [showFormWork, setShowFormWork] = useState(false)
@@ -18,12 +17,31 @@ export default function CreateDeliveryNotes() {
   const [isEditingDate, setIsEditingDate] = useState(false)
   const [editedDate, setEditedDate] = useState("")
 
-  // Form states
+  // Form states for creating new line
   const [workConcept, setWorkConcept] = useState("")
   const [workQuantity, setWorkQuantity] = useState("1")
   const [workPrice, setWorkPrice] = useState("")
-  const [observationText, setObservationText] = useState("")
   const [savingWork, setSavingWork] = useState(false)
+
+  // State for editing existing line
+  const [editingWorkId, setEditingWorkId] = useState(null)
+  const [editConcept, setEditConcept] = useState("")
+  const [editQuantity, setEditQuantity] = useState("")
+  const [editPrice, setEditPrice] = useState("")
+  const [updatingWork, setUpdatingWork] = useState(false)
+
+  // State for deleting line
+  const [deletingWorkId, setDeletingWorkId] = useState(null)
+
+  const [observationText, setObservationText] = useState("")
+
+  const recalculateTotal = (works) => {
+    const calc = (works || []).reduce(
+      (accumulator, work) => accumulator + (Number(work.quantity) || 0) * (Number(work.price) || 0),
+      0
+    )
+    setTotal(calc)
+  }
 
   useEffect(() => {
     try {
@@ -37,6 +55,7 @@ export default function CreateDeliveryNotes() {
           if (createdDeliveryNote?.observations) {
             setObservationText(createdDeliveryNote.observations)
           }
+          recalculateTotal(createdDeliveryNote?.works)
         })
         .catch((error) => alert(error.message))
     } catch (error) {
@@ -66,12 +85,7 @@ export default function CreateDeliveryNotes() {
           setWorkQuantity("1")
           setWorkPrice("")
           setSavingWork(false)
-
-          const calculateTotal = (deliveryNoteUpdated.works || []).reduce(
-            (accumulator, work) => accumulator + work.quantity * work.price,
-            0
-          )
-          setTotal(calculateTotal)
+          recalculateTotal(deliveryNoteUpdated.works)
         })
         .catch((error) => {
           setSavingWork(false)
@@ -79,6 +93,76 @@ export default function CreateDeliveryNotes() {
         })
     } catch (error) {
       setSavingWork(false)
+      alert(error.message)
+    }
+  }
+
+  const handleStartEditWork = (work) => {
+    const workId = work.id || work._id
+    setEditingWorkId(workId)
+    setEditConcept(work.concept || "")
+    setEditQuantity(work.quantity?.toString() || "1")
+    setEditPrice(work.price?.toString() || "")
+  }
+
+  const handleCancelEditWork = () => {
+    setEditingWorkId(null)
+    setEditConcept("")
+    setEditQuantity("")
+    setEditPrice("")
+  }
+
+  const handleUpdateWork = (event, workId) => {
+    event.preventDefault()
+    if (!editConcept.trim() || !editQuantity || !editPrice) {
+      alert("Por favor, completa todos los campos para actualizar.")
+      return
+    }
+
+    setUpdatingWork(true)
+    const concept = editConcept.trim().replace(/\s+/g, " ")
+    const quantity = parseFloat(editQuantity)
+    const price = parseFloat(editPrice)
+
+    try {
+      //prettier-ignore
+      logic.updateWork(deliveryNote.id || deliveryNote._id, workId, concept, quantity, price)
+        .then((deliveryNoteUpdated) => {
+          setDeliveryNote(deliveryNoteUpdated)
+          setEditingWorkId(null)
+          setUpdatingWork(false)
+          recalculateTotal(deliveryNoteUpdated.works)
+        })
+        .catch((error) => {
+          setUpdatingWork(false)
+          alert(error.message)
+        })
+    } catch (error) {
+      setUpdatingWork(false)
+      alert(error.message)
+    }
+  }
+
+  const handleDeleteWork = (workId) => {
+    if (!confirm("¿Deseas eliminar esta línea de trabajo?")) {
+      return
+    }
+
+    setDeletingWorkId(workId)
+    try {
+      //prettier-ignore
+      logic.deleteWork(deliveryNote.id || deliveryNote._id, workId)
+        .then((deliveryNoteUpdated) => {
+          setDeliveryNote(deliveryNoteUpdated)
+          setDeletingWorkId(null)
+          recalculateTotal(deliveryNoteUpdated.works)
+        })
+        .catch((error) => {
+          setDeletingWorkId(null)
+          alert(error.message)
+        })
+    } catch (error) {
+      setDeletingWorkId(null)
       alert(error.message)
     }
   }
@@ -230,24 +314,128 @@ export default function CreateDeliveryNotes() {
                   Aún no has añadido conceptos a este albarán.
                 </div>
               ) : (
-                deliveryNote.works.map((work, idx) => (
-                  <div
-                    key={work.id || work._id || idx}
-                    className="flex items-start justify-between gap-3 border-b border-slate-100 pb-2.5 last:border-b-0 last:pb-0 text-xs sm:text-sm text-left"
-                  >
-                    <div className="flex flex-col flex-1 min-w-0">
-                      <span className="font-semibold text-slate-800 leading-snug">
-                        {work.concept}
-                      </span>
-                      <span className="text-[11px] text-slate-400 font-medium mt-0.5">
-                        {work.quantity?.toFixed(2)} ud. × {work.price?.toFixed(2)} €
-                      </span>
+                deliveryNote.works.map((work, idx) => {
+                  const workId = work.id || work._id
+                  const isEditingThisWork = editingWorkId === workId
+
+                  if (isEditingThisWork) {
+                    return (
+                      <form
+                        key={workId || idx}
+                        onSubmit={(e) => handleUpdateWork(e, workId)}
+                        className="rounded-xl bg-amber-50/80 p-3 border border-amber-200 flex flex-col gap-2.5 text-left transition-all"
+                      >
+                        <span className="text-xs font-bold text-amber-900 flex items-center gap-1">
+                          <FaPencil className="w-3 h-3" /> Editando línea #{idx + 1}
+                        </span>
+
+                        <div>
+                          <label className="block text-[11px] font-semibold text-slate-600 mb-0.5">
+                            Concepto
+                          </label>
+                          <input
+                            type="text"
+                            required
+                            value={editConcept}
+                            onChange={(e) => setEditConcept(e.target.value)}
+                            className="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                          />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-2.5">
+                          <div>
+                            <label className="block text-[11px] font-semibold text-slate-600 mb-0.5">
+                              Cantidad
+                            </label>
+                            <input
+                              type="number"
+                              step="any"
+                              required
+                              value={editQuantity}
+                              onChange={(e) => setEditQuantity(e.target.value)}
+                              className="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-[11px] font-semibold text-slate-600 mb-0.5">
+                              Precio (€)
+                            </label>
+                            <input
+                              type="number"
+                              step="any"
+                              required
+                              value={editPrice}
+                              onChange={(e) => setEditPrice(e.target.value)}
+                              className="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="flex items-center justify-end gap-2 pt-1">
+                          <button
+                            type="button"
+                            onClick={handleCancelEditWork}
+                            className="rounded-lg bg-white border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-100 active:scale-95 transition-all"
+                          >
+                            Cancelar
+                          </button>
+                          <button
+                            type="submit"
+                            disabled={updatingWork}
+                            className="rounded-lg bg-blue-600 hover:bg-blue-700 px-3.5 py-1.5 text-xs font-bold text-white shadow-xs active:scale-95 transition-all disabled:opacity-50"
+                          >
+                            {updatingWork ? "Guardando..." : "Actualizar"}
+                          </button>
+                        </div>
+                      </form>
+                    )
+                  }
+
+                  return (
+                    <div
+                      key={workId || idx}
+                      className="group flex items-start justify-between gap-2.5 border-b border-slate-100 pb-2.5 last:border-b-0 last:pb-0 text-xs sm:text-sm text-left"
+                    >
+                      <div className="flex flex-col flex-1 min-w-0">
+                        <span className="font-semibold text-slate-800 leading-snug">
+                          {work.concept}
+                        </span>
+                        <span className="text-[11px] text-slate-400 font-medium mt-0.5">
+                          {work.quantity?.toFixed(2)} ud. × {work.price?.toFixed(2)} €
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-2 shrink-0 pt-0.5">
+                        <span className="font-bold text-slate-900 whitespace-nowrap">
+                          {(work.quantity * work.price).toFixed(2)} €
+                        </span>
+
+                        {/* Botones de Acción (Editar y Eliminar) */}
+                        <div className="flex items-center gap-1 ml-1">
+                          <button
+                            type="button"
+                            onClick={() => handleStartEditWork(work)}
+                            className="p-1.5 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 active:scale-95 transition-all"
+                            title="Editar línea"
+                          >
+                            <FaPencil className="w-3 h-3" />
+                          </button>
+
+                          <button
+                            type="button"
+                            disabled={deletingWorkId === workId}
+                            onClick={() => handleDeleteWork(workId)}
+                            className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 active:scale-95 transition-all disabled:opacity-40"
+                            title="Eliminar línea"
+                          >
+                            <FaTrashCan className="w-3 h-3" />
+                          </button>
+                        </div>
+                      </div>
                     </div>
-                    <span className="font-bold text-slate-900 whitespace-nowrap pt-0.5">
-                      {(work.quantity * work.price).toFixed(2)} €
-                    </span>
-                  </div>
-                ))
+                  )
+                })
               )}
             </div>
 
