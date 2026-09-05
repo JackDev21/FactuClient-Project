@@ -38,7 +38,7 @@ export default function UserProfile() {
       </Header>
 
       <Main className="MainProfile">
-        <div className="w-full max-w-lg mx-auto flex flex-col gap-3.5 sm:gap-4 px-3 sm:px-4">
+        <div className="w-full max-w-xl sm:max-w-2xl mx-auto flex flex-col gap-3.5 sm:gap-4 px-3 sm:px-4">
           {/* Tarjeta de Identidad / Cabecera de Perfil */}
           <div className="w-full flex flex-col items-center text-center rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-xs gap-3">
             {user?.companyLogo ? (
@@ -126,8 +126,8 @@ export default function UserProfile() {
                 )}
               </div>
               <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1.5 pt-0.5">
-                <span className="font-semibold text-slate-500">💳 Cuenta Bancaria (IBAN):</span>
-                <span className="font-bold font-mono text-slate-900 text-xs sm:text-sm tracking-wider bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-200 text-center sm:text-right">
+                <span className="font-semibold text-slate-500 shrink-0">💳 Cuenta Bancaria (IBAN):</span>
+                <span className="font-bold font-mono text-slate-900 text-xs sm:text-sm tracking-wider bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-200 text-center sm:text-right whitespace-nowrap">
                   {user?.bankAccount || "No especificada"}
                 </span>
               </div>

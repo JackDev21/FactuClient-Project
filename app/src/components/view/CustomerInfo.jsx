@@ -105,7 +105,7 @@ export default function CustomerInfo() {
       </Header>
 
       <Main className="CustomerProfile Info">
-        <div className="w-full max-w-lg mx-auto flex flex-col gap-3.5 sm:gap-4 px-3 sm:px-4">
+        <div className="w-full max-w-xl sm:max-w-2xl mx-auto flex flex-col gap-3.5 sm:gap-4 px-3 sm:px-4">
           {/* Navegación por Pestañas Segmentadas */}
           <div className="w-full inline-flex rounded-2xl bg-slate-200/70 p-1 border border-slate-200 shadow-inner">
             <button
