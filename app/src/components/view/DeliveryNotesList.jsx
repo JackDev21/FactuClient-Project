@@ -156,13 +156,17 @@ export default function DeliveryNoteList() {
                   </div>
 
                   <span
-                    className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-bold uppercase tracking-wider ${
+                    className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-bold tracking-wider ${
                       deliveryNote.isInvoiced
                         ? "bg-emerald-100/90 text-emerald-800 border border-emerald-200"
-                        : "bg-amber-100/90 text-amber-800 border border-amber-200"
+                        : "bg-amber-100/90 text-amber-800 border border-amber-200 uppercase"
                     }`}
                   >
-                    {deliveryNote.isInvoiced ? "Facturado" : "Pendiente"}
+                    {deliveryNote.isInvoiced
+                      ? deliveryNote.invoiceNumber
+                        ? `Fra. ${deliveryNote.invoiceNumber}`
+                        : "Facturado"
+                      : "Pendiente"}
                   </span>
                 </li>
               </Link>

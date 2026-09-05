@@ -334,7 +334,7 @@ export default function CustomerProfile() {
                       <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
                         deliveryNote.isInvoiced ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : "bg-orange-50 text-orange-700 border border-orange-200"
                       }`}>
-                        {deliveryNote.isInvoiced ? "Facturado" : "Pendiente"}
+                        {deliveryNote.isInvoiced ? (deliveryNote.invoiceNumber ? `Fra. ${deliveryNote.invoiceNumber}` : "Facturado") : "Pendiente"}
                       </span>
                       <FaChevronRight className="text-slate-300 text-sm" />
                     </div>

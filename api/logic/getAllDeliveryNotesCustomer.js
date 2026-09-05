@@ -1,7 +1,6 @@
-import { User, DeliveryNote } from "../model/index.js"
+import { User, DeliveryNote, Invoice } from "../model/index.js"
 import validate from "com/validate.js"
 import { NotFoundError, SystemError } from "com/errors.js"
-
 
 function getAllDeliveryNotesCustomer(userId, customerId) {
   validate.id(userId, "userId")
@@ -21,19 +20,31 @@ function getAllDeliveryNotesCustomer(userId, customerId) {
             throw new NotFoundError("Customer not found")
           }
 
-
-          return DeliveryNote.find({ customer: customerId }).populate("customer").populate("company").populate("works").sort({ date: -1 }).select("-__v").lean()
+          return Promise.all([
+            DeliveryNote.find({ customer: customerId }).populate("customer").populate("company").populate("works").sort({ date: -1 }).select("-__v").lean(),
+            Invoice.find({ customer: customerId }).select("deliveryNotes number").lean()
+          ])
             .catch(error => { throw new SystemError(error.message) })
-            .then(deliveryNotes => {
-
+            .then(([deliveryNotes, invoices]) => {
               if (!deliveryNotes.length) {
                 throw new NotFoundError("DeliveryNotes not found")
               }
 
+              const activeInvoiceMap = new Map()
+              invoices.forEach(inv => {
+                (inv.deliveryNotes || []).forEach(dnId => {
+                  activeInvoiceMap.set(dnId.toString(), inv.number)
+                })
+              })
 
               return deliveryNotes.map(deliveryNote => {
-                deliveryNote.id = deliveryNote._id.toString()
+                const dnIdStr = deliveryNote._id.toString()
+                deliveryNote.id = dnIdStr
                 delete deliveryNote._id
+
+                const invoiceNumber = activeInvoiceMap.get(dnIdStr)
+                deliveryNote.isInvoiced = !!invoiceNumber
+                deliveryNote.invoiceNumber = invoiceNumber || null
 
                 return deliveryNote
               })
