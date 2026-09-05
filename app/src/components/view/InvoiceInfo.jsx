@@ -161,17 +161,22 @@ export default function InvoiceInfo() {
                 </span>
                 {/* En móvil mostramos la fecha a la derecha si no se está editando */}
                 {!isEditingDate && (
-                  <div className="flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-slate-700 sm:hidden">
-                    <span className="bg-slate-50 border border-slate-200/80 px-2.5 py-1 rounded-lg">📅 <Time>{invoice?.date}</Time></span>
-                    {logic.getInfo().role === "user" && (
+                  <div className="flex items-center sm:hidden">
+                    {logic.getInfo().role === "user" ? (
                       <button
+                        type="button"
                         onClick={() => setIsEditingDate(true)}
-                        className="inline-flex items-center justify-center p-1.5 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 active:scale-95 transition-all"
-                        title="Editar fecha"
+                        className="inline-flex items-center gap-1.5 bg-slate-50 hover:bg-blue-50 border border-slate-200 hover:border-blue-300 px-2.5 py-1 rounded-xl text-xs sm:text-sm font-semibold text-slate-700 hover:text-blue-600 active:scale-95 transition-all cursor-pointer group shadow-2xs"
+                        title="Pulsar para editar fecha"
                         aria-label="Editar fecha"
                       >
-                        <FaPencil className="w-3.5 h-3.5" />
+                        <span>📅 <Time>{invoice?.date}</Time></span>
+                        <FaPencil className="w-3 h-3 text-slate-400 group-hover:text-blue-600 transition-colors" />
                       </button>
+                    ) : (
+                      <span className="bg-slate-50 border border-slate-200/80 px-2.5 py-1 rounded-lg text-xs sm:text-sm font-semibold text-slate-700">
+                        📅 <Time>{invoice?.date}</Time>
+                      </span>
                     )}
                   </div>
                 )}
@@ -211,17 +216,22 @@ export default function InvoiceInfo() {
                     </div>
                   </div>
                 ) : (
-                  <div className="hidden sm:flex items-center justify-end gap-1.5 text-xs sm:text-sm font-semibold text-slate-700">
-                    <span className="bg-slate-50 border border-slate-200/80 px-2.5 py-1 rounded-lg">📅 <Time>{invoice?.date}</Time></span>
-                    {logic.getInfo().role === "user" && (
+                  <div className="hidden sm:flex items-center justify-end">
+                    {logic.getInfo().role === "user" ? (
                       <button
+                        type="button"
                         onClick={() => setIsEditingDate(true)}
-                        className="inline-flex items-center justify-center p-1.5 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 active:scale-95 transition-all"
-                        title="Editar fecha"
+                        className="inline-flex items-center gap-1.5 bg-slate-50 hover:bg-blue-50 border border-slate-200 hover:border-blue-300 px-2.5 py-1 rounded-xl text-xs sm:text-sm font-semibold text-slate-700 hover:text-blue-600 active:scale-95 transition-all cursor-pointer group shadow-2xs"
+                        title="Pulsar para editar fecha"
                         aria-label="Editar fecha"
                       >
-                        <FaPencil className="w-3.5 h-3.5" />
+                        <span>📅 <Time>{invoice?.date}</Time></span>
+                        <FaPencil className="w-3 h-3 text-slate-400 group-hover:text-blue-600 transition-colors" />
                       </button>
+                    ) : (
+                      <span className="bg-slate-50 border border-slate-200/80 px-2.5 py-1 rounded-lg text-xs sm:text-sm font-semibold text-slate-700">
+                        📅 <Time>{invoice?.date}</Time>
+                      </span>
                     )}
                   </div>
                 )}
@@ -282,20 +292,25 @@ export default function InvoiceInfo() {
                   </div>
                 </div>
               ) : (
-                <div className="flex items-center justify-between sm:justify-end gap-1.5 font-bold text-slate-800">
-                  <span className="bg-slate-50 border border-slate-200/80 px-2.5 py-1 rounded-lg">{invoice?.paymentType || "Transferencia"}</span>
-                  {logic.getInfo().role === "user" && (
+                <div className="flex items-center justify-between sm:justify-end">
+                  {logic.getInfo().role === "user" ? (
                     <button
+                      type="button"
                       onClick={() => {
                         setIsEditingPaymentType(true)
                         setEditedPaymentType(invoice?.paymentType || "Transferencia")
                       }}
-                      className="inline-flex items-center justify-center p-1.5 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 active:scale-95 transition-all"
-                      title="Editar forma de pago"
+                      className="inline-flex items-center gap-1.5 bg-slate-50 hover:bg-blue-50 border border-slate-200 hover:border-blue-300 px-2.5 py-1 rounded-xl text-xs sm:text-sm font-bold text-slate-800 hover:text-blue-600 active:scale-95 transition-all cursor-pointer group shadow-2xs"
+                      title="Pulsar para editar forma de pago"
                       aria-label="Editar forma de pago"
                     >
-                      <FaPencil className="w-3.5 h-3.5" />
+                      <span>{invoice?.paymentType || "Transferencia"}</span>
+                      <FaPencil className="w-3 h-3 text-slate-400 group-hover:text-blue-600 transition-colors" />
                     </button>
+                  ) : (
+                    <span className="bg-slate-50 border border-slate-200/80 px-2.5 py-1 rounded-lg text-xs sm:text-sm font-bold text-slate-800">
+                      {invoice?.paymentType || "Transferencia"}
+                    </span>
                   )}
                 </div>
               )}

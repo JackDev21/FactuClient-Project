@@ -258,19 +258,15 @@ export default function CreateDeliveryNotes() {
                     </button>
                   </form>
                 ) : (
-                  <div className="flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-slate-700">
-                    <span className="bg-slate-50 border border-slate-200/80 px-2.5 py-1 rounded-lg">
-                      📅 <Time>{deliveryNote?.date}</Time>
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => setIsEditingDate(true)}
-                      className="p-1.5 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 active:scale-95 transition-all"
-                      title="Editar fecha"
-                    >
-                      <FaPencil className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setIsEditingDate(true)}
+                    className="inline-flex items-center gap-1.5 bg-slate-50 hover:bg-amber-50 border border-slate-200 hover:border-amber-300 px-2.5 py-1 rounded-xl text-xs sm:text-sm font-semibold text-slate-700 hover:text-amber-900 active:scale-95 transition-all cursor-pointer group shadow-2xs"
+                    title="Pulsar para editar fecha"
+                  >
+                    <span>📅 <Time>{deliveryNote?.date}</Time></span>
+                    <FaPencil className="w-3 h-3 text-slate-400 group-hover:text-amber-800 transition-colors" />
+                  </button>
                 )}
               </div>
             </div>
