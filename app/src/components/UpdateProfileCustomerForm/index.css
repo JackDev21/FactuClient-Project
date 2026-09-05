@@ -1,7 +1,1 @@
-@tailwind components;
-
-@layer components {
-  .UpdateCustomer {
-    @apply top-[11rem];
-  }
-}
+/* UpdateProfileCustomerForm.css */

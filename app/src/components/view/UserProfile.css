@@ -1,11 +1,8 @@
-@tailwind components;
-
-@layer components {
-  .CompanyLogo {
-    @apply max-h-20 min-h-20 min-w-20 max-w-20 rounded-2xl;
-  }
-
-  .HeaderProfile .IconLeftHeader {
-    @apply top-[-1rem];
-  }
+.CompanyLogo {
+  max-height: 5rem;
+  min-height: 5rem;
+  min-width: 5rem;
+  max-width: 5rem;
+  border-radius: 1rem;
+  object-fit: cover;
 }
