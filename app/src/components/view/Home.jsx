@@ -3,7 +3,7 @@ import { Link, Navigate } from "react-router-dom"
 
 import logic from "../../logic/index"
 
-import { FaUserEdit } from "react-icons/fa"
+import { FaUserEdit, FaSpinner } from "react-icons/fa"
 import { PiUsersThreeBold, PiClockCountdownBold } from "react-icons/pi"
 import { LiaFileInvoiceDollarSolid } from "react-icons/lia"
 import { GiStabbedNote } from "react-icons/gi"
@@ -66,8 +66,12 @@ export default function Home() {
           <div className="grid grid-cols-3 gap-2 sm:gap-2.5">
             <Link to="/customers" className="StatCard border-t-4 border-t-blue-500">
               <div className="flex flex-col items-center text-center">
-                <span className="text-xl sm:text-2xl font-black text-slate-900">
-                  {stats.loading ? "·" : stats.customersCount}
+                <span className="text-xl sm:text-2xl font-black text-slate-900 flex items-center justify-center min-h-[28px] sm:min-h-[32px]">
+                  {stats.loading ? (
+                    <FaSpinner className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500 animate-spin" />
+                  ) : (
+                    stats.customersCount
+                  )}
                 </span>
                 <span className="text-[11px] sm:text-xs font-bold text-slate-500 mt-0.5">
                   Clientes
@@ -77,8 +81,12 @@ export default function Home() {
 
             <Link to="/delivery-notes" className="StatCard border-t-4 border-t-amber-500">
               <div className="flex flex-col items-center text-center">
-                <span className="text-xl sm:text-2xl font-black text-amber-600">
-                  {stats.loading ? "·" : stats.pendingDeliveryCount}
+                <span className="text-xl sm:text-2xl font-black text-amber-600 flex items-center justify-center min-h-[28px] sm:min-h-[32px]">
+                  {stats.loading ? (
+                    <FaSpinner className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500 animate-spin" />
+                  ) : (
+                    stats.pendingDeliveryCount
+                  )}
                 </span>
                 <span className="text-[11px] sm:text-xs font-bold text-slate-500 mt-0.5">
                   Pendientes
@@ -88,8 +96,12 @@ export default function Home() {
 
             <Link to="/invoices" className="StatCard border-t-4 border-t-emerald-500">
               <div className="flex flex-col items-center text-center">
-                <span className="text-xl sm:text-2xl font-black text-emerald-600">
-                  {stats.loading ? "·" : stats.invoicesCount}
+                <span className="text-xl sm:text-2xl font-black text-emerald-600 flex items-center justify-center min-h-[28px] sm:min-h-[32px]">
+                  {stats.loading ? (
+                    <FaSpinner className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-500 animate-spin" />
+                  ) : (
+                    stats.invoicesCount
+                  )}
                 </span>
                 <span className="text-[11px] sm:text-xs font-bold text-slate-500 mt-0.5">
                   Facturas
