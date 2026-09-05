@@ -57,9 +57,6 @@ export default function Login() {
         <Title level={1} className="FactuClient">
           FACTUCLIENT
         </Title>
-        <Title level={2} className="Welcome">
-          ¡¡Bienvenido!!
-        </Title>
       </div>
 
       <Main className="LoginMain">
