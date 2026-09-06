@@ -2,12 +2,14 @@ import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { FaXmark, FaUserPen, FaBuilding, FaPhone, FaEnvelope, FaCreditCard, FaPercent, FaLocationDot, FaIdCard, FaImage, FaUser } from "react-icons/fa6"
 
+import useContext from "../../useContext"
 import logic from "../../logic"
 import extractPayloadJwt from "../../../utils/extractPayloadJwt"
 import "./index.css"
 
 export default function UpdateProfileForm({ onUpdateProfile, onCloseEditProfile }) {
   const navigate = useNavigate()
+  const { alert } = useContext()
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -64,21 +66,72 @@ export default function UpdateProfileForm({ onUpdateProfile, onCloseEditProfile 
     }))
   }
 
+  const handleLogoUpload = (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    if (file.size > 2 * 1024 * 1024) {
+      alert("La imagen no debe superar los 2MB de tamaño.")
+      return
+    }
+
+    const reader = new FileReader()
+    reader.onload = () => {
+      setFormData((prev) => ({
+        ...prev,
+        companyLogo: reader.result
+      }))
+    }
+    reader.readAsDataURL(file)
+  }
+
   const handleUpdateProfileForm = (event) => {
     event.preventDefault()
-    setSaving(true)
+
+    const cleanUsername = (formData.username || "").trim()
+    const cleanEmail = (formData.email || "").trim().toLowerCase()
+    const cleanFullName = (formData.fullName || "").trim().replace(/\s+/g, " ")
+    const cleanCompanyName = (formData.companyName || "").trim().replace(/\s+/g, " ")
+    const cleanAddress = (formData.address || "").trim().replace(/\s+/g, " ")
+    const cleanTaxId = (formData.taxId || "").trim().toUpperCase()
+    const cleanPhone = (formData.phone || "").replace(/[\s\-\.\(\)]/g, "").replace(/^(\+34|0034)/, "").trim()
+    const cleanBankAccount = (formData.bankAccount || "").replace(/\s+/g, "").toUpperCase()
+    const cleanLogo = (formData.companyLogo || "").trim()
+
+    const irpfStr = String(formData.irpf || "0").replace(",", ".").trim()
+    const irpfNum = parseFloat(irpfStr)
+
+    if (isNaN(irpfNum) || irpfNum < 0 || irpfNum > 100) {
+      alert("El IRPF debe ser un porcentaje válido entre 0 y 100.")
+      return
+    }
+
+    if (cleanLogo && !cleanLogo.startsWith("http://") && !cleanLogo.startsWith("https://") && !cleanLogo.startsWith("data:image/")) {
+      alert("El logotipo debe ser una URL válida (http:// o https://) o un archivo de imagen.")
+      return
+    }
 
     const updates = {
-      ...formData,
-      username: formData.username.trim(),
-      irpf: parseFloat(formData.irpf) || 0
+      username: cleanUsername,
+      email: cleanEmail,
+      fullName: cleanFullName,
+      companyName: cleanCompanyName,
+      address: cleanAddress,
+      taxId: cleanTaxId,
+      phone: cleanPhone,
+      bankAccount: cleanBankAccount,
+      irpf: irpfNum,
+      companyLogo: cleanLogo,
     }
+
+    setSaving(true)
 
     try {
       // prettier-ignore
       logic.updateProfile(updates)
         .then(() => {
           setSaving(false)
+          alert("Perfil de empresa actualizado correctamente")
           if (onUpdateProfile) onUpdateProfile()
           navigate("/users/profile")
         })
@@ -296,16 +349,52 @@ export default function UpdateProfileForm({ onUpdateProfile, onCloseEditProfile 
 
                   <div>
                     <label className="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1.5">
-                      <FaImage className="text-slate-400 text-xs" /> URL Logo de Empresa (Opcional)
+                      <FaImage className="text-slate-400 text-xs" /> Logotipo de Empresa (Opcional)
                     </label>
-                    <input
-                      type="text"
-                      name="companyLogo"
-                      value={formData.companyLogo}
-                      onChange={handleChange}
-                      placeholder="https://ejemplo.com/logo.png"
-                      className="w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-2 text-xs sm:text-sm font-medium text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-500"
-                    />
+
+                    <div className="flex flex-col gap-2.5">
+                      {formData.companyLogo && (
+                        <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200">
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            <img
+                              src={formData.companyLogo}
+                              alt="Vista previa logo"
+                              className="h-10 w-auto max-w-[100px] object-contain rounded-lg bg-white p-1 border border-slate-200 shadow-xs shrink-0"
+                            />
+                            <span className="text-xs font-medium text-slate-500 truncate">
+                              {formData.companyLogo.startsWith("data:image") ? "Imagen cargada en el perfil" : formData.companyLogo}
+                            </span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => setFormData((prev) => ({ ...prev, companyLogo: "" }))}
+                            className="text-xs font-bold text-red-600 hover:text-red-700 hover:bg-red-50 px-2.5 py-1 rounded-lg transition-all shrink-0 ml-2"
+                          >
+                            Quitar
+                          </button>
+                        </div>
+                      )}
+
+                      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                        <label className="cursor-pointer inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-xs font-bold text-slate-700 transition-all shadow-xs active:scale-95 shrink-0">
+                          <span>📁 Subir imagen</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleLogoUpload}
+                            className="hidden"
+                          />
+                        </label>
+                        <input
+                          type="text"
+                          name="companyLogo"
+                          value={formData.companyLogo.startsWith("data:image") ? "" : formData.companyLogo}
+                          onChange={handleChange}
+                          placeholder="o escribe una URL: https://ejemplo.com/logo.png"
+                          className="flex-1 rounded-xl border border-slate-300 bg-slate-50 px-3 py-2 text-xs sm:text-sm font-medium text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-500"
+                        />
+                      </div>
+                    </div>
                   </div>
                 </div>
               </>

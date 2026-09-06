@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react"
 import { FaXmark, FaUserPen, FaBuilding, FaPhone, FaEnvelope, FaLock, FaLocationDot, FaIdCard, FaUser } from "react-icons/fa6"
 
+import useContext from "../../useContext"
 import logic from "../../logic"
 import "./index.css"
 
 export default function UpdateCustomerProfileForm({ onUpdateProfile, onCloseEditProfile, customer }) {
+  const { alert } = useContext()
   const [formData, setFormData] = useState({
     username: "",
     password: "",
@@ -45,13 +47,23 @@ export default function UpdateCustomerProfileForm({ onUpdateProfile, onCloseEdit
     setSaving(true)
 
     const updates = {
-      ...formData,
-      username: formData.username.trim()
+      username: (formData.username || "").trim(),
+      companyName: (formData.companyName || "").trim().replace(/\s+/g, " "),
+      fullName: (formData.fullName || "").trim().replace(/\s+/g, " "),
+      taxId: (formData.taxId || "").trim().toUpperCase(),
+      email: (formData.email || "").trim().toLowerCase(),
+      address: (formData.address || "").trim().replace(/\s+/g, " "),
+      phone: (formData.phone || "").replace(/[\s\-\.\(\)]/g, "").replace(/^(\+34|0034)/, "").trim(),
     }
 
-    // Si la contraseña está vacía, no la enviamos para no sobreescribirla
-    if (!updates.password) {
-      delete updates.password
+    // Si hay contraseña nueva y válida, la enviamos
+    if (formData.password && formData.password.trim()) {
+      if (formData.password.length < 4) {
+        setSaving(false)
+        alert("La nueva contraseña debe tener al menos 4 caracteres.")
+        return
+      }
+      updates.password = formData.password
     }
 
     try {
@@ -59,6 +71,7 @@ export default function UpdateCustomerProfileForm({ onUpdateProfile, onCloseEdit
       logic.updateCustomerProfile(customer.id || customer._id, updates)
         .then(() => {
           setSaving(false)
+          alert("Datos del cliente actualizados correctamente")
           if (onUpdateProfile) onUpdateProfile()
         })
         .catch((error) => {

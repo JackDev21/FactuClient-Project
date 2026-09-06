@@ -30,25 +30,59 @@ export default function RegisterCustomer({ onCloseRegisterCustomer }) {
 
   const handleRegisterCustomerSubmit = (event) => {
     event.preventDefault()
-    setSaving(true)
 
-    const { username, password, fullName, companyName, taxId, email, address, phone } = formData
+    const cleanUsername = (formData.username || "").trim()
+    const cleanCompanyName = (formData.companyName || "").trim().replace(/\s+/g, " ")
+    const cleanFullName = (formData.fullName || "").trim().replace(/\s+/g, " ") || cleanCompanyName
+    const cleanTaxId = (formData.taxId || "").trim().toUpperCase()
+    const cleanEmail = (formData.email || "").trim().toLowerCase()
+    const cleanAddress = (formData.address || "").trim().replace(/\s+/g, " ")
+    const cleanPhone = (formData.phone || "").replace(/[\s\-\.\(\)]/g, "").replace(/^(\+34|0034)/, "").trim()
+    const password = formData.password
+
+    if (!cleanCompanyName) {
+      alert("Por favor, introduce la razón social o nombre de empresa.")
+      return
+    }
+    if (!cleanTaxId) {
+      alert("Por favor, introduce el CIF / NIF del cliente.")
+      return
+    }
+    if (!cleanAddress) {
+      alert("Por favor, introduce la dirección del cliente.")
+      return
+    }
+    if (!cleanUsername) {
+      alert("Por favor, introduce el nombre de usuario de acceso.")
+      return
+    }
+    if (!password || password.length < 4) {
+      alert("La contraseña debe tener al menos 4 caracteres.")
+      return
+    }
+    if (!cleanEmail) {
+      alert("Por favor, introduce un email válido.")
+      return
+    }
+    if (!cleanPhone) {
+      alert("Por favor, introduce un teléfono de contacto de 9 dígitos.")
+      return
+    }
+
+    setSaving(true)
 
     try {
       //prettier-ignore
       logic
-        .registerCustomer(username.trim(), password, fullName, companyName, email, taxId, address, phone)
+        .registerCustomer(cleanUsername, password, cleanFullName, cleanCompanyName, cleanEmail, cleanTaxId, cleanAddress, cleanPhone)
         .then(() => {
           setSaving(false)
+          alert("Cliente registrado correctamente")
           onCloseRegisterCustomer()
         })
         .catch((error) => {
           setSaving(false)
-          if (error instanceof SystemError) {
-            alert(error.message)
-          } else {
-            alert(error.message)
-          }
+          alert(error.message)
         })
     } catch (error) {
       setSaving(false)
@@ -185,14 +219,15 @@ export default function RegisterCustomer({ onCloseRegisterCustomer }) {
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1.5">
-                  <FaUser className="text-slate-400 text-xs" /> Nombre de Contacto
+                  <FaUser className="text-slate-400 text-xs" /> Nombre de Contacto *
                 </label>
                 <input
                   type="text"
                   name="fullName"
+                  required
                   value={formData.fullName}
                   onChange={handleChange}
-                  placeholder="Persona de contacto"
+                  placeholder="Ej. Juan Pérez"
                   className="w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-2 text-xs sm:text-sm font-medium text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
@@ -215,11 +250,12 @@ export default function RegisterCustomer({ onCloseRegisterCustomer }) {
 
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1.5">
-                    <FaPhone className="text-slate-400 text-xs" /> Teléfono
+                    <FaPhone className="text-slate-400 text-xs" /> Teléfono *
                   </label>
                   <input
-                    type="text"
+                    type="tel"
                     name="phone"
+                    required
                     value={formData.phone}
                     onChange={handleChange}
                     placeholder="600000000"

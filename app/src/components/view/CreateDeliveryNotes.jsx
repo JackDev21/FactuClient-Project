@@ -8,6 +8,7 @@ import Header from "../Header"
 import Main from "../core/Main"
 import Footer from "../core/Footer"
 import Time from "../core/Time"
+import Confirm from "../Confirm"
 
 export default function CreateDeliveryNotes() {
   const { customerId } = useParams()
@@ -35,6 +36,7 @@ export default function CreateDeliveryNotes() {
 
   // State for deleting line
   const [deletingWorkId, setDeletingWorkId] = useState(null)
+  const [workToDelete, setWorkToDelete] = useState(null)
 
   const [observationText, setObservationText] = useState("")
 
@@ -92,15 +94,28 @@ export default function CreateDeliveryNotes() {
 
   const handleCreateWork = (event) => {
     event.preventDefault()
-    if (!workConcept.trim() || !workQuantity || !workPrice) {
-      alert("Por favor, completa todos los campos del trabajo.")
+    const concept = workConcept.trim().replace(/\s+/g, " ")
+    if (!concept) {
+      showAlert("Por favor, introduce una descripción para el trabajo.")
+      return
+    }
+
+    const cleanQty = String(workQuantity).replace(",", ".").trim()
+    const cleanPrc = String(workPrice).replace(",", ".").trim()
+    const quantity = parseFloat(cleanQty)
+    const price = parseFloat(cleanPrc)
+
+    if (isNaN(quantity) || quantity <= 0) {
+      showAlert("La cantidad debe ser un número superior a 0.")
+      return
+    }
+
+    if (isNaN(price) || price < 0) {
+      showAlert("El precio unitario debe ser un número válido (0 o superior).")
       return
     }
 
     setSavingWork(true)
-    const concept = workConcept.trim().replace(/\s+/g, " ")
-    const quantity = parseFloat(workQuantity)
-    const price = parseFloat(workPrice)
 
     try {
       //prettier-ignore
@@ -116,11 +131,11 @@ export default function CreateDeliveryNotes() {
         })
         .catch((error) => {
           setSavingWork(false)
-          alert(error.message)
+          showAlert(error.message)
         })
     } catch (error) {
       setSavingWork(false)
-      alert(error.message)
+      showAlert(error.message)
     }
   }
 
@@ -141,15 +156,28 @@ export default function CreateDeliveryNotes() {
 
   const handleUpdateWork = (event, workId) => {
     event.preventDefault()
-    if (!editConcept.trim() || !editQuantity || !editPrice) {
-      alert("Por favor, completa todos los campos para actualizar.")
+    const concept = editConcept.trim().replace(/\s+/g, " ")
+    if (!concept) {
+      showAlert("Por favor, introduce una descripción para el trabajo.")
+      return
+    }
+
+    const cleanQty = String(editQuantity).replace(",", ".").trim()
+    const cleanPrc = String(editPrice).replace(",", ".").trim()
+    const quantity = parseFloat(cleanQty)
+    const price = parseFloat(cleanPrc)
+
+    if (isNaN(quantity) || quantity <= 0) {
+      showAlert("La cantidad debe ser un número superior a 0.")
+      return
+    }
+
+    if (isNaN(price) || price < 0) {
+      showAlert("El precio unitario debe ser un número válido (0 o superior).")
       return
     }
 
     setUpdatingWork(true)
-    const concept = editConcept.trim().replace(/\s+/g, " ")
-    const quantity = parseFloat(editQuantity)
-    const price = parseFloat(editPrice)
 
     try {
       //prettier-ignore
@@ -162,19 +190,22 @@ export default function CreateDeliveryNotes() {
         })
         .catch((error) => {
           setUpdatingWork(false)
-          alert(error.message)
+          showAlert(error.message)
         })
     } catch (error) {
       setUpdatingWork(false)
-      alert(error.message)
+      showAlert(error.message)
     }
   }
 
   const handleDeleteWork = (workId) => {
-    if (!confirm("¿Deseas eliminar esta línea de trabajo?")) {
-      return
-    }
+    setWorkToDelete(workId)
+  }
 
+  const handleConfirmDeleteWork = () => {
+    if (!workToDelete) return
+    const workId = workToDelete
+    setWorkToDelete(null)
     setDeletingWorkId(workId)
     try {
       //prettier-ignore
@@ -186,11 +217,11 @@ export default function CreateDeliveryNotes() {
         })
         .catch((error) => {
           setDeletingWorkId(null)
-          alert(error.message)
+          showAlert(error.message)
         })
     } catch (error) {
       setDeletingWorkId(null)
-      alert(error.message)
+      showAlert(error.message)
     }
   }
 
@@ -209,10 +240,10 @@ export default function CreateDeliveryNotes() {
           setShowObservationInput(false)
         })
         .catch((error) => {
-          alert(error.message)
+          showAlert(error.message)
         })
     } catch (error) {
-      alert(error.message)
+      showAlert(error.message)
     }
   }
 
@@ -236,10 +267,10 @@ export default function CreateDeliveryNotes() {
           setIsEditingDate(false)
         })
         .catch((error) => {
-          alert(error.message)
+          showAlert(error.message)
         })
     } catch (error) {
-      alert(error.message)
+      showAlert(error.message)
     }
   }
 
@@ -386,6 +417,8 @@ export default function CreateDeliveryNotes() {
                             <input
                               type="number"
                               step="any"
+                              min="0.01"
+                              inputMode="decimal"
                               required
                               value={editQuantity}
                               onChange={(e) => setEditQuantity(e.target.value)}
@@ -400,6 +433,8 @@ export default function CreateDeliveryNotes() {
                             <input
                               type="number"
                               step="any"
+                              min="0"
+                              inputMode="decimal"
                               required
                               value={editPrice}
                               onChange={(e) => setEditPrice(e.target.value)}
@@ -502,6 +537,8 @@ export default function CreateDeliveryNotes() {
                     <input
                       type="number"
                       step="any"
+                      min="0.01"
+                      inputMode="decimal"
                       required
                       value={workQuantity}
                       onChange={(e) => setWorkQuantity(e.target.value)}
@@ -517,6 +554,8 @@ export default function CreateDeliveryNotes() {
                     <input
                       type="number"
                       step="any"
+                      min="0"
+                      inputMode="decimal"
                       required
                       value={workPrice}
                       onChange={(e) => setWorkPrice(e.target.value)}
@@ -630,6 +669,12 @@ export default function CreateDeliveryNotes() {
               <span>Ver Albarán y Generar PDF</span>
               <FaArrowRight className="w-4 h-4" />
             </button>
+          )}
+          {workToDelete && (
+            <Confirm
+              setShowConfirmDelete={() => setWorkToDelete(null)}
+              handleDeleteDeliveryNote={handleConfirmDeleteWork}
+            />
           )}
         </div>
       </Main>

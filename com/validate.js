@@ -1,14 +1,14 @@
 import { ContentError, MatchError } from "./errors.js";
 
-export const NAME_REGEX = /^[a-zA-Z=\[\]\{\}\<\>\(\) ]{1,}$/
+export const NAME_REGEX = /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ=\[\]\{\}\<\>\(\)\s.'-]+$/
 export const USERNAME_REGEX = /^[\w-]+$/
 export const PASSWORD_REGEX = /^[a-zA-Z0-9-_$%&=\[\]\{\}\<\>\(\)]{4,}$/
 export const EMAIL_REGEX = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
 export const ID_REGEX = /^[0-9a-z-_]+$/i
-export const NIF_CIF_REGEX = /^[0-9]{8}[A-Z]|^[A-HJ-NP-SUVW][0-9]{7}[0-9A-J]?$/
+export const NIF_CIF_REGEX = /^[0-9]{8}[A-Z]$|^[XYZ][0-9]{7}[A-Z]$|^[A-HJ-NP-SUVW][0-9]{7}[0-9A-J]?$/i
 export const PHONE_REGEX = /^(6|7|8|9)\d{8}$/
-export const COMPANY_NAME_REGEX = /^[a-zA-Z0-9 ,.&áéíóúÁÉÍÓÚñÑ]+$/
-export const ADDRESS_REGEX = /^[\w\s,.áéíóúÁÉÍÓÚñÑ/ºª\-]+$/u
+export const COMPANY_NAME_REGEX = /^[a-zA-Z0-9 ,.&áéíóúÁÉÍÓÚñÑüÜ\-_/()'\"]+$/
+export const ADDRESS_REGEX = /^[\w\s,.áéíóúÁÉÍÓÚñÑüÜ/ºª\-'()]+$/u
 export const IBANREGEX = /^[A-Z]{2}\d{2}\s?\d{4}\s?\d{4}\s?\d{2}\s?\d{10}$/i
 export const dateRegex = /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/\d{4}$/
 
@@ -49,7 +49,7 @@ function validateText(text, explain = 'text', maxLength = Infinity) {
 }
 
 function validateUrl(url, explain = 'url') {
-  if (typeof url !== 'string' || !url.startsWith('http')) {
+  if (typeof url !== 'string' || (!url.startsWith('http://') && !url.startsWith('https://') && !url.startsWith('data:image/'))) {
     throw new ContentError(`${explain} is not valid`)
   }
 }
@@ -59,13 +59,17 @@ function validateId(id, explain = 'id') {
   }
 }
 function validateTaxId(taxId, explain = "NIF/CIF") {
-  if (typeof taxId !== "string" || !NIF_CIF_REGEX.test(taxId)) {
+  if (typeof taxId !== "string" || !NIF_CIF_REGEX.test(taxId.trim().toUpperCase())) {
     throw new ContentError(`${explain} is not valid`)
   }
 }
 
 function validatePhoneNumber(phone, explain = "phone number") {
-  if (typeof phone !== "string" || !PHONE_REGEX.test(phone)) {
+  if (typeof phone !== "string") {
+    throw new ContentError(`${explain} is not valid`)
+  }
+  const cleanPhone = phone.replace(/[\s\-\.\(\)]/g, "").replace(/^(\+34|0034)/, "")
+  if (!PHONE_REGEX.test(cleanPhone)) {
     throw new ContentError(`${explain} is not valid`)
   }
 }

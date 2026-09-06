@@ -39,8 +39,10 @@ const updateProfile = (userId, updates) => {
     validate.iban(updates.bankAccount, "bankAccount")
     updateFields.bankAccount = updates.bankAccount
   }
-  if (updates.companyLogo) {
-    validate.url(updates.companyLogo, "companyLogo")
+  if (updates.companyLogo !== undefined) {
+    if (updates.companyLogo) {
+      validate.url(updates.companyLogo, "companyLogo")
+    }
     updateFields.companyLogo = updates.companyLogo
   }
 

@@ -24,6 +24,7 @@ export default function NewInvoice() {
   const [deliveryNotes, setDeliveryNotes] = useState([])
   const [selectedDeliveryNotes, setSelectedDeliveryNotes] = useState([])
   const [expandedNotes, setExpandedNotes] = useState({})
+  const [statusFilter, setStatusFilter] = useState("pending")
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedMonth, setSelectedMonth] = useState("")
   const today = new Date().toISOString().split("T")[0]
@@ -58,6 +59,7 @@ export default function NewInvoice() {
   const handleCustomerSelect = (customer) => {
     setSelectedCustomer(customer)
     setExpandedNotes({})
+    setStatusFilter("pending")
     setLoading(true)
     try {
       //prettier-ignore
@@ -89,6 +91,12 @@ export default function NewInvoice() {
   }
 
   const handleCheckboxChange = (deliveryNoteId) => {
+    const dn = deliveryNotes.find((d) => (d.id || d._id) === deliveryNoteId)
+    if (dn && dn.isInvoiced) {
+      alert("Este albarán ya ha sido facturado anteriormente.")
+      return
+    }
+
     setSelectedDeliveryNotes((prevSelected) => {
       if (prevSelected.includes(deliveryNoteId)) {
         return prevSelected.filter((id) => id !== deliveryNoteId)
@@ -99,11 +107,24 @@ export default function NewInvoice() {
   }
 
   const handleSelectAll = () => {
-    const pendingNotes = filteredDeliveryNotes.filter((d) => !d.isInvoiced).map((d) => d.id || d._id)
-    if (selectedDeliveryNotes.length === pendingNotes.length) {
-      setSelectedDeliveryNotes([])
+    const pendingInCurrentView = filteredDeliveryNotes
+      .filter((d) => !d.isInvoiced)
+      .map((d) => d.id || d._id)
+
+    if (pendingInCurrentView.length === 0) return
+
+    const allAreSelected = pendingInCurrentView.every((id) =>
+      selectedDeliveryNotes.includes(id)
+    )
+
+    if (allAreSelected) {
+      setSelectedDeliveryNotes((prev) =>
+        prev.filter((id) => !pendingInCurrentView.includes(id))
+      )
     } else {
-      setSelectedDeliveryNotes(pendingNotes)
+      setSelectedDeliveryNotes((prev) =>
+        Array.from(new Set([...prev, ...pendingInCurrentView]))
+      )
     }
   }
 
@@ -113,6 +134,7 @@ export default function NewInvoice() {
     setDeliveryNotes([])
     setSelectedDeliveryNotes([])
     setExpandedNotes({})
+    setStatusFilter("pending")
     setSearchTerm("")
     setSelectedMonth("")
   }
@@ -151,10 +173,19 @@ export default function NewInvoice() {
     setSelectedMonth(event.target.value)
   }
 
+  const pendingCount = deliveryNotes.filter((d) => !d.isInvoiced).length
+  const invoicedCount = deliveryNotes.filter((d) => d.isInvoiced).length
+
   const filteredDeliveryNotes = deliveryNotes.filter((deliveryNote) => {
-    if (!selectedMonth) return true
-    const noteMonth = new Date(deliveryNote.date).getMonth() + 1
-    return noteMonth === parseInt(selectedMonth, 10)
+    if (selectedMonth) {
+      const noteMonth = new Date(deliveryNote.date).getMonth() + 1
+      if (noteMonth !== parseInt(selectedMonth, 10)) return false
+    }
+
+    if (statusFilter === "pending" && deliveryNote.isInvoiced) return false
+    if (statusFilter === "invoiced" && !deliveryNote.isInvoiced) return false
+
+    return true
   })
 
   return (
@@ -280,18 +311,63 @@ export default function NewInvoice() {
               {/* Filtro por Mes */}
               <MonthFilter selectedMonth={selectedMonth} handleMonthChange={handleMonthChange} />
 
+              {/* Barra de Filtros por Estado */}
+              <div className="flex w-full items-center justify-between rounded-2xl border border-slate-200/80 bg-white/90 p-1 shadow-xs backdrop-blur">
+                <button
+                  type="button"
+                  onClick={() => setStatusFilter("pending")}
+                  className={`flex-1 rounded-xl py-2 text-center text-xs sm:text-sm font-bold transition-all ${
+                    statusFilter === "pending"
+                      ? "bg-amber-500 text-white shadow-xs"
+                      : "text-amber-700 hover:bg-amber-50/50"
+                  }`}
+                >
+                  ⏳ Pendientes ({loading ? "..." : pendingCount})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setStatusFilter("invoiced")}
+                  className={`flex-1 rounded-xl py-2 text-center text-xs sm:text-sm font-bold transition-all ${
+                    statusFilter === "invoiced"
+                      ? "bg-emerald-600 text-white shadow-xs"
+                      : "text-emerald-700 hover:bg-emerald-50/50"
+                  }`}
+                >
+                  ✅ Facturados ({loading ? "..." : invoicedCount})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setStatusFilter("all")}
+                  className={`flex-1 rounded-xl py-2 text-center text-xs sm:text-sm font-bold transition-all ${
+                    statusFilter === "all"
+                      ? "bg-slate-900 text-white shadow-xs"
+                      : "text-slate-600 hover:text-slate-900"
+                  }`}
+                >
+                  Todos ({loading ? "..." : deliveryNotes.length})
+                </button>
+              </div>
+
               {/* Cabecera de Albaranes y Selección Rápida */}
               <div className="flex items-center justify-between px-1">
                 <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                  Albaranes Disponibles ({loading ? "..." : filteredDeliveryNotes.length})
+                  {statusFilter === "pending"
+                    ? `Albaranes Pendientes (${loading ? "..." : filteredDeliveryNotes.length})`
+                    : statusFilter === "invoiced"
+                    ? `Albaranes Facturados (${loading ? "..." : filteredDeliveryNotes.length})`
+                    : `Todos los Albaranes (${loading ? "..." : filteredDeliveryNotes.length})`}
                 </span>
-                {filteredDeliveryNotes.length > 0 && !loading && (
+                {filteredDeliveryNotes.some((d) => !d.isInvoiced) && !loading && (
                   <button
                     type="button"
                     onClick={handleSelectAll}
                     className="text-xs font-bold text-blue-600 hover:underline"
                   >
-                    {selectedDeliveryNotes.length > 0 ? "Deseleccionar todos" : "Seleccionar pendientes"}
+                    {filteredDeliveryNotes
+                      .filter((d) => !d.isInvoiced)
+                      .every((d) => selectedDeliveryNotes.includes(d.id || d._id))
+                      ? "Deseleccionar todos"
+                      : "Seleccionar pendientes"}
                   </button>
                 )}
               </div>
@@ -315,13 +391,18 @@ export default function NewInvoice() {
                   </div>
                 ) : filteredDeliveryNotes.length === 0 ? (
                   <div className="py-12 text-center text-slate-400 font-medium text-sm bg-white rounded-2xl border border-slate-200 p-6">
-                    No hay albaranes disponibles para este cliente en el periodo seleccionado.
+                    {statusFilter === "pending"
+                      ? "No hay albaranes pendientes para este cliente en el periodo seleccionado."
+                      : statusFilter === "invoiced"
+                      ? "No hay albaranes facturados para este cliente en el periodo seleccionado."
+                      : "No hay albaranes disponibles para este cliente en el periodo seleccionado."}
                   </div>
                 ) : (
                   filteredDeliveryNotes.map((deliveryNote) => {
                     const dnId = deliveryNote.id || deliveryNote._id
                     const isSelected = selectedDeliveryNotes.includes(dnId)
                     const isExpanded = !!expandedNotes[dnId]
+                    const isInvoiced = !!deliveryNote.isInvoiced
                     const works = deliveryNote.works || []
                     const totalAmount = works.reduce(
                       (sum, w) => sum + (Number(w.quantity) || 0) * (Number(w.price) || 0),
@@ -331,11 +412,16 @@ export default function NewInvoice() {
                     return (
                       <div
                         key={dnId}
-                        onClick={() => handleCheckboxChange(dnId)}
-                        className={`w-full flex flex-col rounded-2xl border p-3.5 sm:p-4 shadow-xs transition-all cursor-pointer text-left ${
-                          isSelected
-                            ? "border-blue-500 bg-blue-50/70 shadow-sm"
-                            : "border-slate-200 bg-white hover:border-slate-300"
+                        onClick={() => {
+                          if (isInvoiced) return
+                          handleCheckboxChange(dnId)
+                        }}
+                        className={`w-full flex flex-col rounded-2xl border p-3.5 sm:p-4 shadow-xs transition-all text-left ${
+                          isInvoiced
+                            ? "border-slate-200 bg-slate-50/75 opacity-90 cursor-default"
+                            : isSelected
+                            ? "border-blue-500 bg-blue-50/70 shadow-sm cursor-pointer"
+                            : "border-slate-200 bg-white hover:border-slate-300 cursor-pointer"
                         }`}
                       >
                         <div className="w-full flex items-center justify-between gap-2">
@@ -343,8 +429,11 @@ export default function NewInvoice() {
                             <input
                               type="checkbox"
                               checked={isSelected}
+                              disabled={isInvoiced}
                               onChange={() => {}} // Controlled via parent div click
-                              className="w-5 h-5 rounded-md border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer shrink-0"
+                              className={`w-5 h-5 rounded-md border-slate-300 text-blue-600 focus:ring-blue-500 shrink-0 ${
+                                isInvoiced ? "cursor-not-allowed opacity-40" : "cursor-pointer"
+                              }`}
                             />
                             <div className="flex flex-col min-w-0 flex-1">
                               <div className="flex items-center gap-2 flex-wrap">
@@ -394,12 +483,16 @@ export default function NewInvoice() {
 
                             <span
                               className={`text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wide shrink-0 ${
-                                deliveryNote.isInvoiced
-                                  ? "bg-slate-100 text-slate-600 border border-slate-200"
+                                isInvoiced
+                                  ? "bg-emerald-100/90 text-emerald-800 border border-emerald-200"
                                   : "bg-amber-100/90 text-amber-800 border border-amber-200"
                               }`}
                             >
-                              {deliveryNote.isInvoiced ? "Ya Facturado" : "Pendiente"}
+                              {isInvoiced
+                                ? deliveryNote.invoiceNumber
+                                  ? `Fra. ${deliveryNote.invoiceNumber}`
+                                  : "Facturado"
+                                : "Pendiente"}
                             </span>
                           </div>
                         </div>
