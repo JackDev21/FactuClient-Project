@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
-import { useParams, useNavigate } from "react-router-dom"
+import { useParams, useNavigate, Link } from "react-router-dom"
 import { PDFDownloadLink } from "@react-pdf/renderer"
-import { FaRegFilePdf } from "react-icons/fa6"
+import { FaRegFilePdf, FaHouse, FaPlus } from "react-icons/fa6"
 import { FaSpinner } from "react-icons/fa"
 
 import { GiStabbedNote } from "react-icons/gi"
@@ -184,6 +184,26 @@ export default function DeliveryInfo() {
                 )
               }
             </PDFDownloadLink>
+          )}
+
+          {/* Botones de navegación */}
+          {deliveryNote && (
+            <div className="flex w-full gap-3">
+              <Link
+                to="/"
+                className="flex flex-1 items-center justify-center gap-2 rounded-2xl border-2 border-slate-300 bg-white py-3 px-4 text-sm font-bold text-slate-700 shadow-xs transition-all active:scale-95 hover:bg-slate-50 hover:border-slate-400"
+              >
+                <FaHouse className="text-base text-slate-500" />
+                <span>Inicio</span>
+              </Link>
+              <Link
+                to={`/create/delivery-notes/${deliveryNote.customer?._id || deliveryNote.customer?.id}`}
+                className="flex flex-1 items-center justify-center gap-2 rounded-2xl border-2 border-amber-400 bg-amber-50 py-3 px-4 text-sm font-bold text-amber-800 shadow-xs transition-all active:scale-95 hover:bg-amber-100 hover:border-amber-500"
+              >
+                <FaPlus className="text-base" />
+                <span>Crear Otro Albarán</span>
+              </Link>
+            </div>
           )}
 
           {showConfirmDelete && (

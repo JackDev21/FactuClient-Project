@@ -13,7 +13,7 @@ const getAllDeliveryNotes = (userId) => {
       }
 
       return Promise.all([
-        DeliveryNote.find({ company: userId }).populate("customer", "username companyName").sort({ number: -1 }).select("-__v").lean(),
+        DeliveryNote.find({ company: userId }).populate("customer", "username companyName").sort({ date: -1 }).select("-__v").lean(),
         Invoice.find({ company: userId }).select("deliveryNotes number").lean()
       ])
         .catch(error => { throw new SystemError(error.message) })

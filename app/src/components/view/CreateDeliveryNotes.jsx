@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react"
-import { useParams, Link } from "react-router-dom"
+import { useEffect, useState, useRef } from "react"
+import { useParams, useNavigate } from "react-router-dom"
 import { FaPlus, FaCheck, FaXmark, FaPencil, FaTrashCan, FaCommentDots, FaArrowRight } from "react-icons/fa6"
 
 import logic from "../../logic/index"
+import useContext from "../../useContext"
 import Header from "../Header"
 import Main from "../core/Main"
 import Footer from "../core/Footer"
@@ -10,6 +11,8 @@ import Time from "../core/Time"
 
 export default function CreateDeliveryNotes() {
   const { customerId } = useParams()
+  const navigate = useNavigate()
+  const { alert: showAlert } = useContext()
   const [deliveryNote, setDeliveryNote] = useState(null)
   const [total, setTotal] = useState(0)
   const [showFormWork, setShowFormWork] = useState(false)
@@ -35,6 +38,10 @@ export default function CreateDeliveryNotes() {
 
   const [observationText, setObservationText] = useState("")
 
+  // Refs para controlar la limpieza al desmontar
+  const deliveryNoteRef = useRef(null)
+  const navigatedToPdfRef = useRef(false)
+
   const recalculateTotal = (works) => {
     const calc = (works || []).reduce(
       (accumulator, work) => accumulator + (Number(work.quantity) || 0) * (Number(work.price) || 0),
@@ -49,6 +56,7 @@ export default function CreateDeliveryNotes() {
       logic.createDeliveryNote(customerId)
         .then((createdDeliveryNote) => {
           setDeliveryNote(createdDeliveryNote)
+          deliveryNoteRef.current = createdDeliveryNote
           if (createdDeliveryNote?.date) {
             setEditedDate(new Date(createdDeliveryNote.date).toISOString().split("T")[0])
           }
@@ -62,6 +70,25 @@ export default function CreateDeliveryNotes() {
       alert(error.message)
     }
   }, [customerId])
+
+  // Cleanup: eliminar albarán vacío al desmontar (si el usuario navega atrás)
+  useEffect(() => {
+    return () => {
+      const dn = deliveryNoteRef.current
+      if (dn && !navigatedToPdfRef.current) {
+        const hasWorks = dn.works && dn.works.length > 0
+        if (!hasWorks) {
+          const dnId = dn.id || dn._id
+          logic.deleteDeliveryNote(dnId).catch(() => {})
+        }
+      }
+    }
+  }, [])
+
+  // Sincronizar ref con el estado actual del albarán
+  useEffect(() => {
+    deliveryNoteRef.current = deliveryNote
+  }, [deliveryNote])
 
   const handleCreateWork = (event) => {
     event.preventDefault()
@@ -587,13 +614,22 @@ export default function CreateDeliveryNotes() {
 
           {/* Botón para Ver Albarán Completo / Finalizar */}
           {deliveryNote && (
-            <Link
-              to={`/delivery-notes/${deliveryNote.id || deliveryNote._id}`}
+            <button
+              type="button"
+              onClick={() => {
+                const worksCount = deliveryNote.works?.length || 0
+                if (worksCount === 0) {
+                  showAlert("No has guardado ninguna línea de concepto en este albarán. Añade al menos una línea antes de generar el PDF.")
+                  return
+                }
+                navigatedToPdfRef.current = true
+                navigate(`/delivery-notes/${deliveryNote.id || deliveryNote._id}`)
+              }}
               className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 py-3.5 px-6 text-sm sm:text-base font-bold text-white shadow-md transition-all active:scale-95 hover:from-amber-600 hover:to-orange-600"
             >
               <span>Ver Albarán y Generar PDF</span>
               <FaArrowRight className="w-4 h-4" />
-            </Link>
+            </button>
           )}
         </div>
       </Main>

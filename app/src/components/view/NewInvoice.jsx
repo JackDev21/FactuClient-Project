@@ -97,6 +97,15 @@ export default function NewInvoice() {
     }
   }
 
+  const handleBackToCustomerSelect = () => {
+    setSelectedCustomer(null)
+    setShowCustomerList(true)
+    setDeliveryNotes([])
+    setSelectedDeliveryNotes([])
+    setSearchTerm("")
+    setSelectedMonth("")
+  }
+
   const handleCreateInvoice = () => {
     if (selectedDeliveryNotes.length === 0) {
       alert("Por favor, selecciona al menos un albarán para facturar.")
@@ -319,7 +328,7 @@ export default function NewInvoice() {
                           />
                           <div className="flex flex-col min-w-0 flex-1">
                             <span className="font-extrabold text-sm text-slate-900">
-                              A/Nº {deliveryNote.number}
+                              A/Nº: {deliveryNote.number}
                             </span>
                             <span className="text-xs text-slate-500 mt-0.5 font-medium">
                               📅 <Time>{deliveryNote.date}</Time>
@@ -328,10 +337,10 @@ export default function NewInvoice() {
                         </div>
 
                         <span
-                          className={`text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 ml-2 ${
+                          className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full shrink-0 ml-2 uppercase tracking-wide ${
                             deliveryNote.isInvoiced
                               ? "bg-slate-100 text-slate-600 border border-slate-200"
-                              : "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                              : "bg-amber-100/90 text-amber-800 border border-amber-200"
                           }`}
                         >
                           {deliveryNote.isInvoiced ? "Ya Facturado" : "Pendiente"}

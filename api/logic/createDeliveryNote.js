@@ -13,46 +13,55 @@ const createDeliveryNote = (userId, customerId) => {
         throw new NotFoundError("User not found")
       }
 
-      return DeliveryNote.findOne({ company: userId }).sort({ number: -1 }).select("-__v").lean()
-        .then(lastDeliveryNote => {
+      return DeliveryNote.find({ company: userId }).select("number").lean()
+        .then(allDeliveryNotes => {
           const currentYear = new Date().getFullYear()
-          //const currentYear = 2025 // prueba con año 2025 para ver si modifica la nota de entrega
 
-          let nextDeliveryNoteNumber = 1
+          // Extraer el número secuencial de cualquier formato
+          let maxNumber = 0
+          allDeliveryNotes.forEach(dn => {
+            const num = dn.number || ""
+            let year, seq
 
-          if (lastDeliveryNote) {
-            const [lastYear, lastNumber] = lastDeliveryNote.number.split("/") // ["2024", "001"]
-
-            if (currentYear === parseInt(lastYear)) {
-
-              nextDeliveryNoteNumber = parseInt(lastNumber) + 1
+            if (num.startsWith("ALB-")) {
+              // Formato legacy ALB-2026-0062
+              const parts = num.split("-")
+              year = parseInt(parts[1])
+              seq = parseInt(parts[2])
+            } else if (num.includes("/")) {
+              // Formato actual 2026/001
+              const parts = num.split("/")
+              year = parseInt(parts[0])
+              seq = parseInt(parts[1])
             } else {
-              nextDeliveryNoteNumber = 1
+              return // formato desconocido, ignorar
             }
+
+            if (year === currentYear && seq > maxNumber) {
+              maxNumber = seq
+            }
+          })
+
+          const nextNumber = maxNumber + 1
+          const deliveryNoteNumber = `${currentYear}/${String(nextNumber).padStart(3, '0')}`
+
+          const newDeliveryNote = {
+            date: new Date(),
+            number: deliveryNoteNumber,
+            company: userId,
+            customer: customerId,
+            observations: "",
+            works: [],
           }
 
-          const deliveryNoteNumber = `${currentYear}/${String(nextDeliveryNoteNumber).padStart(3, '0')}`
-
-          return DeliveryNote.findOne({ number: deliveryNoteNumber, company: userId }).select("-__v").lean()
-            .then(() => {
-              const newDeliveryNote = {
-                date: new Date(),
-                number: deliveryNoteNumber,
-                company: userId,
-                customer: customerId,
-                observations: "",
-                works: [],
-              }
-
-              return DeliveryNote.create(newDeliveryNote)
-                .catch(error => { throw new SystemError(error.message) })
+          return DeliveryNote.create(newDeliveryNote)
+            .catch(error => { throw new SystemError(error.message) })
+            .then((deliveryNote) => {
+              return DeliveryNote.findById(deliveryNote.id).populate("customer").populate("company").populate("works").select("-__v").lean()
                 .then((deliveryNote) => {
-                  return DeliveryNote.findById(deliveryNote.id).populate("customer").populate("company").populate("works").select("-__v").lean()
-                    .then((deliveryNote) => {
-                      deliveryNote.id = deliveryNote._id.toString()
-                      delete deliveryNote._id
-                      return deliveryNote
-                    })
+                  deliveryNote.id = deliveryNote._id.toString()
+                  delete deliveryNote._id
+                  return deliveryNote
                 })
             })
         })
