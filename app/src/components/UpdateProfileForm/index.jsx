@@ -70,17 +70,38 @@ export default function UpdateProfileForm({ onUpdateProfile, onCloseEditProfile 
     const file = e.target.files?.[0]
     if (!file) return
 
-    if (file.size > 2 * 1024 * 1024) {
-      alert("La imagen no debe superar los 2MB de tamaño.")
-      return
-    }
-
     const reader = new FileReader()
-    reader.onload = () => {
-      setFormData((prev) => ({
-        ...prev,
-        companyLogo: reader.result
-      }))
+    reader.onload = (event) => {
+      const img = new Image()
+      img.onload = () => {
+        // Redimensionar automáticamente si es grande (máximo 500px)
+        const canvas = document.createElement("canvas")
+        let { width, height } = img
+        const maxDim = 500
+
+        if (width > maxDim || height > maxDim) {
+          if (width > height) {
+            height = Math.round((height * maxDim) / width)
+            width = maxDim
+          } else {
+            width = Math.round((width * maxDim) / height)
+            height = maxDim
+          }
+        }
+
+        canvas.width = width
+        canvas.height = height
+        const ctx = canvas.getContext("2d")
+        ctx.drawImage(img, 0, 0, width, height)
+
+        // Comprimir a PNG/JPEG ligero (~30-60 KB)
+        const optimizedBase64 = canvas.toDataURL(file.type === "image/png" ? "image/png" : "image/jpeg", 0.85)
+        setFormData((prev) => ({
+          ...prev,
+          companyLogo: optimizedBase64
+        }))
+      }
+      img.src = event.target.result
     }
     reader.readAsDataURL(file)
   }

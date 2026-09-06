@@ -3,7 +3,7 @@ import routes from "./handlers/index.js"
 import updateInvoiceDateHandler from "./handlers/updateInvoiceDateHandler.js"
 import updateInvoicePaymentTypeHandler from "./handlers/updateInvoicePaymentTypeHandler.js"
 
-const jsonBodyParser = express.json({ strict: true, type: "application/json" })
+const jsonBodyParser = express.json({ strict: true, type: "application/json", limit: "10mb" })
 
 const router = express.Router()
 
