@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
-import { FaChevronRight, FaFileInvoiceDollar, FaReceipt, FaCheck, FaRotateLeft } from "react-icons/fa6"
+import { FaChevronRight, FaFileInvoiceDollar, FaReceipt, FaCheck, FaRotateLeft, FaEye, FaEyeSlash } from "react-icons/fa6"
 
 import useContext from "../../useContext"
 import { SystemError } from "com/errors"
@@ -23,6 +23,7 @@ export default function NewInvoice() {
   const [showCustomerList, setShowCustomerList] = useState(true)
   const [deliveryNotes, setDeliveryNotes] = useState([])
   const [selectedDeliveryNotes, setSelectedDeliveryNotes] = useState([])
+  const [expandedNotes, setExpandedNotes] = useState({})
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedMonth, setSelectedMonth] = useState("")
   const today = new Date().toISOString().split("T")[0]
@@ -56,6 +57,7 @@ export default function NewInvoice() {
 
   const handleCustomerSelect = (customer) => {
     setSelectedCustomer(customer)
+    setExpandedNotes({})
     setLoading(true)
     try {
       //prettier-ignore
@@ -76,6 +78,14 @@ export default function NewInvoice() {
       setLoading(false)
       alert(error.message)
     }
+  }
+
+  const toggleExpandNote = (deliveryNoteId, event) => {
+    if (event) event.stopPropagation()
+    setExpandedNotes((prev) => ({
+      ...prev,
+      [deliveryNoteId]: !prev[deliveryNoteId],
+    }))
   }
 
   const handleCheckboxChange = (deliveryNoteId) => {
@@ -102,6 +112,7 @@ export default function NewInvoice() {
     setShowCustomerList(true)
     setDeliveryNotes([])
     setSelectedDeliveryNotes([])
+    setExpandedNotes({})
     setSearchTerm("")
     setSelectedMonth("")
   }
@@ -308,43 +319,150 @@ export default function NewInvoice() {
                   </div>
                 ) : (
                   filteredDeliveryNotes.map((deliveryNote) => {
-                    const isSelected = selectedDeliveryNotes.includes(deliveryNote.id || deliveryNote._id)
+                    const dnId = deliveryNote.id || deliveryNote._id
+                    const isSelected = selectedDeliveryNotes.includes(dnId)
+                    const isExpanded = !!expandedNotes[dnId]
+                    const works = deliveryNote.works || []
+                    const totalAmount = works.reduce(
+                      (sum, w) => sum + (Number(w.quantity) || 0) * (Number(w.price) || 0),
+                      0
+                    )
+
                     return (
                       <div
-                        key={deliveryNote.id || deliveryNote._id}
-                        onClick={() => handleCheckboxChange(deliveryNote.id || deliveryNote._id)}
-                        className={`w-full flex items-center justify-between rounded-2xl border p-4 shadow-xs transition-all cursor-pointer text-left ${
+                        key={dnId}
+                        onClick={() => handleCheckboxChange(dnId)}
+                        className={`w-full flex flex-col rounded-2xl border p-3.5 sm:p-4 shadow-xs transition-all cursor-pointer text-left ${
                           isSelected
                             ? "border-blue-500 bg-blue-50/70 shadow-sm"
                             : "border-slate-200 bg-white hover:border-slate-300"
                         }`}
                       >
-                        <div className="flex items-center gap-3.5 min-w-0 flex-1">
-                          <input
-                            type="checkbox"
-                            checked={isSelected}
-                            onChange={() => {}} // Controlled via parent div click
-                            className="w-5 h-5 rounded-md border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer shrink-0"
-                          />
-                          <div className="flex flex-col min-w-0 flex-1">
-                            <span className="font-extrabold text-sm text-slate-900">
-                              A/Nº: {deliveryNote.number}
-                            </span>
-                            <span className="text-xs text-slate-500 mt-0.5 font-medium">
-                              📅 <Time>{deliveryNote.date}</Time>
+                        <div className="w-full flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-3 min-w-0 flex-1">
+                            <input
+                              type="checkbox"
+                              checked={isSelected}
+                              onChange={() => {}} // Controlled via parent div click
+                              className="w-5 h-5 rounded-md border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer shrink-0"
+                            />
+                            <div className="flex flex-col min-w-0 flex-1">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <span className="font-extrabold text-sm sm:text-base text-slate-900">
+                                  A/Nº: {deliveryNote.number}
+                                </span>
+                                {totalAmount > 0 && (
+                                  <span className="font-bold text-xs sm:text-sm text-slate-700 bg-slate-100 px-2 py-0.5 rounded-md border border-slate-200/80">
+                                    {totalAmount.toFixed(2)} €
+                                  </span>
+                                )}
+                              </div>
+                              <div className="flex items-center gap-2 text-xs text-slate-500 mt-0.5 font-medium">
+                                <span>📅 <Time>{deliveryNote.date}</Time></span>
+                                {works.length > 0 && (
+                                  <span className="text-slate-400">
+                                    · {works.length} {works.length === 1 ? "concepto" : "conceptos"}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-1.5 shrink-0">
+                            <button
+                              type="button"
+                              onClick={(e) => toggleExpandNote(dnId, e)}
+                              className={`flex items-center gap-1 text-[11px] sm:text-xs font-bold px-2 sm:px-2.5 py-1 rounded-xl border transition-all active:scale-95 ${
+                                isExpanded
+                                  ? "bg-blue-100 text-blue-800 border-blue-300"
+                                  : "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100 hover:text-slate-900"
+                              }`}
+                              title={isExpanded ? "Ocultar conceptos" : "Ver conceptos"}
+                            >
+                              {isExpanded ? (
+                                <>
+                                  <FaEyeSlash className="text-xs text-blue-600" />
+                                  <span className="hidden xs:inline sm:inline">Ocultar</span>
+                                </>
+                              ) : (
+                                <>
+                                  <FaEye className="text-xs text-blue-600" />
+                                  <span>Ver</span>
+                                </>
+                              )}
+                            </button>
+
+                            <span
+                              className={`text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wide shrink-0 ${
+                                deliveryNote.isInvoiced
+                                  ? "bg-slate-100 text-slate-600 border border-slate-200"
+                                  : "bg-amber-100/90 text-amber-800 border border-amber-200"
+                              }`}
+                            >
+                              {deliveryNote.isInvoiced ? "Ya Facturado" : "Pendiente"}
                             </span>
                           </div>
                         </div>
 
-                        <span
-                          className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full shrink-0 ml-2 uppercase tracking-wide ${
-                            deliveryNote.isInvoiced
-                              ? "bg-slate-100 text-slate-600 border border-slate-200"
-                              : "bg-amber-100/90 text-amber-800 border border-amber-200"
-                          }`}
-                        >
-                          {deliveryNote.isInvoiced ? "Ya Facturado" : "Pendiente"}
-                        </span>
+                        {/* Desplegable de Trabajos / Conceptos */}
+                        {isExpanded && (
+                          <div
+                            className="mt-3 pt-3 border-t border-slate-200/80 flex flex-col gap-2 cursor-default"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <div className="flex items-center justify-between text-[11px] font-bold uppercase tracking-wider text-slate-400 px-1">
+                              <span>Conceptos</span>
+                              <span>Importe</span>
+                            </div>
+
+                            {works.length > 0 ? (
+                              <div className="flex flex-col gap-1.5 rounded-xl bg-slate-50/90 p-2.5 border border-slate-200/70">
+                                {works.map((work, idx) => {
+                                  const lineTotal = (Number(work.quantity) || 0) * (Number(work.price) || 0)
+                                  return (
+                                    <div
+                                      key={work._id || work.id || idx}
+                                      className="flex items-start justify-between gap-3 border-b border-slate-200/40 pb-1.5 last:border-b-0 last:pb-0"
+                                    >
+                                      <div className="flex flex-col text-left flex-1 min-w-0 pr-2">
+                                        <span className="font-semibold text-slate-800 text-xs leading-snug">
+                                          {work.concept}
+                                        </span>
+                                        <span className="text-[11px] text-slate-400 font-medium">
+                                          {Number(work.quantity).toFixed(2)} ud. × {Number(work.price || 0).toFixed(2)} €
+                                        </span>
+                                      </div>
+                                      <span className="font-bold text-slate-700 text-xs shrink-0 whitespace-nowrap">
+                                        {lineTotal.toFixed(2)} €
+                                      </span>
+                                    </div>
+                                  )
+                                })}
+                              </div>
+                            ) : (
+                              <div className="rounded-xl bg-slate-50 p-2.5 text-center text-xs text-slate-400 italic border border-slate-200/50">
+                                Este albarán no contiene líneas de trabajo.
+                              </div>
+                            )}
+
+                            {/* Subtotal del albarán */}
+                            <div className="flex items-center justify-between px-1 pt-0.5">
+                              <span className="text-xs font-bold text-slate-500 uppercase tracking-wide">
+                                Total albarán:
+                              </span>
+                              <span className="text-xs sm:text-sm font-black text-blue-700 bg-blue-50 border border-blue-200 px-2.5 py-0.5 rounded-lg">
+                                {totalAmount.toFixed(2)} €
+                              </span>
+                            </div>
+
+                            {deliveryNote.observations && (
+                              <div className="text-[11px] text-slate-600 bg-amber-50/70 p-2 rounded-xl border border-amber-200/70 text-left mt-0.5">
+                                <span className="font-bold text-amber-800">Nota: </span>
+                                {deliveryNote.observations}
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </div>
                     )
                   })
