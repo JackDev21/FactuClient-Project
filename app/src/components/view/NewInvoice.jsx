@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom"
 import { FaChevronRight, FaFileInvoiceDollar, FaReceipt, FaCheck, FaRotateLeft, FaEye, FaEyeSlash } from "react-icons/fa6"
 
@@ -31,6 +31,7 @@ export default function NewInvoice() {
   const [invoiceDate, setInvoiceDate] = useState(today)
   const [loading, setLoading] = useState(true)
   const [creating, setCreating] = useState(false)
+  const isCreatingRef = useRef(false)
 
   const filterCustomers = () =>
     customers.filter((customer) => customer.companyName.toLowerCase().includes(searchTerm.toLowerCase()))
@@ -140,30 +141,32 @@ export default function NewInvoice() {
   }
 
   const handleCreateInvoice = () => {
+    if (isCreatingRef.current || creating) return
+
     if (selectedDeliveryNotes.length === 0) {
       alert("Por favor, selecciona al menos un albarán para facturar.")
       return
     }
 
+    isCreatingRef.current = true
     setCreating(true)
     try {
       //prettier-ignore
       logic
         .createInvoice(selectedCustomer.id || selectedCustomer._id, selectedDeliveryNotes, invoiceDate)
         .then(() => {
+          isCreatingRef.current = false
           setCreating(false)
           alert("Factura creada correctamente")
           navigate("/invoices")
         })
         .catch((error) => {
+          isCreatingRef.current = false
           setCreating(false)
-          if (error instanceof SystemError) {
-            alert(error.message)
-          } else {
-            alert(error.message)
-          }
+          alert(error.message)
         })
     } catch (error) {
+      isCreatingRef.current = false
       setCreating(false)
       alert(error.message)
     }

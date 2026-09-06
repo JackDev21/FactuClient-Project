@@ -26,14 +26,29 @@ const deleteInvoice = (userId, invoiceId) => {
 
           const deliveryNotesToFree = invoice.deliveryNotes || []
 
-          return DeliveryNote.updateMany(
-            { _id: { $in: deliveryNotesToFree } },
-            { $set: { isInvoiced: false } }
-          )
+          return Invoice.deleteOne({ _id: invoiceId })
             .catch(error => { throw new SystemError(error.message) })
             .then(() => {
-              return Invoice.deleteOne({ _id: invoiceId })
+              return Invoice.find({ deliveryNotes: { $in: deliveryNotesToFree } }).select("deliveryNotes").lean()
                 .catch(error => { throw new SystemError(error.message) })
+                .then(activeInvoices => {
+                  const stillUsedIds = new Set()
+                  activeInvoices.forEach(inv => {
+                    (inv.deliveryNotes || []).forEach(dn => stillUsedIds.add(dn.toString()))
+                  })
+
+                  const idsToFree = deliveryNotesToFree
+                    .map(dn => dn.toString())
+                    .filter(dnId => !stillUsedIds.has(dnId))
+
+                  if (idsToFree.length > 0) {
+                    return DeliveryNote.updateMany(
+                      { _id: { $in: idsToFree } },
+                      { $set: { isInvoiced: false } }
+                    )
+                      .catch(error => { throw new SystemError(error.message) })
+                  }
+                })
                 .then(() => { })
             })
         })

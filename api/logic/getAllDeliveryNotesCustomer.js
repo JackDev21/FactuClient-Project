@@ -37,17 +37,39 @@ function getAllDeliveryNotesCustomer(userId, customerId) {
                 })
               })
 
-              return deliveryNotes.map(deliveryNote => {
+              const outOfSyncIdsToFix = []
+              const outOfSyncInvoicedIdsToFix = []
+
+              const mappedNotes = deliveryNotes.map(deliveryNote => {
                 const dnIdStr = deliveryNote._id.toString()
                 deliveryNote.id = dnIdStr
                 delete deliveryNote._id
 
                 const invoiceNumber = activeInvoiceMap.get(dnIdStr)
-                deliveryNote.isInvoiced = !!invoiceNumber
+                const isReallyInvoiced = !!invoiceNumber
+
+                if (deliveryNote.isInvoiced !== isReallyInvoiced) {
+                  if (isReallyInvoiced) {
+                    outOfSyncInvoicedIdsToFix.push(dnIdStr)
+                  } else {
+                    outOfSyncIdsToFix.push(dnIdStr)
+                  }
+                }
+
+                deliveryNote.isInvoiced = isReallyInvoiced
                 deliveryNote.invoiceNumber = invoiceNumber || null
 
                 return deliveryNote
               })
+
+              if (outOfSyncIdsToFix.length > 0) {
+                DeliveryNote.updateMany({ _id: { $in: outOfSyncIdsToFix } }, { $set: { isInvoiced: false } }).catch(() => {})
+              }
+              if (outOfSyncInvoicedIdsToFix.length > 0) {
+                DeliveryNote.updateMany({ _id: { $in: outOfSyncInvoicedIdsToFix } }, { $set: { isInvoiced: true } }).catch(() => {})
+              }
+
+              return mappedNotes
             })
         })
     })
