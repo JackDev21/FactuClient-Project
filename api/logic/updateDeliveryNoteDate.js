@@ -31,7 +31,7 @@ const updateDateDeliveryNote = (userId, deliveryNoteId, date) => {
             throw new NotFoundError("Delivery note not found")
           }
 
-          return updateDateDeliveryNote
+          return updatedDeliveryNote
         })
 
     })

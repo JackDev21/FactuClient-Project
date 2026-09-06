@@ -1,12 +1,13 @@
 import validate from "com/validate.js";
 import { User, DeliveryNote } from "../model/index.js";
-import { NotFoundError, SystemError } from "com/errors.js"
-
+import { NotFoundError, SystemError, ContentError } from "com/errors.js"
 
 const addNewObservation = (userId, deliveryNoteId, observation) => {
   validate.id(userId, "userId")
   validate.id(deliveryNoteId, "deliveryNoteId")
-  validate.text(observation, "observation")
+  if (typeof observation !== "string") {
+    throw new ContentError("observation is not valid")
+  }
 
   return User.findById(userId).select("-__v").lean()
     .catch(error => { throw new SystemError(error.message) })
