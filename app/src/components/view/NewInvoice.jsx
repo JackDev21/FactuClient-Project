@@ -443,8 +443,8 @@ export default function NewInvoice() {
                                 <span className="font-extrabold text-sm sm:text-base text-slate-900">
                                   A/Nº: {deliveryNote.number}
                                 </span>
-                                {totalAmount > 0 && (
-                                  <span className="font-bold text-xs sm:text-sm text-slate-700 bg-slate-100 px-2 py-0.5 rounded-md border border-slate-200/80">
+                                {totalAmount !== 0 && (
+                                  <span className={`font-bold text-xs sm:text-sm px-2 py-0.5 rounded-md border ${totalAmount < 0 ? "text-red-700 bg-red-50 border-red-200/80" : "text-slate-700 bg-slate-100 border-slate-200/80"}`}>
                                     {totalAmount.toFixed(2)} €
                                   </span>
                                 )}

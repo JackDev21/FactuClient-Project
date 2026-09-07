@@ -129,13 +129,13 @@ export default function DeliveryInfo() {
     const quantity = Number(editQuantity.replace(",", "."))
     const price = Number(editPrice.replace(",", "."))
 
-    if (isNaN(quantity) || quantity <= 0) {
-      showAlert("La cantidad debe ser un número superior a 0.")
+    if (isNaN(quantity) || quantity === 0) {
+      showAlert("La cantidad debe ser un número distinto de 0.")
       return
     }
 
-    if (isNaN(price) || price < 0) {
-      showAlert("El precio unitario debe ser un número válido (0 o superior).")
+    if (isNaN(price)) {
+      showAlert("El precio unitario debe ser un número válido.")
       return
     }
 
@@ -199,13 +199,13 @@ export default function DeliveryInfo() {
     const quantity = Number(newQuantity.replace(",", "."))
     const price = Number(newPrice.replace(",", "."))
 
-    if (isNaN(quantity) || quantity <= 0) {
-      showAlert("La cantidad debe ser un número superior a 0.")
+    if (isNaN(quantity) || quantity === 0) {
+      showAlert("La cantidad debe ser un número distinto de 0.")
       return
     }
 
-    if (isNaN(price) || price < 0) {
-      showAlert("El precio unitario debe ser un número válido (0 o superior).")
+    if (isNaN(price)) {
+      showAlert("El precio unitario debe ser un número válido.")
       return
     }
 
@@ -460,7 +460,6 @@ export default function DeliveryInfo() {
                             <input
                               type="number"
                               step="any"
-                              min="0.01"
                               inputMode="decimal"
                               required
                               value={editQuantity}
@@ -476,7 +475,6 @@ export default function DeliveryInfo() {
                             <input
                               type="number"
                               step="any"
-                              min="0"
                               inputMode="decimal"
                               required
                               value={editPrice}
@@ -590,7 +588,6 @@ export default function DeliveryInfo() {
                     <input
                       type="number"
                       step="any"
-                      min="0.01"
                       inputMode="decimal"
                       required
                       value={newQuantity}
@@ -607,7 +604,6 @@ export default function DeliveryInfo() {
                     <input
                       type="number"
                       step="any"
-                      min="0"
                       inputMode="decimal"
                       required
                       value={newPrice}

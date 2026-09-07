@@ -105,13 +105,13 @@ export default function CreateDeliveryNotes() {
     const quantity = parseFloat(cleanQty)
     const price = parseFloat(cleanPrc)
 
-    if (isNaN(quantity) || quantity <= 0) {
-      showAlert("La cantidad debe ser un número superior a 0.")
+    if (isNaN(quantity) || quantity === 0) {
+      showAlert("La cantidad debe ser un número distinto de 0.")
       return
     }
 
-    if (isNaN(price) || price < 0) {
-      showAlert("El precio unitario debe ser un número válido (0 o superior).")
+    if (isNaN(price)) {
+      showAlert("El precio unitario debe ser un número válido.")
       return
     }
 
@@ -167,13 +167,13 @@ export default function CreateDeliveryNotes() {
     const quantity = parseFloat(cleanQty)
     const price = parseFloat(cleanPrc)
 
-    if (isNaN(quantity) || quantity <= 0) {
-      showAlert("La cantidad debe ser un número superior a 0.")
+    if (isNaN(quantity) || quantity === 0) {
+      showAlert("La cantidad debe ser un número distinto de 0.")
       return
     }
 
-    if (isNaN(price) || price < 0) {
-      showAlert("El precio unitario debe ser un número válido (0 o superior).")
+    if (isNaN(price)) {
+      showAlert("El precio unitario debe ser un número válido.")
       return
     }
 
@@ -250,20 +250,22 @@ export default function CreateDeliveryNotes() {
   const handleUpdateDeliveryNoteDate = (event) => {
     event.preventDefault()
 
-    const convertToISODate = (dateStr) => {
+    const convertToDDMMYYYY = (dateStr) => {
       if (dateStr.includes("-")) {
         const parts = dateStr.split("-")
-        if (parts[0].length === 4) return dateStr // Already YYYY-MM-DD
-        return `${parts[2]}/${parts[1]}/${parts[0]}`
+        if (parts[0].length === 4) {
+          // YYYY-MM-DD → DD/MM/YYYY
+          return `${parts[2]}/${parts[1]}/${parts[0]}`
+        }
       }
       return dateStr
     }
 
     try {
       //prettier-ignore
-      logic.updateDeliveryNoteDate(deliveryNote.id || deliveryNote._id, convertToISODate(editedDate))
-        .then((deliveryNoteUpdated) => {
-          setDeliveryNote((prev) => ({ ...prev, date: deliveryNoteUpdated.date || editedDate }))
+      logic.updateDeliveryNoteDate(deliveryNote.id || deliveryNote._id, convertToDDMMYYYY(editedDate))
+        .then(() => {
+          setDeliveryNote((prev) => ({ ...prev, date: editedDate }))
           setIsEditingDate(false)
         })
         .catch((error) => {
@@ -417,7 +419,6 @@ export default function CreateDeliveryNotes() {
                             <input
                               type="number"
                               step="any"
-                              min="0.01"
                               inputMode="decimal"
                               required
                               value={editQuantity}
@@ -433,7 +434,6 @@ export default function CreateDeliveryNotes() {
                             <input
                               type="number"
                               step="any"
-                              min="0"
                               inputMode="decimal"
                               required
                               value={editPrice}
@@ -537,7 +537,6 @@ export default function CreateDeliveryNotes() {
                     <input
                       type="number"
                       step="any"
-                      min="0.01"
                       inputMode="decimal"
                       required
                       value={workQuantity}
@@ -554,7 +553,6 @@ export default function CreateDeliveryNotes() {
                     <input
                       type="number"
                       step="any"
-                      min="0"
                       inputMode="decimal"
                       required
                       value={workPrice}
