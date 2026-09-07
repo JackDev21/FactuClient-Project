@@ -2,6 +2,19 @@ import { User, DeliveryNote, Invoice } from "../model/index.js"
 import validate from "com/validate.js"
 import { NotFoundError, SystemError } from "com/errors.js"
 
+const parseDeliveryNoteNumber = (numStr) => {
+  if (!numStr) return { year: 0, seq: 0 }
+  if (numStr.startsWith("ALB-")) {
+    const parts = numStr.split("-")
+    return { year: parseInt(parts[1]) || 0, seq: parseInt(parts[2]) || 0 }
+  }
+  if (numStr.includes("/")) {
+    const parts = numStr.split("/")
+    return { year: parseInt(parts[0]) || 0, seq: parseInt(parts[1]) || 0 }
+  }
+  return { year: 0, seq: parseInt(numStr) || 0 }
+}
+
 function getAllDeliveryNotesCustomer(userId, customerId) {
   validate.id(userId, "userId")
   validate.id(customerId, "customerId")
@@ -21,7 +34,7 @@ function getAllDeliveryNotesCustomer(userId, customerId) {
           }
 
           return Promise.all([
-            DeliveryNote.find({ customer: customerId }).populate("customer").populate("company").populate("works").sort({ date: -1 }).select("-__v").lean(),
+            DeliveryNote.find({ customer: customerId }).populate("customer").populate("company").populate("works").sort({ number: -1 }).select("-__v").lean(),
             Invoice.find({ customer: customerId }).select("deliveryNotes number").lean()
           ])
             .catch(error => { throw new SystemError(error.message) })
@@ -68,6 +81,15 @@ function getAllDeliveryNotesCustomer(userId, customerId) {
               if (outOfSyncInvoicedIdsToFix.length > 0) {
                 DeliveryNote.updateMany({ _id: { $in: outOfSyncInvoicedIdsToFix } }, { $set: { isInvoiced: true } }).catch(() => {})
               }
+
+              mappedNotes.sort((a, b) => {
+                const numA = parseDeliveryNoteNumber(a.number)
+                const numB = parseDeliveryNoteNumber(b.number)
+                if (numB.year !== numA.year) {
+                  return numB.year - numA.year
+                }
+                return numB.seq - numA.seq
+              })
 
               return mappedNotes
             })
