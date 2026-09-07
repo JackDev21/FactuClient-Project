@@ -13,12 +13,8 @@ const createDeliveryNote = (userId, customerId) => {
         throw new NotFoundError("User not found")
       }
 
-      // Limpiar albaranes huérfanos (sin líneas de trabajo y no facturados) antes de crear uno nuevo
-      return DeliveryNote.deleteMany({ company: userId, works: { $size: 0 }, isInvoiced: false })
-        .catch(error => { throw new SystemError(error.message) })
-        .then(() => {
-          return DeliveryNote.find({ company: userId }).select("number").lean()
-            .then(allDeliveryNotes => {
+      return DeliveryNote.find({ company: userId }).select("number").lean()
+        .then(allDeliveryNotes => {
               const currentYear = new Date().getFullYear()
 
               // Extraer el número secuencial de cualquier formato
@@ -68,7 +64,6 @@ const createDeliveryNote = (userId, customerId) => {
                       return deliveryNote
                     })
                 })
-            })
         })
     })
 }

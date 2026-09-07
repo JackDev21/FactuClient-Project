@@ -18,6 +18,19 @@ import "./DeliveryNotesList.css"
 
 const PAGE_SIZE = 8
 
+const parseDeliveryNoteNumber = (numStr) => {
+  if (!numStr) return { year: 0, seq: 0 }
+  if (numStr.startsWith("ALB-")) {
+    const parts = numStr.split("-")
+    return { year: parseInt(parts[1]) || 0, seq: parseInt(parts[2]) || 0 }
+  }
+  if (numStr.includes("/")) {
+    const parts = numStr.split("/")
+    return { year: parseInt(parts[0]) || 0, seq: parseInt(parts[1]) || 0 }
+  }
+  return { year: 0, seq: parseInt(numStr) || 0 }
+}
+
 export default function DeliveryNoteList() {
   const { alert } = useContext()
 
@@ -33,7 +46,15 @@ export default function DeliveryNoteList() {
       logic
         .getAllDeliveryNotes()
         .then((deliveryNotes) => {
-          setDeliveryNotes(deliveryNotes || [])
+          const sorted = (deliveryNotes || []).slice().sort((a, b) => {
+            const numA = parseDeliveryNoteNumber(a.number)
+            const numB = parseDeliveryNoteNumber(b.number)
+            if (numB.year !== numA.year) {
+              return numB.year - numA.year
+            }
+            return numB.seq - numA.seq
+          })
+          setDeliveryNotes(sorted)
         })
         .catch((error) => {
           if (error instanceof SystemError) {

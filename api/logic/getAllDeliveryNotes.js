@@ -25,14 +25,10 @@ const getAllDeliveryNotes = (userId) => {
         throw new NotFoundError("User not found")
       }
 
-      // Limpiar albaranes huérfanos (sin líneas de trabajo y no facturados)
-      return DeliveryNote.deleteMany({ company: userId, works: { $size: 0 }, isInvoiced: false })
-        .catch(error => { throw new SystemError(error.message) })
-        .then(() => {
-          return Promise.all([
-            DeliveryNote.find({ company: userId }).populate("customer", "username companyName").sort({ number: -1 }).select("-__v").lean(),
-            Invoice.find({ company: userId }).select("deliveryNotes number").lean()
-          ])
+      return Promise.all([
+        DeliveryNote.find({ company: userId }).populate("customer", "username companyName").sort({ number: -1 }).select("-__v").lean(),
+        Invoice.find({ company: userId }).select("deliveryNotes number").lean()
+      ])
             .catch(error => { throw new SystemError(error.message) })
             .then(([deliveryNotes, invoices]) => {
               if (!deliveryNotes.length) {
@@ -91,7 +87,6 @@ const getAllDeliveryNotes = (userId) => {
               return mappedNotes
             })
         })
-    })
 }
 
 export default getAllDeliveryNotes
