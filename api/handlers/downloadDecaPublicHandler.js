@@ -1,4 +1,5 @@
 import logic from "../logic/index.js"
+import getBaseUrl from "../utils/getBaseUrl.js"
 
 /**
  * Endpoint público para inspección en carretera por la Guardia Civil / Inspectores de Transporte.
@@ -8,8 +9,9 @@ import logic from "../logic/index.js"
 export default (req, res, next) => {
   try {
     const { publicToken } = req.params
+    const baseUrl = getBaseUrl(req)
 
-    logic.getDecaByToken(publicToken)
+    logic.getDecaByToken(publicToken, baseUrl)
       .then(({ pdfPath, pdfFilename }) => {
         // Enviar cabeceras HTTP para visualización y descarga inmediata
         res.setHeader("Content-Type", "application/pdf")
