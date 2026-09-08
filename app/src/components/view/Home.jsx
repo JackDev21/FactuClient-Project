@@ -7,7 +7,7 @@ import { FaUserEdit, FaSpinner } from "react-icons/fa"
 import { PiUsersThreeBold, PiClockCountdownBold } from "react-icons/pi"
 import { LiaFileInvoiceDollarSolid } from "react-icons/lia"
 import { GiStabbedNote } from "react-icons/gi"
-import { FaPlus, FaChevronRight } from "react-icons/fa6"
+import { FaPlus, FaChevronRight, FaFileShield } from "react-icons/fa6"
 
 import Header from "../Header"
 import Main from "../core/Main"
@@ -152,6 +152,27 @@ export default function Home() {
                 <div className="flex flex-col text-left gap-0.5">
                   <span className="text-base sm:text-lg font-extrabold text-slate-900">Albaranes</span>
                   <span className="text-xs sm:text-sm font-medium text-slate-500">Control de servicios y entregas</span>
+                </div>
+              </div>
+              <FaChevronRight className="text-sm text-slate-400 shrink-0" />
+            </div>
+          </Link>
+
+          {/* Tarjeta: Documentos DeCA (Transporte Oficial) */}
+          <Link to="/deca" className="DashboardCardLink">
+            <div className="DashboardCard border-l-4 border-l-slate-900">
+              <div className="flex items-center gap-3.5">
+                <div className="flex h-13 w-13 shrink-0 items-center justify-center rounded-2xl bg-slate-900 text-2xl sm:text-3xl text-amber-400 shadow-xs">
+                  <FaFileShield />
+                </div>
+                <div className="flex flex-col text-left gap-0.5">
+                  <div className="flex items-center gap-2">
+                    <span className="text-base sm:text-lg font-extrabold text-slate-900">DeCA Digital</span>
+                    <span className="rounded-md bg-amber-100 text-amber-900 text-[10px] font-black px-1.5 py-0.5 border border-amber-300">
+                      OCT 2026
+                    </span>
+                  </div>
+                  <span className="text-xs sm:text-sm font-medium text-slate-500">Control administrativo y QR para transporte</span>
                 </div>
               </div>
               <FaChevronRight className="text-sm text-slate-400 shrink-0" />

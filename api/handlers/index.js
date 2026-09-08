@@ -33,6 +33,13 @@ import addNewObservation from "./addNewObservationHandler.js"
 import requestPasswordResetHandler from "./requestPasswordResetHandler.js"
 import resetPasswordHandler from "./resetPasswordHandler.js"
 
+import createDecaHandler from "./createDecaHandler.js"
+import getDecaHandler from "./getDecaHandler.js"
+import getAllDecasHandler from "./getAllDecasHandler.js"
+import downloadDecaPublicHandler from "./downloadDecaPublicHandler.js"
+import updateDecaHandler from "./updateDecaHandler.js"
+import updateDecaTransportEndHandler from "./updateDecaTransportEndHandler.js"
+
 
 export default {
   registerUserHandler,
@@ -70,4 +77,11 @@ export default {
 
   requestPasswordResetHandler,
   resetPasswordHandler,
+
+  createDecaHandler,
+  getDecaHandler,
+  getAllDecasHandler,
+  downloadDecaPublicHandler,
+  updateDecaHandler,
+  updateDecaTransportEndHandler,
 }

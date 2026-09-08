@@ -45,4 +45,12 @@ router.post("/request-password-reset", jsonBodyParser, routes.requestPasswordRes
 
 router.post("/reset-password/:userId/:token", jsonBodyParser, routes.resetPasswordHandler)
 
+// === DeCA (Documento Electrónico de Control Administrativo) ===
+router.get("/deca/public/:publicToken/download", routes.downloadDecaPublicHandler)
+router.post("/deca/:deliveryNoteId", jsonBodyParser, routes.createDecaHandler)
+router.get("/deca", routes.getAllDecasHandler)
+router.get("/deca/:decaId", routes.getDecaHandler)
+router.patch("/deca/:decaId", jsonBodyParser, routes.updateDecaHandler)
+router.patch("/deca/:decaId/transport-end", jsonBodyParser, routes.updateDecaTransportEndHandler)
+
 export default router

@@ -23,6 +23,9 @@ import logic from "./logic/index"
 
 import "./global.css"
 import ResetPassword from "./components/view/ResetPassword"
+import DecaList from "./components/view/DecaList"
+import DecaForm from "./components/view/DecaForm"
+import DecaInfo from "./components/view/DecaInfo"
 
 function App() {
   const [message, setMessage] = useState(null)
@@ -54,6 +57,10 @@ function App() {
 
           <Route path="/delivery-notes" element={<DeliveryNoteList />} />
           <Route path="/delivery-notes/:deliveryNoteId" element={<DeliveryInfo />} />
+
+          <Route path="/deca" element={<DecaList />} />
+          <Route path="/deca/new/:deliveryNoteId" element={<DecaForm />} />
+          <Route path="/deca/:decaId" element={<DecaInfo />} />
 
           <Route path="/request-password-reset" element={<RequestPassword />} />
           <Route path="/reset-password/:userId/:token" element={<ResetPassword />} />

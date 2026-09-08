@@ -33,6 +33,13 @@ import addNewObservation from "./addNewObservation.js"
 import requestPasswordReset from "./requestPasswordReset.js"
 import resetPassword from "./resetPassword.js"
 
+import createDeca from "./createDeca.js"
+import getDeca from "./getDeca.js"
+import getDecaByToken from "./getDecaByToken.js"
+import getAllDecas from "./getAllDecas.js"
+import updateDeca from "./updateDeca.js"
+import updateDecaTransportEnd from "./updateDecaTransportEnd.js"
+
 
 const logic = {
   registerUser,
@@ -69,6 +76,13 @@ const logic = {
 
   requestPasswordReset,
   resetPassword,
+
+  createDeca,
+  getDeca,
+  getDecaByToken,
+  getAllDecas,
+  updateDeca,
+  updateDecaTransportEnd,
 }
 
 export default logic

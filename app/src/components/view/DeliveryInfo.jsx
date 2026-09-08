@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react"
 import { useParams, useNavigate, Link } from "react-router-dom"
 import { PDFDownloadLink } from "@react-pdf/renderer"
-import { FaRegFilePdf, FaHouse, FaPlus, FaPencil, FaTrashCan, FaCheck, FaXmark, FaCommentDots } from "react-icons/fa6"
+import { FaRegFilePdf, FaHouse, FaPlus, FaPencil, FaTrashCan, FaCheck, FaXmark, FaCommentDots, FaFileShield, FaTruckFast } from "react-icons/fa6"
 import { FaSpinner } from "react-icons/fa"
 
 import { MdDeleteForever } from "react-icons/md"
@@ -713,6 +713,27 @@ export default function DeliveryInfo() {
               {total.toFixed(2)} €
             </span>
           </div>
+
+          {/* Botón DeCA Oficial para transporte */}
+          {deliveryNote && (
+            deliveryNote.deca ? (
+              <Link
+                to={`/deca/${deliveryNote.deca}`}
+                className="flex w-full items-center justify-center gap-2.5 rounded-2xl bg-slate-900 py-3.5 px-6 text-sm font-bold text-white shadow-md transition-all active:scale-95 hover:bg-slate-800"
+              >
+                <FaFileShield className="text-amber-400 text-base" />
+                <span>Ver DeCA Oficial Emitido (con QR de Inspección)</span>
+              </Link>
+            ) : (
+              <Link
+                to={`/deca/new/${deliveryNoteId}`}
+                className="flex w-full items-center justify-center gap-2.5 rounded-2xl border-2 border-amber-500 bg-amber-50 py-3 px-6 text-sm font-bold text-amber-900 shadow-xs transition-all active:scale-95 hover:bg-amber-100"
+              >
+                <FaTruckFast className="text-amber-600 text-base" />
+                <span>Emitir DeCA Oficial (Transporte de Mercancías)</span>
+              </Link>
+            )
+          )}
 
           {/* Botón de Descarga PDF */}
           {deliveryNote && (

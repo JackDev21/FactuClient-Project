@@ -37,6 +37,12 @@ import addNewObservation from "./addNewObservation.js"
 import requestPasswordReset from "./requestPasswordReset.js"
 import resetPassword from "./resetPassword.js"
 
+import createDeca from "./createDeca.js"
+import getDeca from "./getDeca.js"
+import getAllDecas from "./getAllDecas.js"
+import updateDeca from "./updateDeca.js"
+import updateDecaTransportEnd from "./updateDecaTransportEnd.js"
+
 
 const logic = {
   isUserLoggedIn,
@@ -79,6 +85,11 @@ const logic = {
   requestPasswordReset,
   resetPassword,
 
+  createDeca,
+  getDeca,
+  getAllDecas,
+  updateDeca,
+  updateDecaTransportEnd,
 }
 
 export default logic

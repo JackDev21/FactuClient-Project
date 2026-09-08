@@ -34,6 +34,10 @@ const deliveryNote = new Schema({
   isInvoiced: {
     type: Boolean,
     default: false
+  },
+  deca: {
+    type: ObjectId,
+    ref: "Deca"
   }
 })
 
