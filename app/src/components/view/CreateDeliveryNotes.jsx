@@ -52,7 +52,13 @@ export default function CreateDeliveryNotes() {
     setTotal(calc)
   }
 
+  // Ref para evitar doble creación por re-render
+  const creatingRef = useRef(false)
+
   useEffect(() => {
+    if (creatingRef.current) return
+    creatingRef.current = true
+
     try {
       //prettier-ignore
       logic.createDeliveryNote(customerId)

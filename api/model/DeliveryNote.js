@@ -37,6 +37,8 @@ const deliveryNote = new Schema({
   }
 })
 
+deliveryNote.index({ company: 1, number: 1 }, { unique: true })
+
 const DeliveryNote = model("DeliveryNote", deliveryNote)
 
 export default DeliveryNote

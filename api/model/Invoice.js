@@ -31,6 +31,8 @@ const invoice = new Schema({
   }
 })
 
+invoice.index({ company: 1, number: 1 }, { unique: true })
+
 const Invoice = model("Invoice", invoice)
 
 export default Invoice
