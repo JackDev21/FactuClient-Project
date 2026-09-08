@@ -257,9 +257,8 @@ export default async function generateDecaPdf(decaData, outputPath, publicDownlo
         .fillColor(primaryColor)
         .fill()
 
-      doc.fontSize(7).font("Helvetica-Bold").fillColor("#FFFFFF").text("CONCEPTO / DETALLE DE PARTIDAS", 45, curY + 4)
-      doc.text("CANTIDAD", 420, curY + 4, { width: 55, align: "right" })
-      doc.text("PRECIO REF.", 485, curY + 4, { width: 60, align: "right" })
+      doc.fontSize(7).font("Helvetica-Bold").fillColor("#FFFFFF").text("DESCRIPCIÓN DE PARTIDAS / MERCANCÍA", 45, curY + 4)
+      doc.text("CANTIDAD / BULTOS", 450, curY + 4, { width: 95, align: "right" })
 
       curY += 18
 
@@ -267,12 +266,11 @@ export default async function generateDecaPdf(decaData, outputPath, publicDownlo
       works.slice(0, 4).forEach((work) => {
         const conceptText = work.concept || ""
         doc.fontSize(7.5).font("Helvetica")
-        const textH = doc.heightOfString(conceptText, { width: 360 })
+        const textH = doc.heightOfString(conceptText, { width: 400 })
         const rowH = Math.max(14, textH + 4)
 
-        doc.fillColor(primaryColor).text(conceptText, 45, curY + 1, { width: 360 })
-        doc.text(String(work.quantity ?? "-"), 420, curY + 1, { width: 55, align: "right" })
-        doc.text(work.price ? `${Number(work.price).toFixed(2)} €` : "-", 485, curY + 1, { width: 60, align: "right" })
+        doc.fillColor(primaryColor).text(conceptText, 45, curY + 1, { width: 400 })
+        doc.text(String(work.quantity ?? "-"), 450, curY + 1, { width: 95, align: "right" })
 
         curY += rowH
 
