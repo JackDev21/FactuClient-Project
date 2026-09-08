@@ -1,6 +1,6 @@
 import validate from "com/validate.js"
 import { Work, User, DeliveryNote } from "../model/index.js"
-import { NotFoundError, SystemError } from "com/errors.js"
+import { MatchError, NotFoundError, SystemError } from "com/errors.js"
 
 const deleteWork = (userId, deliveryNoteId, workId) => {
   validate.id(userId, "userId")
@@ -19,6 +19,14 @@ const deleteWork = (userId, deliveryNoteId, workId) => {
         .then((deliveryNote) => {
           if (!deliveryNote) {
             throw new NotFoundError("Delivery note not found")
+          }
+
+          if (deliveryNote.company.toString() !== userId) {
+            throw new MatchError("Can not delete work from another company's delivery note")
+          }
+
+          if (deliveryNote.isInvoiced) {
+            throw new MatchError("Can not delete work from an invoiced delivery note")
           }
 
           return Work.findByIdAndDelete(workId)

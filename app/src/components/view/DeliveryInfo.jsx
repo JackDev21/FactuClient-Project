@@ -34,6 +34,7 @@ export default function DeliveryInfo() {
   const [newQuantity, setNewQuantity] = useState("1")
   const [newPrice, setNewPrice] = useState("")
   const [savingNewWork, setSavingNewWork] = useState(false)
+  const isCreatingWorkRef = useRef(false)
 
   // Estados para editar línea existente
   const [editingWorkId, setEditingWorkId] = useState(null)
@@ -190,6 +191,8 @@ export default function DeliveryInfo() {
   // --- AÑADIR NUEVA LÍNEA DE TRABAJO ---
   const handleCreateWork = (event) => {
     event.preventDefault()
+    if (isCreatingWorkRef.current || savingNewWork) return
+
     const concept = newConcept.trim().replace(/\s+/g, " ")
     if (!concept) {
       showAlert("Por favor, introduce una descripción para el trabajo.")
@@ -209,6 +212,7 @@ export default function DeliveryInfo() {
       return
     }
 
+    isCreatingWorkRef.current = true
     setSavingNewWork(true)
     try {
       logic
@@ -220,13 +224,16 @@ export default function DeliveryInfo() {
           setNewQuantity("1")
           setNewPrice("")
           setShowAddWorkForm(false)
+          isCreatingWorkRef.current = false
           setSavingNewWork(false)
         })
         .catch((error) => {
+          isCreatingWorkRef.current = false
           setSavingNewWork(false)
           showAlert(error.message)
         })
     } catch (error) {
+      isCreatingWorkRef.current = false
       setSavingNewWork(false)
       showAlert(error.message)
     }
@@ -297,8 +304,8 @@ export default function DeliveryInfo() {
   return (
     <>
       <Header
-        iconLeftHeader={logic.getInfo().role === "user" && <MdDeleteForever />}
-        onDeleteDeliveryNote={handleShowConfirmDelete}
+        iconLeftHeader={isEditable && <MdDeleteForever />}
+        onDeleteDeliveryNote={isEditable ? handleShowConfirmDelete : undefined}
       >
         <div className="flex flex-col items-center justify-center">
           <span className="text-xs font-semibold text-slate-800">

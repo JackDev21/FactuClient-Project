@@ -54,6 +54,7 @@ export default function CreateDeliveryNotes() {
 
   // Ref para evitar doble creación por re-render
   const creatingRef = useRef(false)
+  const isAddingWorkRef = useRef(false)
 
   useEffect(() => {
     if (creatingRef.current) return
@@ -100,6 +101,8 @@ export default function CreateDeliveryNotes() {
 
   const handleCreateWork = (event) => {
     event.preventDefault()
+    if (isAddingWorkRef.current || savingWork) return
+
     const concept = workConcept.trim().replace(/\s+/g, " ")
     if (!concept) {
       showAlert("Por favor, introduce una descripción para el trabajo.")
@@ -121,6 +124,7 @@ export default function CreateDeliveryNotes() {
       return
     }
 
+    isAddingWorkRef.current = true
     setSavingWork(true)
 
     try {
@@ -132,14 +136,17 @@ export default function CreateDeliveryNotes() {
           setWorkConcept("")
           setWorkQuantity("1")
           setWorkPrice("")
+          isAddingWorkRef.current = false
           setSavingWork(false)
           recalculateTotal(deliveryNoteUpdated.works)
         })
         .catch((error) => {
+          isAddingWorkRef.current = false
           setSavingWork(false)
           showAlert(error.message)
         })
     } catch (error) {
+      isAddingWorkRef.current = false
       setSavingWork(false)
       showAlert(error.message)
     }

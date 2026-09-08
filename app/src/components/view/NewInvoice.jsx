@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom"
 import { FaChevronRight, FaFileInvoiceDollar, FaReceipt, FaCheck, FaRotateLeft, FaEye, FaEyeSlash } from "react-icons/fa6"
 
 import useContext from "../../useContext"
-import { SystemError } from "com/errors"
+import { NotFoundError, SystemError } from "com/errors"
 
 import Header from "../Header"
 import Main from "../core/Main"
@@ -58,22 +58,37 @@ export default function NewInvoice() {
   }, [])
 
   const handleCustomerSelect = (customer) => {
-    setSelectedCustomer(customer)
-    setExpandedNotes({})
-    setStatusFilter("pending")
     setLoading(true)
     try {
       //prettier-ignore
       logic
         .getAllDeliveryNotesCustomer(customer.id || customer._id)
         .then((customerDeliveryNotes) => {
-          setDeliveryNotes(customerDeliveryNotes || [])
-          setShowCustomerList(false)
           setLoading(false)
+          const notes = customerDeliveryNotes || []
+
+          if (notes.length === 0) {
+            alert("Este cliente no tiene ningún albarán registrado. Debes crear al menos un albarán antes de poder facturarle.")
+            return
+          }
+
+          const hasPending = notes.some((d) => !d.isInvoiced)
+          if (!hasPending) {
+            alert("Este cliente no tiene albaranes pendientes. Todos sus albaranes ya han sido facturados anteriormente.")
+            return
+          }
+
+          setSelectedCustomer(customer)
+          setExpandedNotes({})
+          setStatusFilter("pending")
+          setDeliveryNotes(notes)
+          setShowCustomerList(false)
         })
         .catch((error) => {
           setLoading(false)
-          if (error instanceof SystemError) {
+          if (error instanceof NotFoundError || error.message === "DeliveryNotes not found") {
+            alert("Este cliente no tiene ningún albarán registrado. Debes crear al menos un albarán antes de poder facturarle.")
+          } else {
             alert(error.message)
           }
         })

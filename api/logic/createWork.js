@@ -1,6 +1,6 @@
-import validate from "com/validate.js";
-import { Work, User, DeliveryNote } from "../model/index.js";
-import { NotFoundError, SystemError } from "com/errors.js"
+import validate from "com/validate.js"
+import { Work, User, DeliveryNote } from "../model/index.js"
+import { MatchError, NotFoundError, SystemError } from "com/errors.js"
 
 const createWork = (userId, deliveryNoteId, concept, quantity, price) => {
   validate.id(userId, "userId")
@@ -8,7 +8,6 @@ const createWork = (userId, deliveryNoteId, concept, quantity, price) => {
   validate.text(concept, "concept")
   validate.number(quantity, "quantity")
   validate.number(price, "price")
-
 
   return User.findById(userId).select("-__v").lean()
     .catch(error => { throw new SystemError(error.message) })
@@ -24,6 +23,14 @@ const createWork = (userId, deliveryNoteId, concept, quantity, price) => {
             throw new NotFoundError("Delivery note not found")
           }
 
+          if (deliveryNote.company.toString() !== userId) {
+            throw new MatchError("Can not add work to another company's delivery note")
+          }
+
+          if (deliveryNote.isInvoiced) {
+            throw new MatchError("Can not add work to an invoiced delivery note")
+          }
+
           const work = {
             concept,
             quantity,
@@ -33,8 +40,10 @@ const createWork = (userId, deliveryNoteId, concept, quantity, price) => {
           return Work.create(work)
             .catch(error => { throw new SystemError(error.message) })
             .then((work) => {
-
-              return DeliveryNote.findByIdAndUpdate(deliveryNoteId, { $push: { works: work._id } }, { new: true }).populate("works").select("-__v").lean()
+              return DeliveryNote.findByIdAndUpdate(deliveryNoteId, { $push: { works: work._id } }, { new: true })
+                .populate("works")
+                .select("-__v")
+                .lean()
                 .catch(error => { throw new SystemError(error.message) })
                 .then((deliveryNote) => {
                   deliveryNote.id = deliveryNote._id.toString()

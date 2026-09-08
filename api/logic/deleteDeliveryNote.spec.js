@@ -126,5 +126,34 @@ describe("deleteDeliveryNote", () => {
     }
   })
 
+  it("fails on invoiced delivery note", () => {
+    let errorThrown
+
+    return bcrypt.hash("1234", 8)
+      .then(hash => User.create({
+        username: "Peter",
+        email: "peter@email.es",
+        password: hash,
+      }))
+      .then(user => {
+        return DeliveryNote.create({
+          date: new Date(),
+          number: "1234",
+          customer: user.id,
+          company: user.id,
+          works: [],
+          observations: "Observations",
+          isInvoiced: true
+        })
+          .then(deliveryNote => ({ user, deliveryNote }))
+      })
+      .then(({ user, deliveryNote }) => deleteDeliveryNote(user.id.toString(), deliveryNote.id.toString()))
+      .catch(error => errorThrown = error)
+      .finally(() => {
+        expect(errorThrown).to.be.an.instanceOf(MatchError)
+        expect(errorThrown.message).to.equal("Can not delete an invoiced Delivery Note")
+      })
+  })
+
   after(() => User.deleteMany().then(() => DeliveryNote.deleteMany()).then(() => mongoose.disconnect()))
 })

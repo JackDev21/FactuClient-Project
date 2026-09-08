@@ -1,6 +1,6 @@
 import validate from "com/validate.js"
 import { Work, User, DeliveryNote } from "../model/index.js"
-import { NotFoundError, SystemError } from "com/errors.js"
+import { MatchError, NotFoundError, SystemError } from "com/errors.js"
 
 const updateWork = (userId, deliveryNoteId, workId, concept, quantity, price) => {
   validate.id(userId, "userId")
@@ -22,6 +22,14 @@ const updateWork = (userId, deliveryNoteId, workId, concept, quantity, price) =>
         .then((deliveryNote) => {
           if (!deliveryNote) {
             throw new NotFoundError("Delivery note not found")
+          }
+
+          if (deliveryNote.company.toString() !== userId) {
+            throw new MatchError("Can not update work from another company's delivery note")
+          }
+
+          if (deliveryNote.isInvoiced) {
+            throw new MatchError("Can not update work in an invoiced delivery note")
           }
 
           return Work.findByIdAndUpdate(

@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { FaXmark, FaUserPlus, FaBuilding, FaPhone, FaEnvelope, FaLock, FaLocationDot, FaIdCard, FaUser } from "react-icons/fa6"
 
 import useContext from "../../useContext"
@@ -19,6 +19,7 @@ export default function RegisterCustomer({ onCloseRegisterCustomer }) {
     phone: ""
   })
   const [saving, setSaving] = useState(false)
+  const isSavingRef = useRef(false)
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -30,6 +31,7 @@ export default function RegisterCustomer({ onCloseRegisterCustomer }) {
 
   const handleRegisterCustomerSubmit = (event) => {
     event.preventDefault()
+    if (isSavingRef.current || saving) return
 
     const cleanUsername = (formData.username || "").trim()
     const cleanCompanyName = (formData.companyName || "").trim().replace(/\s+/g, " ")
@@ -69,6 +71,7 @@ export default function RegisterCustomer({ onCloseRegisterCustomer }) {
       return
     }
 
+    isSavingRef.current = true
     setSaving(true)
 
     try {
@@ -76,15 +79,18 @@ export default function RegisterCustomer({ onCloseRegisterCustomer }) {
       logic
         .registerCustomer(cleanUsername, password, cleanFullName, cleanCompanyName, cleanEmail, cleanTaxId, cleanAddress, cleanPhone)
         .then(() => {
+          isSavingRef.current = false
           setSaving(false)
           alert("Cliente registrado correctamente")
           onCloseRegisterCustomer()
         })
         .catch((error) => {
+          isSavingRef.current = false
           setSaving(false)
           alert(error.message)
         })
     } catch (error) {
+      isSavingRef.current = false
       setSaving(false)
       alert(error.message)
     }
