@@ -59,9 +59,23 @@ export default function DecaInfo() {
     loadDeca()
   }, [decaId])
 
+  // Resuelve la URL pública de descarga asegurando que en producción apunte a la API real (no a localhost)
+  const publicDownloadUrl = (() => {
+    if (!deca) return ""
+    const apiUrl = (import.meta.env.VITE_API_URL || "").replace(/\/+$/, "")
+    if (
+      deca.publicToken &&
+      (!deca.publicDownloadUrl ||
+        (deca.publicDownloadUrl.includes("localhost") && !apiUrl.includes("localhost")))
+    ) {
+      return `${apiUrl}/deca/public/${deca.publicToken}/download`
+    }
+    return deca.publicDownloadUrl || (deca.publicToken ? `${apiUrl}/deca/public/${deca.publicToken}/download` : "")
+  })()
+
   const handleCopyLink = () => {
-    if (!deca?.publicDownloadUrl) return
-    navigator.clipboard.writeText(deca.publicDownloadUrl)
+    if (!publicDownloadUrl) return
+    navigator.clipboard.writeText(publicDownloadUrl)
     setCopied(true)
     setTimeout(() => setCopied(false), 2500)
   }
@@ -73,7 +87,7 @@ export default function DecaInfo() {
       `Albarán: ${deca.deliveryNote?.number || ""}\n` +
       `Origen: ${deca.origin}\n` +
       `Destino: ${deca.destination}\n\n` +
-      `Enlace de inspección en carretera para Guardia Civil / Transportes:\n${deca.publicDownloadUrl}`
+      `Enlace de inspección en carretera para Guardia Civil / Transportes:\n${publicDownloadUrl}`
     )
     window.open(`https://api.whatsapp.com/send?text=${text}`, "_blank")
   }
@@ -205,7 +219,7 @@ export default function DecaInfo() {
             <div className="flex flex-col items-center gap-2 shrink-0 bg-slate-50 p-3 rounded-2xl border border-slate-200 text-center">
               <img
                 src={`https://api.qrserver.com/v1/create-qr-code/?size=110x110&data=${encodeURIComponent(
-                  deca.publicDownloadUrl
+                  publicDownloadUrl
                 )}`}
                 alt="Código QR DeCA"
                 className="w-24 h-24 rounded-lg bg-white p-1 border border-slate-200"
@@ -219,7 +233,7 @@ export default function DecaInfo() {
           {/* Botonera de Acciones Principales */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
             <a
-              href={deca.publicDownloadUrl}
+              href={publicDownloadUrl}
               target="_blank"
               rel="noreferrer"
               className="flex items-center justify-center gap-2 rounded-2xl bg-orange-500 hover:bg-orange-600 py-3 px-4 text-xs sm:text-sm font-bold text-white shadow-xs active:scale-95 transition-all"
