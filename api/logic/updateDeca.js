@@ -2,11 +2,12 @@ import validate from "com/validate.js"
 import { NotFoundError, SystemError, MatchError } from "com/errors.js"
 import { Deca } from "../model/index.js"
 import generateDecaPdf from "./generateDecaPdf.js"
+import getBaseUrl from "../utils/getBaseUrl.js"
 
 /**
  * Modifica datos operativos de un DeCA en curso registrando la trazabilidad exigida por la Resolución de 5 de junio de 2026.
  */
-const updateDeca = async (userId, decaId, updates, reason = "Actualización de datos durante el transporte") => {
+const updateDeca = async (userId, decaId, updates, reason = "Actualización de datos durante el transporte", customBaseUrl) => {
   validate.id(userId, "userId")
   validate.id(decaId, "decaId")
 
@@ -77,8 +78,7 @@ const updateDeca = async (userId, decaId, updates, reason = "Actualización de d
   })
 
   // Regenerar PDF actualizado
-  const port = process.env.PORT || 7070
-  const baseUrl = process.env.API_BASE_URL || `http://localhost:${port}`
+  const baseUrl = getBaseUrl(null, customBaseUrl)
   const publicDownloadUrl = `${baseUrl}/deca/public/${deca.publicToken}/download`
 
   try {

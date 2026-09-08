@@ -11,6 +11,7 @@ const { PORT, MONGODB_URL } = process.env
 mongoose.connect(MONGODB_URL)
   .then(() => {
     const api = express()
+    api.set("trust proxy", 1)
     api.use(cors())
 
     api.get("/", (req, res) => {

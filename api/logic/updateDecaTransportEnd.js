@@ -2,12 +2,13 @@ import validate from "com/validate.js"
 import { NotFoundError, SystemError, MatchError } from "com/errors.js"
 import { Deca } from "../model/index.js"
 import generateDecaPdf from "./generateDecaPdf.js"
+import getBaseUrl from "../utils/getBaseUrl.js"
 
 /**
  * Registra la finalización del transporte, estableciendo el plazo de 7 días naturales
  * para el acceso público de inspección conforme a la normativa.
  */
-const updateDecaTransportEnd = async (userId, decaId) => {
+const updateDecaTransportEnd = async (userId, decaId, customBaseUrl) => {
   validate.id(userId, "userId")
   validate.id(decaId, "decaId")
 
@@ -43,8 +44,7 @@ const updateDecaTransportEnd = async (userId, decaId) => {
   })
 
   // Regenerar el PDF con el estado actualizado
-  const port = process.env.PORT || 7070
-  const baseUrl = process.env.API_BASE_URL || `http://localhost:${port}`
+  const baseUrl = getBaseUrl(null, customBaseUrl)
   const publicDownloadUrl = `${baseUrl}/deca/public/${deca.publicToken}/download`
 
   try {

@@ -1,8 +1,9 @@
 import validate from "com/validate.js"
 import { NotFoundError, SystemError } from "com/errors.js"
 import { Deca } from "../model/index.js"
+import getBaseUrl from "../utils/getBaseUrl.js"
 
-const getDeca = async (userId, decaId) => {
+const getDeca = async (userId, decaId, customBaseUrl) => {
   validate.id(userId, "userId")
   validate.id(decaId, "decaId")
 
@@ -26,8 +27,7 @@ const getDeca = async (userId, decaId) => {
   deca.id = deca._id.toString()
   delete deca._id
 
-  const port = process.env.PORT || 7070
-  const baseUrl = process.env.API_BASE_URL || `http://localhost:${port}`
+  const baseUrl = getBaseUrl(null, customBaseUrl)
   deca.publicDownloadUrl = `${baseUrl}/deca/public/${deca.publicToken}/download`
 
   return deca

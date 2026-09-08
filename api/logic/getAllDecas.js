@@ -1,8 +1,9 @@
 import validate from "com/validate.js"
 import { SystemError } from "com/errors.js"
 import { Deca } from "../model/index.js"
+import getBaseUrl from "../utils/getBaseUrl.js"
 
-const getAllDecas = async (userId) => {
+const getAllDecas = async (userId, customBaseUrl) => {
   validate.id(userId, "userId")
 
   const decas = await Deca.find({ company: userId })
@@ -15,8 +16,7 @@ const getAllDecas = async (userId) => {
       throw new SystemError(err.message)
     })
 
-  const port = process.env.PORT || 7070
-  const baseUrl = process.env.API_BASE_URL || `http://localhost:${port}`
+  const baseUrl = getBaseUrl(null, customBaseUrl)
 
   return decas.map((deca) => {
     deca.id = deca._id.toString()

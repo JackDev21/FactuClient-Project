@@ -4,6 +4,7 @@ import validate from "com/validate.js"
 import { NotFoundError, SystemError, DuplicityError, MatchError } from "com/errors.js"
 import { User, DeliveryNote, Deca } from "../model/index.js"
 import generateDecaPdf from "./generateDecaPdf.js"
+import getBaseUrl from "../utils/getBaseUrl.js"
 
 const getNextDecaSeq = (allDecas, currentYear) => {
   let maxNumber = 0
@@ -26,7 +27,7 @@ const formatDecaNumber = (year, seq) => `DECA-${year}/${String(seq).padStart(3, 
 /**
  * Crea un nuevo DeCA asociado a un albarán existente, genera su PDF con QR y guarda el registro.
  */
-const createDeca = async (userId, deliveryNoteId, decaData) => {
+const createDeca = async (userId, deliveryNoteId, decaData, customBaseUrl) => {
   validate.id(userId, "userId")
   validate.id(deliveryNoteId, "deliveryNoteId")
 
@@ -101,8 +102,7 @@ const createDeca = async (userId, deliveryNoteId, decaData) => {
   const pdfPath = path.join(uploadsDir, pdfFilename)
 
   // URL pública de inspección (directa sin credenciales)
-  const port = process.env.PORT || 7070
-  const baseUrl = process.env.API_BASE_URL || `http://localhost:${port}`
+  const baseUrl = getBaseUrl(null, customBaseUrl)
   const publicDownloadUrl = `${baseUrl}/deca/public/${publicToken}/download`
 
   const generatedAt = new Date()
