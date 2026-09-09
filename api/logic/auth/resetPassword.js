@@ -30,8 +30,8 @@ const resetPassword = (id, password, passwordRepeat, token) => {
               user.password = hash
               return user.save()
             })
+            .catch((error) => { throw new SystemError(error.message) })
         })
-        .catch((error) => { throw new CredentialsError(error.message) })
     })
 }
 

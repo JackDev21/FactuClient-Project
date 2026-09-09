@@ -1,7 +1,8 @@
-import { useNavigate } from "react-router-dom"
+import { useState } from "react"
+import { useNavigate, Link } from "react-router-dom"
 import useContext from "../../useContext"
 
-import { SystemError } from "com/errors"
+import { NotFoundError, SystemError } from "com/errors"
 
 import Title from "../../components/Title"
 import Main from "../../components/core/Main"
@@ -14,6 +15,7 @@ import logic from "../../logic"
 export default function RequestPassword() {
   const { alert } = useContext()
   const navigate = useNavigate()
+  const [loading, setLoading] = useState(false)
 
   const handleRequestPasswordReset = (event) => {
     event.preventDefault()
@@ -22,18 +24,26 @@ export default function RequestPassword() {
     const email = target.email.value
 
     try {
-      // prettier-ignore
+      setLoading(true)
       logic.requestPasswordReset(email)
         .then(() => {
+          alert("Te hemos enviado un correo con las instrucciones para restablecer tu contraseña. Por favor, revisa tu bandeja de entrada o spam.")
           navigate("/login")
         })
         .catch((error) => {
-          if(error instanceof SystemError) {
-            alert(error.message)
+          if (error instanceof NotFoundError) {
+            alert("No existe ninguna cuenta registrada con este correo electrónico.")
+          } else if (error instanceof SystemError) {
+            alert("Error al conectar con el servidor de correo. Por favor, inténtalo más tarde.")
+          } else {
+            alert(error.message || "Error al procesar la solicitud.")
           }
-          alert("Invalid email")
+        })
+        .finally(() => {
+          setLoading(false)
         })
     } catch (error) {
+      setLoading(false)
       alert(error.message)
     }
   }
@@ -54,9 +64,13 @@ export default function RequestPassword() {
 
         <form className="flex flex-col items-center" onSubmit={handleRequestPasswordReset}>
           <Field label="Email" id="email" type="email" placeholder="Introduce tu Email" />
-          <Button className="mt-10" type="submit">
-            Enviar
+          <Button className="mt-10" type="submit" disabled={loading}>
+            {loading ? "Enviando..." : "Enviar"}
           </Button>
+
+          <Link to="/login" className="mt-6 text-sm font-semibold text-stone-500 hover:text-stone-800 underline">
+            Volver a iniciar sesión
+          </Link>
         </form>
       </Main>
 

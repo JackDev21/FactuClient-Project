@@ -20,7 +20,7 @@ const requestPasswordReset = (email) => {
 
       const userId = user.id
 
-      return jwt.sign({ sub: userId }, JWT_SECRET, { expiresIn: "5m" })
+      return jwt.sign({ sub: userId }, JWT_SECRET, { expiresIn: "30m" })
         .catch((error) => { throw new SystemError(error.message) })
         .then((token) => {
           const resetUrl = `${FRONTEND_URL}/reset-password/${user.id}/${token}`
@@ -40,13 +40,17 @@ const requestPasswordReset = (email) => {
             text: `Estás recibiendo esto porque tú (u otra persona) has solicitado el restablecimiento de la contraseña de tu cuenta.\n\n
               Por favor, haz clic en el siguiente enlace, o pégalo en tu navegador para completar el proceso:\n\n
               ${resetUrl}\n\n
+              Este enlace tiene una validez de 30 minutos.\n\n
               Si no solicitaste esto, por favor ignora este correo electrónico y tu contraseña permanecerá sin cambios.\n`
           }
 
           return transporter.sendMail(mailOptions)
         })
     })
-    .catch((error) => { throw new SystemError(error.message) })
+    .catch((error) => {
+      if (error instanceof NotFoundError) throw error
+      throw new SystemError(error.message)
+    })
 }
 
 export default requestPasswordReset

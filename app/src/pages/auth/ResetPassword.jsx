@@ -1,7 +1,8 @@
-import { useNavigate, useParams } from "react-router-dom"
+import { useState } from "react"
+import { useNavigate, useParams, Link } from "react-router-dom"
 
 import useContext from "../../useContext"
-import { SystemError } from "com/errors"
+import { CredentialsError, SystemError } from "com/errors"
 
 import Title from "../../components/Title"
 import Main from "../../components/core/Main"
@@ -15,6 +16,7 @@ export default function ResetPassword() {
   const { alert } = useContext()
   const navigate = useNavigate()
   const { userId, token } = useParams()
+  const [loading, setLoading] = useState(false)
 
   const handlePasswordReset = (event) => {
     event.preventDefault()
@@ -24,18 +26,28 @@ export default function ResetPassword() {
     const repeatPassword = target.confirmPassword.value
 
     try {
+      setLoading(true)
       logic
         .resetPassword(userId, password, repeatPassword, token)
         .then(() => {
+          alert("¡Contraseña restablecida con éxito! Ya puedes iniciar sesión con tu nueva contraseña.")
           navigate("/login")
         })
         .catch((error) => {
-          if (error instanceof SystemError) {
-            alert(error.message)
+          const msg = (error.message || "").toLowerCase()
+          if (error instanceof CredentialsError || msg.includes("jwt") || msg.includes("token") || msg.includes("expired")) {
+            alert("El enlace ha caducado o no es válido. Por favor, solicita un nuevo correo de restablecimiento.")
+          } else if (error instanceof SystemError) {
+            alert("Error al conectar con el servidor. Inténtalo de nuevo más tarde.")
+          } else {
+            alert(error.message || "Error al restablecer la contraseña.")
           }
-          alert("Tiempo de reseteo de contraseña expirado")
+        })
+        .finally(() => {
+          setLoading(false)
         })
     } catch (error) {
+      setLoading(false)
       alert(error.message)
     }
   }
@@ -56,9 +68,13 @@ export default function ResetPassword() {
         <form className="-mt-5 flex flex-col items-center" onSubmit={handlePasswordReset}>
           <PasswordField id="password" type="password" placeholder="Password" />
           <PasswordField id="confirmPassword" type="password" placeholder="Repite tu Password" />
-          <Button className="mt-10" type="submit">
-            Enviar
+          <Button className="mt-10" type="submit" disabled={loading}>
+            {loading ? "Guardando..." : "Enviar"}
           </Button>
+
+          <Link to="/login" className="mt-6 text-sm font-semibold text-stone-500 hover:text-stone-800 underline">
+            Volver a iniciar sesión
+          </Link>
         </form>
       </Main>
 
