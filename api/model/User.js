@@ -1,10 +1,12 @@
 import { Schema, model } from "mongoose"
+import { ROLES } from "com/constants.js"
+
 const { ObjectId } = Schema.Types
 
 const user = new Schema({
   username: {
     type: String,
-    unique: true
+    unique: true,
   },
   email: {
     type: String,
@@ -32,23 +34,24 @@ const user = new Schema({
     type: String,
   },
   companyLogo: {
-    type: String
+    type: String,
   },
   role: {
     type: String,
+    enum: Object.values(ROLES),
+    default: ROLES.ADMIN,
   },
   manager: {
     type: ObjectId,
-    ref: "User"
+    ref: "User",
   },
   active: {
     type: Boolean,
-    default: true
+    default: true,
   },
   irpf: {
     type: Number,
   },
-
 })
 
 const User = model("User", user)

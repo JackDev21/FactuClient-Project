@@ -11,3 +11,11 @@ export {
   Invoice,
   Deca,
 }
+
+export default {
+  User,
+  Work,
+  DeliveryNote,
+  Invoice,
+  Deca,
+}

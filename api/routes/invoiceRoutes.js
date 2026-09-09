@@ -1,17 +1,15 @@
 import express from "express"
-import routes from "../handlers/index.js"
-import updateInvoiceDateHandler from "../handlers/updateInvoiceDateHandler.js"
-import updateInvoicePaymentTypeHandler from "../handlers/updateInvoicePaymentTypeHandler.js"
+import { invoiceHandlers } from "../handlers/index.js"
 
 const jsonBodyParser = express.json({ strict: true, type: "application/json", limit: "10mb" })
 const router = express.Router()
 
-router.post("/create/invoices/:customerId", jsonBodyParser, routes.createInvoiceHandler)
-router.get("/invoices", routes.getAllInvoicesHandler)
-router.get("/invoices/:invoiceId", routes.getInvoiceHandler)
-router.delete("/invoices/:invoiceId", routes.deleteInvoiceHandler)
-router.patch("/invoices/:invoiceId/date", jsonBodyParser, updateInvoiceDateHandler)
-router.patch("/invoices/:invoiceId/payment-type", jsonBodyParser, updateInvoicePaymentTypeHandler)
-router.get("/:customerId/invoices", routes.getAllInvoicesCustomerHandler)
+router.post("/create/invoices/:customerId", jsonBodyParser, invoiceHandlers.createInvoiceHandler)
+router.get("/invoices", invoiceHandlers.getAllInvoicesHandler)
+router.get("/invoices/:invoiceId", invoiceHandlers.getInvoiceHandler)
+router.delete("/invoices/:invoiceId", invoiceHandlers.deleteInvoiceHandler)
+router.patch("/invoices/:invoiceId/date", jsonBodyParser, invoiceHandlers.updateInvoiceDateHandler)
+router.patch("/invoices/:invoiceId/payment-type", jsonBodyParser, invoiceHandlers.updateInvoicePaymentTypeHandler)
+router.get("/:customerId/invoices", invoiceHandlers.getAllInvoicesCustomerHandler)
 
 export default router

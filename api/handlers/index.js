@@ -1,87 +1,49 @@
-import registerUserHandler from "./registerUserHandler.js"
-import authenticateUserHandler from "./authenticateUserHandler.js"
-import getUserNameHandler from "./getUserNameHandler.js"
-import updateProfileHandler from "./updateProfileHandler.js"
+import authHandlers from "./auth/index.js"
+import userHandlers from "./users/index.js"
+import customerHandlers from "./customers/index.js"
+import deliveryNoteHandlers from "./deliveryNotes/index.js"
+import invoiceHandlers from "./invoices/index.js"
+import decaHandlers from "./deca/index.js"
+import errorHandler from "./errorHandler.js"
 
-import registerCustomHandler from "./registerCustomerHandler.js"
-import getAllCustomersHandler from "./getAllCustomersHandler.js"
-import getProfileUserHandler from "./getProfileUserHandler.js"
-import deleteCustomerHandler from "./deleteCustomerHandler.js"
-import updateCustomerProfileHandler from "./updateCustomerProfileHandler.js"
+// Re-export individual handlers
+export * from "./auth/index.js"
+export * from "./users/index.js"
+export * from "./customers/index.js"
+export * from "./deliveryNotes/index.js"
+export * from "./invoices/index.js"
+export * from "./deca/index.js"
 
-import getAllDeliveryNotesHandler from "./getAlldeliveryNotesHandler.js"
-import getDeliveryNoteHandler from "./getDeliveryNoteHandler.js"
-import deleteDeliveryNoteHandler from "./deleteDeliveryNoteHandler.js"
-import getAllDeliveryNotesCustomerHandler from "./getAllDeliveryNotesCustomerHandler.js"
-import updateDateDeliveryNoteHandler from "./updateDeliveryNoteDateHandler.js"
-
-import createDeliveryNoteHandler from "./createDeliveryNoteHandler.js"
-import createWorkHandler from "./createWorkHandler.js"
-import updateWorkHandler from "./updateWorkHandler.js"
-import deleteWorkHandler from "./deleteWorkHandler.js"
-
-import getAllInvoicesHandler from "./getAllInvoicesHandler.js"
-import getInvoiceHandler from "./getInvoiceHandler.js"
-import createInvoiceHandler from "./createInvoiceHandler.js"
-import updateInvoiceDateHandler from "./updateInvoiceDateHandler.js"
-import updateInvoicePaymentTypeHandler from "./updateInvoicePaymentTypeHandler.js"
-import deleteInvoiceHandler from "./deleteInvoiceHandler.js"
-import getAllInvoicesCustomerHandler from "./getAllInvoicesCustomerHandler.js"
-
-import addNewObservation from "./addNewObservationHandler.js"
-
-import requestPasswordResetHandler from "./requestPasswordResetHandler.js"
-import resetPasswordHandler from "./resetPasswordHandler.js"
-
-import createDecaHandler from "./createDecaHandler.js"
-import getDecaHandler from "./getDecaHandler.js"
-import getAllDecasHandler from "./getAllDecasHandler.js"
-import downloadDecaPublicHandler from "./downloadDecaPublicHandler.js"
-import updateDecaHandler from "./updateDecaHandler.js"
-import updateDecaTransportEndHandler from "./updateDecaTransportEndHandler.js"
-
-
-export default {
-  registerUserHandler,
-  authenticateUserHandler,
-  getUserNameHandler,
-  updateProfileHandler,
-
-  registerCustomHandler,
-  getAllCustomersHandler,
-  getProfileUserHandler,
-  deleteCustomerHandler,
-  updateCustomerProfileHandler,
-
-  getAllDeliveryNotesCustomerHandler,
-  getAllDeliveryNotesHandler,
-  getDeliveryNoteHandler,
-  deleteDeliveryNoteHandler,
-  updateDateDeliveryNoteHandler,
-
-  createDeliveryNoteHandler,
-
-  createWorkHandler,
-  updateWorkHandler,
-  deleteWorkHandler,
-
-  getAllInvoicesHandler,
-  getInvoiceHandler,
-  createInvoiceHandler,
-  updateInvoiceDateHandler,
-  updateInvoicePaymentTypeHandler,
-  deleteInvoiceHandler,
-  getAllInvoicesCustomerHandler,
-
-  addNewObservation,
-
-  requestPasswordResetHandler,
-  resetPasswordHandler,
-
-  createDecaHandler,
-  getDecaHandler,
-  getAllDecasHandler,
-  downloadDecaPublicHandler,
-  updateDecaHandler,
-  updateDecaTransportEndHandler,
+// Domain bundles & error handler
+export {
+  authHandlers,
+  userHandlers,
+  customerHandlers,
+  deliveryNoteHandlers,
+  invoiceHandlers,
+  decaHandlers,
+  errorHandler,
 }
+
+// Backward-compatible named aliases
+export const registerCustomHandler = customerHandlers.registerCustomerHandler
+export const updateDateDeliveryNoteHandler = deliveryNoteHandlers.updateDeliveryNoteDateHandler
+export const addNewObservation = deliveryNoteHandlers.addNewObservationHandler
+
+// Unified default export for backwards compatibility
+const handlers = {
+  ...authHandlers,
+  ...userHandlers,
+  ...customerHandlers,
+  ...deliveryNoteHandlers,
+  ...invoiceHandlers,
+  ...decaHandlers,
+
+  // Legacy aliases
+  registerCustomHandler,
+  updateDateDeliveryNoteHandler,
+  addNewObservation,
+  errorHandler,
+}
+
+export default handlers

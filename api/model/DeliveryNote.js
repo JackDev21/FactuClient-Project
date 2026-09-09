@@ -5,11 +5,11 @@ const { ObjectId } = Schema.Types
 const deliveryNote = new Schema({
   date: {
     type: Date,
-    required: true
+    required: true,
   },
   number: {
     type: String,
-    required: true
+    required: true,
   },
   company: {
     type: ObjectId,
@@ -24,21 +24,31 @@ const deliveryNote = new Schema({
   works: [
     {
       type: ObjectId,
-      ref: "Work"
-    }
+      ref: "Work",
+    },
   ],
   observations: {
     type: String,
-    required: false
+    required: false,
   },
   isInvoiced: {
     type: Boolean,
-    default: false
+    default: false,
+  },
+  // Albarán valorado (true) o sin valorar (false, utilizado por choferes)
+  isValued: {
+    type: Boolean,
+    default: true,
+  },
+  // Usuario que generó físicamente el albarán (autónomo o chofer empleado)
+  createdBy: {
+    type: ObjectId,
+    ref: "User",
   },
   deca: {
     type: ObjectId,
-    ref: "Deca"
-  }
+    ref: "Deca",
+  },
 })
 
 deliveryNote.index({ company: 1, number: 1 }, { unique: true })
