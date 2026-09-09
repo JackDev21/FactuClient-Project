@@ -12,7 +12,11 @@ import { HiOutlineReceiptTax } from "react-icons/hi"
 
 import "./index.css"
 
-export default function Field({ className, id, type, placeholder, required = true }) {
+export default function Field({ className, id, type, placeholder, required = true, autoComplete }) {
+  const resolvedAutoComplete =
+    autoComplete ||
+    (id === "password" ? "current-password" : id === "confirmPassword" ? "new-password" : undefined)
+
   return (
     <>
       <div className={`Field ${className ? className : ""}`}>
@@ -43,7 +47,13 @@ export default function Field({ className, id, type, placeholder, required = tru
             ) : null}
           </span>
         </div>
-        <input type={type} placeholder={placeholder} id={id} required={required}></input>
+        <input
+          type={type}
+          placeholder={placeholder}
+          id={id}
+          required={required}
+          autoComplete={resolvedAutoComplete}
+        ></input>
       </div>
     </>
   )

@@ -202,6 +202,7 @@ export default function UpdateCustomerProfileForm({ onUpdateProfile, onCloseEdit
                   <input
                     type="password"
                     name="password"
+                    autoComplete="new-password"
                     value={formData.password}
                     onChange={handleChange}
                     placeholder="Dejar en blanco para conservar"

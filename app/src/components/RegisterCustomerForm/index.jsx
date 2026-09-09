@@ -214,6 +214,7 @@ export default function RegisterCustomer({ onCloseRegisterCustomer }) {
                   <input
                     type="password"
                     name="password"
+                    autoComplete="new-password"
                     required
                     value={formData.password}
                     onChange={handleChange}
