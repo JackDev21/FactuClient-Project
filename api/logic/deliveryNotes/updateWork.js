@@ -24,21 +24,35 @@ const updateWork = (userId, deliveryNoteId, workId, concept, quantity, price) =>
             throw new NotFoundError("Delivery note not found")
           }
 
-          if (deliveryNote.company.toString() !== userId) {
+          const isDriver = user.role === "driver"
+          const companyId = isDriver && user.manager ? user.manager.toString() : userId
+
+          if (deliveryNote.company.toString() !== companyId) {
             throw new MatchError("Can not update work from another company's delivery note")
+          }
+
+          if (isDriver && deliveryNote.createdBy && deliveryNote.createdBy.toString() !== userId) {
+            throw new MatchError("Driver can only update their own delivery notes")
           }
 
           if (deliveryNote.isInvoiced) {
             throw new MatchError("Can not update work in an invoiced delivery note")
           }
 
-          return Work.findByIdAndUpdate(
-            workId,
-            { concept, quantity, price },
-            { new: true }
-          )
-            .catch((error) => { throw new SystemError(error.message) })
-            .then((updatedWork) => {
+          const workUpdate = isDriver
+            ? { concept, quantity }
+            : { concept, quantity, price }
+
+          const dnUpdate = (!isDriver && price > 0) ? { isValued: true } : {}
+
+          return Promise.all([
+            Work.findByIdAndUpdate(workId, workUpdate, { new: true })
+              .catch((error) => { throw new SystemError(error.message) }),
+            Object.keys(dnUpdate).length > 0
+              ? DeliveryNote.findByIdAndUpdate(deliveryNoteId, dnUpdate).catch(() => {})
+              : Promise.resolve()
+          ])
+            .then(([updatedWork]) => {
               if (!updatedWork) {
                 throw new NotFoundError("Work not found")
               }

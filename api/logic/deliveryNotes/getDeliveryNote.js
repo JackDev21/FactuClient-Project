@@ -14,7 +14,13 @@ function getDeliveryNote(userId, deliveryNoteId) {
       }
 
       return Promise.all([
-        DeliveryNote.findById(deliveryNoteId).populate("customer").populate("company").populate("works").select("-__v").lean(),
+        DeliveryNote.findById(deliveryNoteId)
+          .populate("customer")
+          .populate("company")
+          .populate("works")
+          .populate("createdBy", "fullName username role")
+          .select("-__v")
+          .lean(),
         Invoice.findOne({ deliveryNotes: deliveryNoteId }).select("number").lean()
       ])
         .catch(error => { throw new SystemError(error.message) })
@@ -28,6 +34,12 @@ function getDeliveryNote(userId, deliveryNoteId) {
 
           deliveryNote.isInvoiced = !!invoice
           deliveryNote.invoiceNumber = invoice?.number || null
+
+          if (user.role === "driver") {
+            (deliveryNote.works || []).forEach(work => {
+              delete work.price
+            })
+          }
 
           return deliveryNote
         })

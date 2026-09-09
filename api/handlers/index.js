@@ -4,6 +4,7 @@ import customerHandlers from "./customers/index.js"
 import deliveryNoteHandlers from "./deliveryNotes/index.js"
 import invoiceHandlers from "./invoices/index.js"
 import decaHandlers from "./deca/index.js"
+import driverHandlers from "./drivers/index.js"
 import errorHandler from "./errorHandler.js"
 
 // Re-export individual handlers
@@ -13,6 +14,7 @@ export * from "./customers/index.js"
 export * from "./deliveryNotes/index.js"
 export * from "./invoices/index.js"
 export * from "./deca/index.js"
+export * from "./drivers/index.js"
 
 // Domain bundles & error handler
 export {
@@ -22,6 +24,7 @@ export {
   deliveryNoteHandlers,
   invoiceHandlers,
   decaHandlers,
+  driverHandlers,
   errorHandler,
 }
 
@@ -38,6 +41,7 @@ const handlers = {
   ...deliveryNoteHandlers,
   ...invoiceHandlers,
   ...decaHandlers,
+  ...driverHandlers,
 
   // Legacy aliases
   registerCustomHandler,

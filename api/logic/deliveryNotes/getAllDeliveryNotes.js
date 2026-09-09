@@ -25,9 +25,20 @@ const getAllDeliveryNotes = (userId) => {
         throw new NotFoundError("User not found")
       }
 
+      const isDriver = user.role === "driver"
+      const companyId = isDriver && user.manager ? user.manager.toString() : userId
+      const query = isDriver
+        ? { company: companyId, createdBy: userId }
+        : { company: companyId }
+
       return Promise.all([
-        DeliveryNote.find({ company: userId }).populate("customer", "username companyName").sort({ number: -1 }).select("-__v").lean(),
-        Invoice.find({ company: userId }).select("deliveryNotes number").lean()
+        DeliveryNote.find(query)
+          .populate("customer", "username companyName")
+          .populate("createdBy", "fullName username role")
+          .sort({ number: -1 })
+          .select("-__v")
+          .lean(),
+        Invoice.find({ company: companyId }).select("deliveryNotes number").lean()
       ])
             .catch(error => { throw new SystemError(error.message) })
             .then(([deliveryNotes, invoices]) => {
@@ -64,6 +75,8 @@ const getAllDeliveryNotes = (userId) => {
                 deliveryNote.isInvoiced = isReallyInvoiced
                 deliveryNote.invoiceNumber = invoiceNumber || null
                 deliveryNote.customerName = deliveryNote.customer?.companyName || deliveryNote.customer?.username
+                deliveryNote.createdByName = deliveryNote.createdBy?.fullName || deliveryNote.createdBy?.username || null
+                deliveryNote.isDriverNote = deliveryNote.createdBy?.role === "driver"
 
                 return deliveryNote
               })

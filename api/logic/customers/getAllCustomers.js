@@ -12,7 +12,13 @@ const getAllCustomers = (userId) => {
         throw new NotFoundError("User not found")
       }
 
-      return User.find({ manager: userId, active: true }).sort({ companyName: 1 }).select("-__v").lean()
+      const isDriver = user.role === "driver"
+      const managerId = isDriver && user.manager ? user.manager.toString() : userId
+
+      return User.find({ manager: managerId, role: { $ne: "driver" }, active: { $ne: false } })
+        .sort({ companyName: 1 })
+        .select("-__v -password")
+        .lean()
         .catch((error) => { throw new SystemError(error.message) })
         .then((customerUsers) => {
 
@@ -23,6 +29,10 @@ const getAllCustomers = (userId) => {
           customerUsers.forEach((customerUser) => {
             customerUser.id = customerUser._id.toString()
             delete customerUser._id
+
+            if (!customerUser.companyName) {
+              customerUser.companyName = customerUser.fullName || customerUser.username || "Cliente"
+            }
 
             if (customerUser.manager) {
               customerUser.manager = customerUser.manager.toString()

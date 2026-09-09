@@ -186,13 +186,13 @@ export default function DecaForm() {
         iconLeftHeader={<FaArrowLeft />}
         onDeleteDeliveryNote={() => navigate(-1)}
       >
-        <div className="flex flex-col items-center justify-center">
-          <span className="text-xs font-semibold text-amber-700 uppercase tracking-wider flex items-center gap-1">
-            <FaFileShield /> Emisión de DeCA Oficial
+        <div className="flex flex-col items-center justify-center max-w-[62vw] sm:max-w-md">
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-slate-950/25 border border-slate-950/20 text-slate-950 text-[10px] sm:text-xs font-black uppercase tracking-wider mb-0.5 shadow-2xs">
+            <FaFileShield className="text-xs shrink-0" /> Emisión DeCA
           </span>
-          <span className="text-sm font-extrabold text-slate-900 truncate max-w-[60vw]">
+          <h1 className="text-sm sm:text-base font-black text-slate-950 tracking-tight leading-tight truncate max-w-full">
             Albarán Nº {deliveryNote?.number}
-          </span>
+          </h1>
         </div>
       </Header>
 

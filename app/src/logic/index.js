@@ -18,7 +18,13 @@ import registerCustomer from "./customers/registerCustomer.js"
 import deleteCustomer from "./customers/deleteCustomer.js"
 import updateCustomerProfile from "./customers/updateCustomerProfile.js"
 
-// --- 4. Albaranes y Partidas (Works) ---
+// --- 4. Choferes / Empleados ---
+import registerDriver from "./drivers/registerDriver.js"
+import getAllDrivers from "./drivers/getAllDrivers.js"
+import deleteDriver from "./drivers/deleteDriver.js"
+import updateDriver from "./drivers/updateDriver.js"
+
+// --- 5. Albaranes y Partidas (Works) ---
 import getAllDeliveryNotes from "./deliveryNotes/getAllDeliveryNotes.js"
 import getAllDeliveryNotesCustomer from "./deliveryNotes/getAllDeliveryNotesCustomer.js"
 import getDeliveryNote from "./deliveryNotes/getDeliveryNote.js"
@@ -30,7 +36,7 @@ import createWork from "./deliveryNotes/createWork.js"
 import updateWork from "./deliveryNotes/updateWork.js"
 import deleteWork from "./deliveryNotes/deleteWork.js"
 
-// --- 5. Facturas y Cobros ---
+// --- 6. Facturas y Cobros ---
 import getAllInvoices from "./invoices/getAllInvoices.js"
 import getAllInvoicesCustomer from "./invoices/getAllInvoicesCustomer.js"
 import getInvoice from "./invoices/getInvoice.js"
@@ -39,7 +45,7 @@ import deleteInvoice from "./invoices/deleteInvoice.js"
 import updateInvoiceDate from "./invoices/updateInvoiceDate.js"
 import updateInvoicePaymentType from "./invoices/updateInvoicePaymentType.js"
 
-// --- 6. DeCA (Documento Electrónico de Control Administrativo) ---
+// --- 7. DeCA (Documento Electrónico de Control Administrativo) ---
 import createDeca from "./deca/createDeca.js"
 import getDeca from "./deca/getDeca.js"
 import getAllDecas from "./deca/getAllDecas.js"
@@ -66,6 +72,12 @@ const logic = {
   registerCustomer,
   deleteCustomer,
   updateCustomerProfile,
+
+  // Drivers
+  registerDriver,
+  getAllDrivers,
+  deleteDriver,
+  updateDriver,
 
   // Delivery Notes
   getAllDeliveryNotes,

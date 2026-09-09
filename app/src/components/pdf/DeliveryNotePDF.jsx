@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
     paddingVertical: 3,
     paddingHorizontal: 8,
     borderRadius: 3,
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: "bold",
     textAlign: "right",
     marginBottom: 4
@@ -121,8 +121,21 @@ const styles = StyleSheet.create({
     lineHeight: 1.25,
     fontSize: 8.5
   },
+  colConceptFull: {
+    flex: 8,
+    textAlign: "left",
+    paddingRight: 6,
+    lineHeight: 1.25,
+    fontSize: 8.5
+  },
   colQuantity: {
     flex: 1.5,
+    textAlign: "right",
+    paddingRight: 6,
+    fontSize: 8.5
+  },
+  colQuantityFull: {
+    flex: 2,
     textAlign: "right",
     paddingRight: 6,
     fontSize: 8.5
@@ -140,7 +153,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#0F172A"
   },
-  // Sección Inferior (Observaciones a la izquierda, Total a la derecha)
+  // Sección Inferior
   bottomRow: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -180,40 +193,66 @@ const styles = StyleSheet.create({
     alignItems: "center"
   },
   totalLabel: {
-    fontSize: 10,
+    fontSize: 9,
     fontWeight: "bold",
-    color: "#0F172A"
+    color: "#0F172A",
+    textTransform: "uppercase"
   },
   totalValue: {
     fontSize: 12,
     fontWeight: "bold",
     color: "#0F172A"
   },
-  // Pie de página
+  // Pie de Página
   footer: {
     position: "absolute",
-    bottom: 15,
+    bottom: 12,
     left: 25,
     right: 25,
-    textAlign: "center",
-    fontSize: 7.5,
-    color: "#94A3B8",
     borderTopWidth: 1,
     borderTopColor: "#E2E8F0",
-    paddingTop: 4
+    paddingTop: 6,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center"
+  },
+  footerText: {
+    fontSize: 7.5,
+    color: "#94A3B8"
   }
 })
 
-const DeliveryNotePDF = ({ deliveryNote, total }) => {
-  const formattedDate = deliveryNote?.date
-    ? new Date(deliveryNote.date).toLocaleDateString("es-ES", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric"
-      })
-    : ""
+export default function DeliveryNotePDF({ deliveryNote }) {
+  const isValued = deliveryNote?.isValued !== false
 
-  const safeTotal = typeof total === "number" ? total : 0
+  // Formatear Fecha
+  let formattedDate = ""
+  if (deliveryNote?.date) {
+    try {
+      const d = new Date(deliveryNote.date)
+      if (!isNaN(d.getTime())) {
+        formattedDate = d.toLocaleDateString("es-ES", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric"
+        })
+      }
+    } catch {
+      formattedDate = ""
+    }
+  }
+
+  // Calcular totales
+  let totalAmount = 0
+  let totalUnits = 0
+  if (Array.isArray(deliveryNote?.works)) {
+    deliveryNote.works.forEach((work) => {
+      const qty = typeof work.quantity === "number" ? work.quantity : 0
+      const prc = typeof work.price === "number" ? work.price : 0
+      totalUnits += qty
+      totalAmount += qty * prc
+    })
+  }
 
   const emisorName =
     deliveryNote?.company?.companyName ||
@@ -241,9 +280,14 @@ const DeliveryNotePDF = ({ deliveryNote, total }) => {
           </View>
 
           <View style={styles.headerRight}>
-            <Text style={styles.docBadge}>ALBARÁN</Text>
+            <Text style={styles.docBadge}>{isValued ? "ALBARÁN" : "ALBARÁN DE ENTREGA"}</Text>
             <Text style={styles.docMetaText}>Nº: {deliveryNote?.number || ""}</Text>
             <Text style={styles.docMetaText}>Fecha: {formattedDate}</Text>
+            {deliveryNote?.createdBy?.role === "driver" && (
+              <Text style={styles.docMetaText}>
+                Chofer: {deliveryNote.createdBy.fullName || deliveryNote.createdBy.username}
+              </Text>
+            )}
           </View>
         </View>
 
@@ -269,28 +313,51 @@ const DeliveryNotePDF = ({ deliveryNote, total }) => {
         </View>
 
         {/* Tabla de Trabajos / Conceptos */}
-        <View style={styles.tableHeader} wrap={false}>
-          <Text style={styles.colConcept}>Concepto</Text>
-          <Text style={styles.colQuantity}>Cantidad</Text>
-          <Text style={styles.colPrice}>Precio</Text>
-          <Text style={styles.colTotal}>Total</Text>
-        </View>
+        {isValued ? (
+          <>
+            <View style={styles.tableHeader} wrap={false}>
+              <Text style={styles.colConcept}>Concepto</Text>
+              <Text style={styles.colQuantity}>Cantidad</Text>
+              <Text style={styles.colPrice}>Precio</Text>
+              <Text style={styles.colTotal}>Total</Text>
+            </View>
 
-        {Array.isArray(deliveryNote?.works) &&
-          deliveryNote.works.map((work) => {
-            const quantity = typeof work.quantity === "number" ? work.quantity : 0
-            const price = typeof work.price === "number" ? work.price : 0
-            const workTotal = quantity * price
+            {Array.isArray(deliveryNote?.works) &&
+              deliveryNote.works.map((work) => {
+                const quantity = typeof work.quantity === "number" ? work.quantity : 0
+                const price = typeof work.price === "number" ? work.price : 0
+                const workTotal = quantity * price
 
-            return (
-              <View key={work._id || work.id || Math.random()} style={styles.tableRow} wrap={false}>
-                <Text style={styles.colConcept}>{work.concept || ""}</Text>
-                <Text style={styles.colQuantity}>{quantity.toFixed(2)}</Text>
-                <Text style={styles.colPrice}>{price.toFixed(2)} €</Text>
-                <Text style={styles.colTotal}>{workTotal.toFixed(2)} €</Text>
-              </View>
-            )
-          })}
+                return (
+                  <View key={work._id || work.id || Math.random()} style={styles.tableRow} wrap={false}>
+                    <Text style={styles.colConcept}>{work.concept || ""}</Text>
+                    <Text style={styles.colQuantity}>{quantity.toFixed(2)}</Text>
+                    <Text style={styles.colPrice}>{price.toFixed(2)} €</Text>
+                    <Text style={styles.colTotal}>{workTotal.toFixed(2)} €</Text>
+                  </View>
+                )
+              })}
+          </>
+        ) : (
+          <>
+            <View style={styles.tableHeader} wrap={false}>
+              <Text style={styles.colConceptFull}>Descripción del Porte / Bultos</Text>
+              <Text style={styles.colQuantityFull}>Cantidad / Bultos</Text>
+            </View>
+
+            {Array.isArray(deliveryNote?.works) &&
+              deliveryNote.works.map((work) => {
+                const quantity = typeof work.quantity === "number" ? work.quantity : 0
+
+                return (
+                  <View key={work._id || work.id || Math.random()} style={styles.tableRow} wrap={false}>
+                    <Text style={styles.colConceptFull}>{work.concept || ""}</Text>
+                    <Text style={styles.colQuantityFull}>{quantity.toFixed(2)}</Text>
+                  </View>
+                )
+              })}
+          </>
+        )}
 
         {/* Sección Inferior: Observaciones y Total */}
         <View style={styles.bottomRow} wrap={false}>
@@ -300,24 +367,31 @@ const DeliveryNotePDF = ({ deliveryNote, total }) => {
               <Text style={styles.observationsText}>{deliveryNote.observations}</Text>
             </View>
           ) : (
-            <View style={{ flex: 1.2 }} />
+            <View style={styles.observationsBox}>
+              <Text style={styles.observationsTitle}>Firma y Conformidad de Entrega</Text>
+              <Text style={styles.observationsText}>Recibido conforme por el cliente.</Text>
+            </View>
           )}
 
           <View style={styles.totalBox}>
-            <Text style={styles.totalLabel}>TOTAL ALBARÁN:</Text>
-            <Text style={styles.totalValue}>{safeTotal.toFixed(2)} €</Text>
+            <Text style={styles.totalLabel}>{isValued ? "TOTAL:" : "TOTAL UDS:"}</Text>
+            <Text style={styles.totalValue}>
+              {isValued ? `${totalAmount.toFixed(2)} €` : `${totalUnits.toFixed(2)} ud.`}
+            </Text>
           </View>
         </View>
 
-        {/* Pie de página Dinámico con Paginación */}
-        <Text
-          style={styles.footer}
-          render={({ pageNumber, totalPages }) => `FactuClient APP · Página ${pageNumber} de ${totalPages}`}
-          fixed
-        />
+        {/* Pie de Página */}
+        <View style={styles.footer} fixed>
+          <Text style={styles.footerText}>
+            Documento generado por FactuClient {isValued ? "" : "· Albarán de Entrega sin Valorar"}
+          </Text>
+          <Text
+            style={styles.footerText}
+            render={({ pageNumber, totalPages }) => `Página ${pageNumber} de ${totalPages}`}
+          />
+        </View>
       </Page>
     </Document>
   )
 }
-
-export default DeliveryNotePDF

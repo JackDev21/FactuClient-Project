@@ -45,10 +45,13 @@ const createDeliveryNote = (userId, customerId) => {
         throw new NotFoundError("User not found")
       }
 
+      const isDriver = user.role === "driver"
+      const companyId = isDriver ? user.manager.toString() : userId
+
       const currentYear = new Date().getFullYear()
 
       const attemptCreate = (retryCount = 0) => {
-        return DeliveryNote.find({ company: userId }).select("number").lean()
+        return DeliveryNote.find({ company: companyId }).select("number").lean()
           .then(allDeliveryNotes => {
             const nextSeq = getNextNumber(allDeliveryNotes, currentYear)
             const deliveryNoteNumber = formatNumber(currentYear, nextSeq)
@@ -56,15 +59,23 @@ const createDeliveryNote = (userId, customerId) => {
             const newDeliveryNote = {
               date: new Date(),
               number: deliveryNoteNumber,
-              company: userId,
+              company: companyId,
               customer: customerId,
               observations: "",
               works: [],
+              isValued: !isDriver,
+              createdBy: userId,
             }
 
             return DeliveryNote.create(newDeliveryNote)
               .then((deliveryNote) => {
-                return DeliveryNote.findById(deliveryNote.id).populate("customer").populate("company").populate("works").select("-__v").lean()
+                return DeliveryNote.findById(deliveryNote.id)
+                  .populate("customer")
+                  .populate("company")
+                  .populate("works")
+                  .populate("createdBy", "fullName username role")
+                  .select("-__v")
+                  .lean()
                   .then((deliveryNote) => {
                     deliveryNote.id = deliveryNote._id.toString()
                     delete deliveryNote._id

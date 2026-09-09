@@ -128,14 +128,14 @@ export default function DeliveryInfo() {
     }
 
     const quantity = Number(editQuantity.replace(",", "."))
-    const price = Number(editPrice.replace(",", "."))
+    const price = isDriver ? (Number(editingWork?.price) || 0) : Number(editPrice.replace(",", "."))
 
     if (isNaN(quantity) || quantity === 0) {
       showAlert("La cantidad debe ser un número distinto de 0.")
       return
     }
 
-    if (isNaN(price)) {
+    if (!isDriver && isNaN(price)) {
       showAlert("El precio unitario debe ser un número válido.")
       return
     }
@@ -200,14 +200,14 @@ export default function DeliveryInfo() {
     }
 
     const quantity = Number(newQuantity.replace(",", "."))
-    const price = Number(newPrice.replace(",", "."))
+    const price = isDriver ? 0 : Number(newPrice.replace(",", "."))
 
     if (isNaN(quantity) || quantity === 0) {
       showAlert("La cantidad debe ser un número distinto de 0.")
       return
     }
 
-    if (isNaN(price)) {
+    if (!isDriver && isNaN(price)) {
       showAlert("El precio unitario debe ser un número válido.")
       return
     }
@@ -299,21 +299,24 @@ export default function DeliveryInfo() {
     }
   }
 
-  const isEditable = logic.getInfo().role === "user" && !deliveryNote?.isInvoiced
+  const userRole = logic.getInfo().role
+  const isDriver = userRole === "driver"
+  const isOwner = userRole === "user" || userRole === "company"
+  const isEditable = (isOwner || isDriver) && !deliveryNote?.isInvoiced
 
   return (
     <>
       <Header
-        iconLeftHeader={isEditable && <MdDeleteForever />}
-        onDeleteDeliveryNote={isEditable ? handleShowConfirmDelete : undefined}
+        iconLeftHeader={isOwner && isEditable && <MdDeleteForever className="text-rose-900 shrink-0" />}
+        onDeleteDeliveryNote={isOwner && isEditable ? handleShowConfirmDelete : undefined}
       >
-        <div className="flex flex-col items-center justify-center">
-          <span className="text-xs font-semibold text-slate-800">
+        <div className="flex flex-col items-center justify-center max-w-[62vw] sm:max-w-md">
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-slate-950/25 border border-slate-950/20 text-slate-950 text-[10px] sm:text-xs font-black uppercase tracking-wider mb-0.5 shadow-2xs">
             Albarán Nº {deliveryNote?.number || ""}
           </span>
-          <span className="text-sm sm:text-base font-extrabold text-slate-900 truncate max-w-[60vw]">
+          <h1 className="text-xs sm:text-base font-black text-slate-950 tracking-tight leading-tight truncate max-w-full">
             {deliveryNote?.customer?.companyName || deliveryNote?.customerName || "Detalle de Albarán"}
-          </span>
+          </h1>
         </div>
       </Header>
 
@@ -327,7 +330,7 @@ export default function DeliveryInfo() {
             {deliveryNote?.customer ? (
               <>
                 <span className="text-sm font-extrabold text-slate-900">
-                  {deliveryNote.customer.companyName}
+                  {deliveryNote.customer.companyName || deliveryNote.customer.fullName || deliveryNote.customer.username || "Cliente"}
                 </span>
                 <span className="text-xs text-slate-600 font-medium">
                   CIF/NIF: {deliveryNote.customer.taxId}
@@ -346,15 +349,42 @@ export default function DeliveryInfo() {
                 Albarán Nº {deliveryNote?.number}
               </span>
 
-              {/* Badge de Estado Facturado / Pendiente */}
-              {deliveryNote?.isInvoiced ? (
-                <span className="rounded-full bg-emerald-100/90 text-emerald-800 border border-emerald-200 px-3 py-1 text-xs font-bold tracking-wide">
-                  {deliveryNote.invoiceNumber ? `Facturado (Fra. ${deliveryNote.invoiceNumber})` : "Facturado"}
-                </span>
+              {/* Badge de Estado: Valorado / Pendiente precio para chofer, Facturado / Pendiente para autónomo */}
+              {isDriver ? (
+                deliveryNote?.isValued !== false ? (
+                  <span className="rounded-full bg-emerald-100/90 text-emerald-800 border border-emerald-200 px-3 py-1 text-xs font-bold tracking-wide">
+                    Valorado
+                  </span>
+                ) : (
+                  <span className="rounded-full bg-amber-100/90 text-amber-800 border border-amber-200 px-3 py-1 text-xs font-bold tracking-wide uppercase">
+                    Pendiente de precio
+                  </span>
+                )
               ) : (
-                <span className="rounded-full bg-amber-100/90 text-amber-800 border border-amber-200 px-3 py-1 text-xs font-bold tracking-wide uppercase">
-                  Pendiente
-                </span>
+                <>
+                  {deliveryNote?.isInvoiced ? (
+                    <span className="rounded-full bg-emerald-100/90 text-emerald-800 border border-emerald-200 px-3 py-1 text-xs font-bold tracking-wide">
+                      {deliveryNote.invoiceNumber ? `Facturado (Fra. ${deliveryNote.invoiceNumber})` : "Facturado"}
+                    </span>
+                  ) : (
+                    <span className="rounded-full bg-amber-100/90 text-amber-800 border border-amber-200 px-3 py-1 text-xs font-bold tracking-wide uppercase">
+                      Pendiente
+                    </span>
+                  )}
+
+                  {deliveryNote?.createdBy?.role === "driver" && (
+                    <span className="rounded-full bg-violet-100 text-violet-800 border border-violet-200 px-3 py-1 text-xs font-bold tracking-wide flex items-center gap-1.5">
+                      <FaTruckFast className="text-[11px]" />
+                      Chofer: {deliveryNote.createdBy.fullName || deliveryNote.createdBy.username}
+                    </span>
+                  )}
+
+                  {deliveryNote?.isValued === false && (
+                    <span className="rounded-full bg-amber-50 text-amber-800 border border-amber-300 px-3 py-1 text-xs font-bold tracking-wide">
+                      Sin Valorar
+                    </span>
+                  )}
+                </>
               )}
             </div>
 
@@ -382,11 +412,17 @@ export default function DeliveryInfo() {
                 <button
                   type="button"
                   onClick={() => setIsEditingDate(true)}
-                  className="group flex items-center gap-2 rounded-xl bg-slate-50 border border-slate-200 px-3 py-1.5 text-xs sm:text-sm font-bold text-slate-800 hover:bg-amber-50 hover:border-amber-300 transition-all active:scale-95"
+                  className="group flex items-center gap-2 rounded-xl bg-slate-50 border border-slate-200 px-3 py-1.5 text-xs sm:text-sm font-bold text-slate-800 hover:bg-amber-50 hover:border-amber-300 transition-all active:scale-95 shadow-2xs"
                   title="Pulsar para cambiar fecha"
                 >
-                  <span>📅 <Time>{deliveryNote?.date}</Time></span>
-                  <FaPencil className="w-3 h-3 text-slate-400 group-hover:text-amber-700 transition-colors" />
+                  <span className="flex items-center gap-1.5">
+                    <span className="text-sm sm:text-base">📅</span>
+                    <Time>{deliveryNote?.date}</Time>
+                  </span>
+                  <span className="flex items-center gap-1 text-xs font-bold text-amber-800 bg-amber-100/70 border border-amber-300/80 px-2 py-0.5 rounded-lg group-hover:bg-amber-200 transition-colors">
+                    <FaPencil className="w-3.5 h-3.5" />
+                    <span>Cambiar</span>
+                  </span>
                 </button>
               ) : (
                 <span className="rounded-xl bg-slate-50 border border-slate-200 px-3 py-1.5 text-xs sm:text-sm font-bold text-slate-800">
@@ -396,8 +432,8 @@ export default function DeliveryInfo() {
             </div>
           </div>
 
-          {/* Aviso informativo si está facturado */}
-          {deliveryNote?.isInvoiced && (
+          {/* Aviso informativo si está facturado (solo para autónomo) */}
+          {!isDriver && deliveryNote?.isInvoiced && (
             <div className="rounded-2xl border border-emerald-200 bg-emerald-50/70 p-3.5 text-left flex items-start gap-2.5">
               <span className="text-base leading-none">🔒</span>
               <p className="text-xs text-emerald-800 font-medium leading-relaxed">
@@ -421,9 +457,9 @@ export default function DeliveryInfo() {
                     setShowAddWorkForm(true)
                     setEditingWorkId(null)
                   }}
-                  className="flex items-center gap-1.5 text-xs font-bold text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200/80 px-2.5 py-1 rounded-xl transition-all active:scale-95"
+                  className="flex items-center gap-1.5 text-xs sm:text-sm font-bold text-amber-800 bg-amber-100/80 hover:bg-amber-200 border border-amber-300 px-3 py-1.5 rounded-xl transition-all active:scale-95 shadow-2xs"
                 >
-                  <FaPlus className="w-3 h-3" />
+                  <FaPlus className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-800" />
                   <span>Añadir Concepto</span>
                 </button>
               )}
@@ -459,10 +495,10 @@ export default function DeliveryInfo() {
                           />
                         </div>
 
-                        <div className="grid grid-cols-2 gap-3">
+                        <div className={isDriver ? "grid grid-cols-1 gap-3" : "grid grid-cols-2 gap-3"}>
                           <div>
                             <label className="block text-[11px] font-semibold text-slate-600 mb-1">
-                              Cantidad *
+                              {isDriver ? "Cantidad / Bultos *" : "Cantidad *"}
                             </label>
                             <input
                               type="number"
@@ -475,20 +511,22 @@ export default function DeliveryInfo() {
                             />
                           </div>
 
-                          <div>
-                            <label className="block text-[11px] font-semibold text-slate-600 mb-1">
-                              Precio Unitario (€) *
-                            </label>
-                            <input
-                              type="number"
-                              step="any"
-                              inputMode="decimal"
-                              required
-                              value={editPrice}
-                              onChange={(e) => setEditPrice(e.target.value)}
-                              className="w-full rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500"
-                            />
-                          </div>
+                          {!isDriver && (
+                            <div>
+                              <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                                Precio Unitario (€) *
+                              </label>
+                              <input
+                                type="number"
+                                step="any"
+                                inputMode="decimal"
+                                required
+                                value={editPrice}
+                                onChange={(e) => setEditPrice(e.target.value)}
+                                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                              />
+                            </div>
+                          )}
                         </div>
 
                         <div className="flex items-center justify-end gap-2 pt-1">
@@ -514,42 +552,55 @@ export default function DeliveryInfo() {
                   return (
                     <div
                       key={workId || idx}
-                      className="group flex items-start justify-between gap-3 border-b border-slate-100 pb-2.5 last:border-b-0 last:pb-0 text-xs sm:text-sm text-left"
+                      className="group flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 border-b border-slate-100 pb-3 last:border-b-0 last:pb-0 text-xs sm:text-sm text-left"
                     >
-                      <div className="flex flex-col text-left flex-1 min-w-0 pr-2">
-                        <span className="font-semibold text-slate-800 leading-snug">
+                      <div className="flex flex-col text-left flex-1 min-w-0">
+                        <span className="font-bold text-slate-900 leading-snug text-xs sm:text-sm">
                           {work.concept}
                         </span>
-                        <span className="text-[11px] text-slate-400 font-medium mt-0.5">
-                          {Number(work.quantity || 0).toFixed(2)} ud. × {Number(work.price || 0).toFixed(2)} €
+                        <span className="text-[11px] text-slate-500 font-medium mt-0.5">
+                          {Number(work.quantity || 0).toFixed(2)} ud.
+                          {!isDriver && deliveryNote?.isValued !== false && ` × ${Number(work.price || 0).toFixed(2)} €`}
                         </span>
                       </div>
 
-                      <div className="flex items-center gap-2 shrink-0 pt-0.5">
-                        <span className="font-bold text-slate-900 whitespace-nowrap">
-                          {((Number(work.quantity) || 0) * (Number(work.price) || 0)).toFixed(2)} €
-                        </span>
+                      <div className="flex items-center justify-between sm:justify-end gap-2 shrink-0 pt-0.5 w-full sm:w-auto">
+                        {!isDriver && deliveryNote?.isValued !== false ? (
+                          <span className="font-bold text-slate-900 whitespace-nowrap text-xs sm:text-sm">
+                            {((Number(work.quantity) || 0) * (Number(work.price) || 0)).toFixed(2)} €
+                          </span>
+                        ) : isDriver && deliveryNote?.isValued !== false ? (
+                          <span className="text-xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-xl whitespace-nowrap flex items-center gap-1">
+                            ✓ Valorado
+                          </span>
+                        ) : (
+                          <span className="text-xs font-bold text-amber-800 bg-amber-50 border border-amber-200 px-3 py-1 rounded-xl whitespace-nowrap">
+                            Pendiente precio
+                          </span>
+                        )}
 
                         {/* Botones de Acción: Editar y Eliminar */}
                         {isEditable && (
-                          <div className="flex items-center gap-1 ml-1">
+                          <div className="flex items-center gap-2 ml-1.5">
                             <button
                               type="button"
                               onClick={() => handleStartEditWork(work)}
-                              className="p-1.5 rounded-lg text-slate-400 hover:text-amber-700 hover:bg-amber-50 active:scale-95 transition-all"
-                              title="Editar concepto o precio"
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-slate-700 bg-slate-100 hover:bg-amber-50 hover:text-amber-800 hover:border-amber-300 border border-slate-200 active:scale-95 transition-all shadow-2xs cursor-pointer"
+                              title="Editar concepto o cantidad"
                             >
-                              <FaPencil className="w-3 h-3" />
+                              <FaPencil className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-600" />
+                              <span>Editar</span>
                             </button>
 
                             <button
                               type="button"
                               disabled={deletingWorkId === workId}
                               onClick={() => handleDeleteWork(workId)}
-                              className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 active:scale-95 transition-all disabled:opacity-40"
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-rose-700 bg-rose-50 hover:bg-rose-100 hover:border-rose-300 border border-rose-200 active:scale-95 transition-all disabled:opacity-40 shadow-2xs cursor-pointer"
                               title="Eliminar línea"
                             >
-                              <FaTrashCan className="w-3 h-3" />
+                              <FaTrashCan className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-rose-600" />
+                              <span>Borrar</span>
                             </button>
                           </div>
                         )}
@@ -587,10 +638,10 @@ export default function DeliveryInfo() {
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
+                <div className={isDriver ? "grid grid-cols-1 gap-3" : "grid grid-cols-2 gap-3"}>
                   <div>
                     <label className="block text-[11px] font-semibold text-slate-600 mb-1">
-                      Cantidad *
+                      {isDriver ? "Cantidad / Bultos *" : "Cantidad *"}
                     </label>
                     <input
                       type="number"
@@ -604,21 +655,23 @@ export default function DeliveryInfo() {
                     />
                   </div>
 
-                  <div>
-                    <label className="block text-[11px] font-semibold text-slate-600 mb-1">
-                      Precio Unitario (€) *
-                    </label>
-                    <input
-                      type="number"
-                      step="any"
-                      inputMode="decimal"
-                      required
-                      value={newPrice}
-                      onChange={(e) => setNewPrice(e.target.value)}
-                      placeholder="0.00"
-                      className="w-full rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500"
-                    />
-                  </div>
+                  {!isDriver && (
+                    <div>
+                      <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                        Precio Unitario (€) *
+                      </label>
+                      <input
+                        type="number"
+                        step="any"
+                        inputMode="decimal"
+                        required
+                        value={newPrice}
+                        onChange={(e) => setNewPrice(e.target.value)}
+                        placeholder="0.00"
+                        className="w-full rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                      />
+                    </div>
+                  )}
                 </div>
 
                 <div className="flex items-center justify-end gap-2 pt-1">
@@ -657,10 +710,10 @@ export default function DeliveryInfo() {
                 <button
                   type="button"
                   onClick={handleStartEditObservation}
-                  className="flex items-center gap-1.5 text-xs font-bold text-amber-700 hover:text-amber-800 px-2 py-0.5 rounded-lg hover:bg-amber-50 transition-all"
+                  className="flex items-center gap-1.5 text-xs sm:text-sm font-bold text-amber-800 bg-amber-50 hover:bg-amber-100 border border-amber-200 px-3 py-1.5 rounded-xl transition-all shadow-2xs"
                   title="Editar observaciones"
                 >
-                  <FaPencil className="w-3 h-3" />
+                  <FaPencil className="w-3.5 h-3.5 text-amber-800" />
                   <span>{deliveryNote?.observations ? "Modificar" : "Añadir Nota"}</span>
                 </button>
               )}
@@ -708,28 +761,43 @@ export default function DeliveryInfo() {
 
           {/* Tarjeta de Resumen de Totales */}
           <div className="flex justify-between items-center rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 shadow-xs text-base sm:text-lg font-black text-slate-900">
-            <span>TOTAL ALBARÁN:</span>
+            <span>{(!isDriver && deliveryNote?.isValued !== false) ? "TOTAL ALBARÁN:" : "TOTAL UNIDADES / BULTOS:"}</span>
             <span className="text-lg sm:text-xl text-amber-600">
-              {total.toFixed(2)} €
+              {(!isDriver && deliveryNote?.isValued !== false)
+                ? `${total.toFixed(2)} €`
+                : `${(deliveryNote?.works || []).reduce((acc, w) => acc + (Number(w.quantity) || 0), 0)} ud.`}
             </span>
           </div>
+
+          {/* Aviso para autónomo si está sin valorar */}
+          {!isDriver && deliveryNote?.isValued === false && (
+            <div className="rounded-2xl bg-amber-50 p-4 border border-amber-200 text-left text-xs text-amber-900 flex items-start gap-3 shadow-xs animate-fadeIn">
+              <FaTruckFast className="text-amber-600 text-2xl sm:text-3xl shrink-0 mt-0.5" />
+              <div className="flex flex-col gap-1">
+                <span className="font-extrabold text-amber-950">Albarán de transporte sin valorar</span>
+                <span className="text-amber-800 leading-relaxed">
+                  Este albarán fue registrado por un chofer. Para poder incluirlo en una factura, asigna el precio correspondiente a cada partida pulsando el botón de edición ✏️.
+                </span>
+              </div>
+            </div>
+          )}
 
           {/* Botón DeCA Oficial para transporte */}
           {deliveryNote && (
             deliveryNote.deca ? (
               <Link
                 to={`/deca/${deliveryNote.deca}`}
-                className="flex w-full items-center justify-center gap-2.5 rounded-2xl bg-slate-900 py-3.5 px-6 text-sm font-bold text-white shadow-md transition-all active:scale-95 hover:bg-slate-800"
+                className="flex w-full items-center justify-center gap-2.5 rounded-2xl bg-slate-900 py-3.5 px-6 text-sm sm:text-base font-bold text-white shadow-md transition-all active:scale-95 hover:bg-slate-800"
               >
-                <FaFileShield className="text-amber-400 text-base" />
+                <FaFileShield className="text-amber-400 text-lg sm:text-xl" />
                 <span>Ver DeCA Oficial Emitido (con QR de Inspección)</span>
               </Link>
             ) : (
               <Link
                 to={`/deca/new/${deliveryNoteId}`}
-                className="flex w-full items-center justify-center gap-2.5 rounded-2xl border-2 border-amber-500 bg-amber-50 py-3 px-6 text-sm font-bold text-amber-900 shadow-xs transition-all active:scale-95 hover:bg-amber-100"
+                className="flex w-full items-center justify-center gap-2.5 rounded-2xl border-2 border-amber-500 bg-amber-50 py-3.5 px-6 text-sm sm:text-base font-bold text-amber-900 shadow-xs transition-all active:scale-95 hover:bg-amber-100"
               >
-                <FaTruckFast className="text-amber-600 text-base" />
+                <FaTruckFast className="text-amber-600 text-lg sm:text-xl" />
                 <span>Emitir DeCA Oficial (Transporte de Mercancías)</span>
               </Link>
             )
@@ -738,19 +806,19 @@ export default function DeliveryInfo() {
           {/* Botón de Descarga PDF */}
           {deliveryNote && (
             <PDFDownloadLink
-              className="flex w-full items-center justify-center gap-2.5 rounded-2xl bg-orange-500 py-3.5 px-6 text-base font-bold text-white shadow-md transition-all active:scale-95 hover:bg-orange-600 hover:shadow-lg"
+              className="flex w-full items-center justify-center gap-2.5 rounded-2xl bg-orange-500 py-3.5 px-6 text-base sm:text-lg font-bold text-white shadow-md transition-all active:scale-95 hover:bg-orange-600 hover:shadow-lg"
               document={<DeliveryNotePDF deliveryNote={deliveryNote} total={total} />}
               fileName={`Albaran-${deliveryNote.number}.pdf`}
             >
               {({ loading }) =>
                 loading ? (
                   <>
-                    <FaSpinner className="animate-spin text-lg" />
+                    <FaSpinner className="animate-spin text-xl sm:text-2xl" />
                     <span>Generando PDF...</span>
                   </>
                 ) : (
                   <>
-                    <FaRegFilePdf className="text-lg" />
+                    <FaRegFilePdf className="text-xl sm:text-2xl" />
                     <span>Descargar Albarán en PDF</span>
                   </>
                 )
@@ -763,16 +831,16 @@ export default function DeliveryInfo() {
             <div className="flex w-full gap-3">
               <Link
                 to="/"
-                className="flex flex-1 items-center justify-center gap-2 rounded-2xl border-2 border-slate-300 bg-white py-3 px-4 text-sm font-bold text-slate-700 shadow-xs transition-all active:scale-95 hover:bg-slate-50 hover:border-slate-400"
+                className="flex flex-1 items-center justify-center gap-2 rounded-2xl border-2 border-slate-300 bg-white py-3 px-4 text-sm sm:text-base font-bold text-slate-700 shadow-xs transition-all active:scale-95 hover:bg-slate-50 hover:border-slate-400"
               >
-                <FaHouse className="text-base text-slate-500" />
+                <FaHouse className="text-lg sm:text-xl text-slate-500" />
                 <span>Inicio</span>
               </Link>
               <Link
                 to={`/create/delivery-notes/${deliveryNote.customer?._id || deliveryNote.customer?.id}`}
-                className="flex flex-1 items-center justify-center gap-2 rounded-2xl border-2 border-amber-400 bg-amber-50 py-3 px-4 text-sm font-bold text-amber-800 shadow-xs transition-all active:scale-95 hover:bg-amber-100 hover:border-amber-500"
+                className="flex flex-1 items-center justify-center gap-2 rounded-2xl border-2 border-amber-400 bg-amber-50 py-3 px-4 text-sm sm:text-base font-bold text-amber-800 shadow-xs transition-all active:scale-95 hover:bg-amber-100 hover:border-amber-500"
               >
-                <FaPlus className="text-base" />
+                <FaPlus className="text-lg sm:text-xl" />
                 <span>Crear Otro Albarán</span>
               </Link>
             </div>

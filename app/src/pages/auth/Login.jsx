@@ -27,18 +27,14 @@ export default function Login() {
     const password = target.password.value
 
     try {
-      // prettier-ignore
       logic.loginUser(username, password)
         .then(() => {    
           const { role, userId } = logic.getInfo()
-          if(role === "user"){
+          if (role === "customer") {
+            navigate(`/customer/${userId}/info`)
+          } else {
             navigate("/")
-          } 
-
-          if(role === "customer"){
-          navigate(`/customer/${userId}/info` )
           }
-
         })
         .catch((error) => {
           if(error instanceof SystemError) {

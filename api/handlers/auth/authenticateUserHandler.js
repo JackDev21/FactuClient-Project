@@ -11,9 +11,9 @@ export default ((req, res, next) => {
 
     logic.authenticateUser(username, password)
       .then((user) => {
-        const { userId, role } = user
+        const { userId, role, manager } = user
 
-        jwt.sign({ sub: userId, role }, JWT_SECRET, { expiresIn: "7d" })
+        jwt.sign({ sub: userId, role, manager }, JWT_SECRET, { expiresIn: "7d" })
           .then((token) => {
             res.json(token)
           })

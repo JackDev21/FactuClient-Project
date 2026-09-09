@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import { Navigate } from "react-router-dom"
 
 import Header from "../../components/Header"
 import Main from "../../components/core/Main"
@@ -12,6 +13,11 @@ import extractPayloadJwt from "../../../utils/extractPayloadJwt"
 import "./UserProfile.css"
 
 export default function UserProfile() {
+  const info = logic.getInfo()
+  if (info?.role === "driver") {
+    return <Navigate to="/" />
+  }
+
   const [user, setUser] = useState(null)
 
   const { sub: userId } = extractPayloadJwt(sessionStorage.token)

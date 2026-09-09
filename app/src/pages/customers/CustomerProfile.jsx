@@ -193,11 +193,11 @@ export default function CustomerProfile() {
                 <button
                   type="button"
                   onClick={handleUpdateProfile}
-                  className="flex items-center gap-1.5 p-2 rounded-xl bg-slate-100 text-slate-700 hover:bg-amber-100 hover:text-amber-800 active:scale-95 transition-all text-xs font-bold shrink-0 ml-2"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 border border-slate-200 text-slate-700 hover:bg-amber-100 hover:text-amber-800 hover:border-amber-300 active:scale-95 transition-all text-xs sm:text-sm font-bold shrink-0 ml-2 shadow-2xs cursor-pointer"
                   title="Editar Cliente"
                 >
-                  <FaUserPen className="w-4 h-4" />
-                  <span className="hidden sm:inline">Editar</span>
+                  <FaUserPen className="w-4 h-4 text-slate-600" />
+                  <span>Editar</span>
                 </button>
               </div>
 

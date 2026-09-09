@@ -4,10 +4,10 @@ import { Link, Navigate } from "react-router-dom"
 import logic from "../../logic/index"
 
 import { FaUserEdit, FaSpinner } from "react-icons/fa"
-import { PiUsersThreeBold, PiClockCountdownBold } from "react-icons/pi"
+import { PiUsersThreeBold } from "react-icons/pi"
 import { LiaFileInvoiceDollarSolid } from "react-icons/lia"
 import { GiStabbedNote } from "react-icons/gi"
-import { FaPlus, FaChevronRight, FaFileShield } from "react-icons/fa6"
+import { FaPlus, FaChevronRight, FaFileShield, FaTruck } from "react-icons/fa6"
 
 import Header from "../../components/Header"
 import Main from "../../components/core/Main"
@@ -21,19 +21,41 @@ export default function Home() {
     customersCount: 0,
     pendingDeliveryCount: 0,
     invoicesCount: 0,
+    driverDeliveryCount: 0,
     loading: true
   })
+
+  const { role, userId } = logic.getInfo()
 
   useEffect(() => {
     try {
       logic.getUserName()
         .then((name) => setUserName(name))
-        .catch(() => {})
+        .catch(console.error)
 
+      if (role === "driver") {
+        // Para choferes, cargar solo sus albaranes
+        logic.getAllDeliveryNotes()
+          .then((notes) => {
+            setStats({
+              customersCount: 0,
+              pendingDeliveryCount: 0,
+              invoicesCount: 0,
+              driverDeliveryCount: Array.isArray(notes) ? notes.length : 0,
+              loading: false
+            })
+          })
+          .catch(() => {
+            setStats(prev => ({ ...prev, loading: false }))
+          })
+        return
+      }
+
+      // Para autónomo / admin
       Promise.allSettled([
         logic.getAllCustomers(),
         logic.getAllDeliveryNotes(),
-        logic.getAllInvoices()
+        logic.getAllInvoices(),
       ]).then(([custRes, delivRes, invRes]) => {
         const customers = custRes.status === "fulfilled" && Array.isArray(custRes.value) ? custRes.value : []
         const deliveryNotes = delivRes.status === "fulfilled" && Array.isArray(delivRes.value) ? delivRes.value : []
@@ -43,19 +65,95 @@ export default function Home() {
           customersCount: customers.length,
           pendingDeliveryCount: deliveryNotes.filter((d) => !d.isInvoiced).length,
           invoicesCount: invoices.length,
+          driverDeliveryCount: 0,
           loading: false
         })
       })
     } catch (error) {
       console.error(error)
     }
-  }, [])
+  }, [role])
 
-  const { role, userId } = logic.getInfo()
   if (role === "customer") {
     return <Navigate to={`/customer/${userId}/info`} />
   }
 
+  // --- VISTA ESPECÍFICA PARA CHOFER ---
+  if (role === "driver") {
+    return (
+      <>
+        <Header iconUser={<FaTruck />}>
+          <div className="flex flex-col items-center">
+            <span className="text-xs font-semibold text-slate-700">Panel de Conductor</span>
+            <span className="text-sm sm:text-base font-extrabold text-slate-900">{userName || "Chofer"}</span>
+          </div>
+        </Header>
+
+        <Main className="MainHome">
+          <div className="w-full max-w-md flex flex-col justify-evenly flex-1 gap-4 px-3 sm:px-4 py-2">
+            {/* Tarjeta de Acción Principal: Crear Albarán */}
+            <Link to="/create/delivery-notes" className="w-full">
+              <div className="rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 p-5 text-white shadow-md hover:from-amber-600 hover:to-orange-600 active:scale-98 transition-all flex items-center justify-between">
+                <div className="flex items-center gap-3.5 text-left">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white/20 text-2xl text-white">
+                    <FaPlus />
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-lg font-black leading-tight">Nuevo Albarán</span>
+                    <span className="text-xs text-amber-100 font-medium mt-0.5">Registrar entrega en ruta</span>
+                  </div>
+                </div>
+                <FaChevronRight className="text-white/80" />
+              </div>
+            </Link>
+
+            {/* Tarjeta: Mis Albaranes Registrados */}
+            <Link to="/delivery-notes" className="DashboardCardLink">
+              <div className="DashboardCard border-l-4 border-l-amber-500">
+                <div className="flex items-center gap-3.5">
+                  <div className="flex h-13 w-13 shrink-0 items-center justify-center rounded-2xl bg-amber-50 text-2xl sm:text-3xl text-amber-600 shadow-xs">
+                    <GiStabbedNote />
+                  </div>
+                  <div className="flex flex-col text-left gap-0.5">
+                    <span className="text-base sm:text-lg font-extrabold text-slate-900">Mis Albaranes</span>
+                    <span className="text-xs sm:text-sm font-medium text-slate-500">
+                      {stats.loading ? "Cargando..." : `${stats.driverDeliveryCount} albaranes registrados`}
+                    </span>
+                  </div>
+                </div>
+                <FaChevronRight className="text-sm text-slate-400 shrink-0" />
+              </div>
+            </Link>
+
+            {/* Tarjeta: Documentos DeCA */}
+            <Link to="/deca" className="DashboardCardLink">
+              <div className="DashboardCard border-l-4 border-l-slate-900">
+                <div className="flex items-center gap-3.5">
+                  <div className="flex h-13 w-13 shrink-0 items-center justify-center rounded-2xl bg-slate-900 text-2xl sm:text-3xl text-amber-400 shadow-xs">
+                    <FaFileShield />
+                  </div>
+                  <div className="flex flex-col text-left gap-0.5">
+                    <div className="flex items-center gap-2">
+                      <span className="text-base sm:text-lg font-extrabold text-slate-900">DeCA Digital</span>
+                      <span className="rounded-md bg-amber-100 text-amber-900 text-[10px] font-black px-1.5 py-0.5 border border-amber-300">
+                        QR
+                      </span>
+                    </div>
+                    <span className="text-xs sm:text-sm font-medium text-slate-500">Documento de control para inspección</span>
+                  </div>
+                </div>
+                <FaChevronRight className="text-sm text-slate-400 shrink-0" />
+              </div>
+            </Link>
+          </div>
+        </Main>
+
+        <Footer>FactuClient Driver</Footer>
+      </>
+    )
+  }
+
+  // --- VISTA PARA AUTÓNOMO / ADMINISTRADOR ---
   return (
     <>
       <Header iconUser={<FaUserEdit />}>{userName || "FactuClient"}</Header>
@@ -120,6 +218,22 @@ export default function Home() {
                 <div className="flex flex-col text-left gap-0.5">
                   <span className="text-base sm:text-lg font-extrabold text-slate-900">Listado de Clientes</span>
                   <span className="text-xs sm:text-sm font-medium text-slate-500">Gestiona tu cartera de clientes</span>
+                </div>
+              </div>
+              <FaChevronRight className="text-sm text-slate-400 shrink-0" />
+            </div>
+          </Link>
+
+          {/* Tarjeta: Choferes / Empleados */}
+          <Link to="/drivers" className="DashboardCardLink">
+            <div className="DashboardCard border-l-4 border-l-violet-600">
+              <div className="flex items-center gap-3.5">
+                <div className="flex h-13 w-13 shrink-0 items-center justify-center rounded-2xl bg-violet-50 text-2xl sm:text-3xl text-violet-600 shadow-xs">
+                  <FaTruck />
+                </div>
+                <div className="flex flex-col text-left gap-0.5">
+                  <span className="text-base sm:text-lg font-extrabold text-slate-900">Choferes y Empleados</span>
+                  <span className="text-xs sm:text-sm font-medium text-slate-500">Gestiona tu equipo de conductores</span>
                 </div>
               </div>
               <FaChevronRight className="text-sm text-slate-400 shrink-0" />
@@ -207,6 +321,3 @@ export default function Home() {
     </>
   )
 }
-
-
-

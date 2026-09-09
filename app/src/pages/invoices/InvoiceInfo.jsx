@@ -85,16 +85,16 @@ export default function InvoiceInfo() {
   return (
     <>
       <Header
-        iconLeftHeader={logic.getInfo().role === "user" && <MdDeleteForever />}
+        iconLeftHeader={logic.getInfo().role === "user" && <MdDeleteForever className="text-rose-900 shrink-0" />}
         onDeleteInvoice={handleShowConfirmDelete}
       >
-        <div className="flex flex-col items-center justify-center">
-          <span className="text-xs font-semibold text-slate-800">
+        <div className="flex flex-col items-center justify-center max-w-[62vw] sm:max-w-md">
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-slate-950/25 border border-slate-950/20 text-slate-950 text-[10px] sm:text-xs font-black uppercase tracking-wider mb-0.5 shadow-2xs">
             Factura Nº {invoice?.number || ""}
           </span>
-          <span className="text-sm sm:text-base font-extrabold text-slate-900 truncate max-w-[60vw]">
+          <h1 className="text-xs sm:text-base font-black text-slate-950 tracking-tight leading-tight truncate max-w-full">
             {invoice?.customer?.companyName || "Detalle de Factura"}
-          </span>
+          </h1>
         </div>
       </Header>
 
@@ -171,7 +171,10 @@ export default function InvoiceInfo() {
                         aria-label="Editar fecha"
                       >
                         <span>📅 <Time>{invoice?.date}</Time></span>
-                        <FaPencil className="w-3 h-3 text-slate-400 group-hover:text-blue-600 transition-colors" />
+                        <span className="flex items-center gap-1 text-xs font-bold text-blue-700 bg-blue-100/70 border border-blue-300/80 px-2 py-0.5 rounded-lg group-hover:bg-blue-200 transition-colors">
+                          <FaPencil className="w-3.5 h-3.5" />
+                          <span>Cambiar</span>
+                        </span>
                       </button>
                     ) : (
                       <span className="bg-slate-50 border border-slate-200/80 px-2.5 py-1 rounded-lg text-xs sm:text-sm font-semibold text-slate-700">
@@ -239,7 +242,10 @@ export default function InvoiceInfo() {
                         aria-label="Editar fecha"
                       >
                         <span>📅 <Time>{invoice?.date}</Time></span>
-                        <FaPencil className="w-3 h-3 text-slate-400 group-hover:text-blue-600 transition-colors" />
+                        <span className="flex items-center gap-1 text-xs font-bold text-blue-700 bg-blue-100/70 border border-blue-300/80 px-2 py-0.5 rounded-lg group-hover:bg-blue-200 transition-colors">
+                          <FaPencil className="w-3.5 h-3.5" />
+                          <span>Cambiar</span>
+                        </span>
                       </button>
                     ) : (
                       <span className="bg-slate-50 border border-slate-200/80 px-2.5 py-1 rounded-lg text-xs sm:text-sm font-semibold text-slate-700">
@@ -318,7 +324,10 @@ export default function InvoiceInfo() {
                       aria-label="Editar forma de pago"
                     >
                       <span>{invoice?.paymentType || "Transferencia"}</span>
-                      <FaPencil className="w-3 h-3 text-slate-400 group-hover:text-blue-600 transition-colors" />
+                      <span className="flex items-center gap-1 text-xs font-bold text-blue-700 bg-blue-100/70 border border-blue-300/80 px-2 py-0.5 rounded-lg group-hover:bg-blue-200 transition-colors">
+                        <FaPencil className="w-3.5 h-3.5" />
+                        <span>Cambiar</span>
+                      </span>
                     </button>
                   ) : (
                     <span className="bg-slate-50 border border-slate-200/80 px-2.5 py-1 rounded-lg text-xs sm:text-sm font-bold text-slate-800">

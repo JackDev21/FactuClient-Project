@@ -7,7 +7,10 @@ const createWork = (userId, deliveryNoteId, concept, quantity, price) => {
   validate.id(deliveryNoteId, "deliveryNoteId")
   validate.text(concept, "concept")
   validate.number(quantity, "quantity")
-  validate.number(price, "price")
+
+  if (price !== undefined && price !== null && price !== "") {
+    validate.number(price, "price")
+  }
 
   return User.findById(userId).select("-__v").lean()
     .catch(error => { throw new SystemError(error.message) })
@@ -23,7 +26,10 @@ const createWork = (userId, deliveryNoteId, concept, quantity, price) => {
             throw new NotFoundError("Delivery note not found")
           }
 
-          if (deliveryNote.company.toString() !== userId) {
+          const isDriver = user.role === "driver"
+          const companyId = isDriver && user.manager ? user.manager.toString() : userId
+
+          if (deliveryNote.company.toString() !== companyId) {
             throw new MatchError("Can not add work to another company's delivery note")
           }
 
@@ -34,13 +40,18 @@ const createWork = (userId, deliveryNoteId, concept, quantity, price) => {
           const work = {
             concept,
             quantity,
-            price,
+            price: (price !== undefined && price !== null && price !== "") ? Number(price) : 0,
           }
 
           return Work.create(work)
             .catch(error => { throw new SystemError(error.message) })
             .then((work) => {
-              return DeliveryNote.findByIdAndUpdate(deliveryNoteId, { $push: { works: work._id } }, { new: true })
+              const updateFields = { $push: { works: work._id } }
+              if (!isDriver && Number(price) > 0) {
+                updateFields.isValued = true
+              }
+
+              return DeliveryNote.findByIdAndUpdate(deliveryNoteId, updateFields, { new: true })
                 .populate("works")
                 .select("-__v")
                 .lean()

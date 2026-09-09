@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 import { useNavigate, useLocation, Link, matchPath } from "react-router-dom"
 import { GiExitDoor } from "react-icons/gi"
+import { FaArrowLeft } from "react-icons/fa6"
 import { TiArrowBack } from "react-icons/ti"
 
 import "./index.css"
@@ -83,6 +84,7 @@ export default function Header({
           <div className="ContainerHeader">
             <span onClick={handleRegisterCustomer} className="IconLeftHeader" title="Añadir Cliente">
               {iconLeftHeader}
+              <span>Cliente</span>
             </span>
             <div className="IconUser">{iconUser}</div>
             <div className="Children">{children}</div>
@@ -93,6 +95,7 @@ export default function Header({
           <div className="ContainerHeader">
             <span onClick={handleUpdateProfile} className="IconLeftHeader" title="Editar Perfil">
               {iconLeftHeader}
+              <span>Editar</span>
             </span>
             <div className="IconUser">{iconUser}</div>
             <div className="Children">{children}</div>
@@ -100,12 +103,21 @@ export default function Header({
         )}
 
         {location.pathname === "/" && (
-          <Link to="/users/profile" className="w-full flex justify-center">
-            <div className="ContainerHeader">
-              <div className="IconUser">{iconUser}</div>
-              <div className="Children">{children}</div>
+          (logic.isUserLoggedIn() && logic.getInfo()?.role === "driver") ? (
+            <div className="w-full flex justify-center select-none">
+              <div className="ContainerHeader">
+                <div className="IconUser">{iconUser}</div>
+                <div className="Children">{children}</div>
+              </div>
             </div>
-          </Link>
+          ) : (
+            <Link to="/users/profile" className="w-full flex justify-center">
+              <div className="ContainerHeader">
+                <div className="IconUser">{iconUser}</div>
+                <div className="Children">{children}</div>
+              </div>
+            </Link>
+          )
         )}
 
         {location.pathname === "/invoices" && (
@@ -117,8 +129,9 @@ export default function Header({
 
         {isCustomerProfilePathInvoiceId && (
           <div className="ContainerHeader">
-            <span onClick={onDeleteInvoice} className="IconLeftHeader" title="Eliminar Factura">
+            <span onClick={onDeleteInvoice} className="IconLeftHeader bg-rose-500/20 text-rose-950 border border-rose-600/30 hover:bg-rose-500/30" title="Eliminar Factura">
               {iconLeftHeader}
+              <span>Borrar</span>
             </span>
             <div className="IconUser">{iconUser}</div>
             <div className="Children">{children}</div>
@@ -148,8 +161,9 @@ export default function Header({
 
         {isCustomerProfilePathCustomerId && (
           <div className="ContainerHeader">
-            <span onClick={onDeleteCustomer} className="IconLeftHeader" title="Eliminar Cliente">
+            <span onClick={onDeleteCustomer} className="IconLeftHeader bg-rose-500/20 text-rose-950 border border-rose-600/30 hover:bg-rose-500/30" title="Eliminar Cliente">
               {iconLeftHeader}
+              <span>Borrar</span>
             </span>
             <div className="IconUser">{iconUser}</div>
             <div className="CustomerName Children">{children}</div>
@@ -158,8 +172,9 @@ export default function Header({
 
         {isCustomerProfilePathDeliveryNoteId && (
           <div className="ContainerHeader">
-            <span onClick={onDeleteDeliveryNote} className="IconLeftHeader" title="Eliminar Albarán">
+            <span onClick={onDeleteDeliveryNote} className="IconLeftHeader bg-rose-500/20 text-rose-950 border border-rose-600/30 hover:bg-rose-500/30" title="Eliminar Albarán">
               {iconLeftHeader}
+              <span>Borrar</span>
             </span>
             <div className="IconUser">{iconUser}</div>
             <div className="Children">{children}</div>
@@ -173,22 +188,78 @@ export default function Header({
           </div>
         )}
 
-        {isCustomerInfoPath && (
+        {location.pathname === "/drivers" && (
           <div className="ContainerHeader">
+            {iconLeftHeader && (
+              <span onClick={onRegisterCustomer} className="IconLeftHeader" title="Añadir Chofer">
+                {iconLeftHeader}
+                <span>Chofer</span>
+              </span>
+            )}
             <div className="IconUser">{iconUser}</div>
             <div className="Children">{children}</div>
-            <span onClick={handleLogout} className="IconLeftHeader" title="Cerrar Sesión">
-              {iconLeftHeader}
-            </span>
           </div>
         )}
+
+        {isCustomerInfoPath && (
+          <div className="ContainerHeader">
+            {iconLeftHeader && (
+              <span onClick={handleLogout} className="IconLeftHeader" title="Cerrar sesión">
+                {iconLeftHeader}
+                <span>Salir</span>
+              </span>
+            )}
+            <div className="IconUser">{iconUser}</div>
+            <div className="Children">{children}</div>
+          </div>
+        )}
+
+        {/* Fallback genérico para rutas personalizadas como /deca, etc. */}
+        {![
+          "/customers",
+          "/users/profile",
+          "/",
+          "/invoices",
+          "/delivery-notes",
+          "/create/delivery-notes",
+          "/create/invoices",
+          "/drivers"
+        ].includes(location.pathname) &&
+          !isCustomerProfilePathInvoiceId &&
+          !isCustomerProfilePathCustomerId &&
+          !isCustomerProfilePathDeliveryNoteId &&
+          !isCustomerProfilePathCreateDeliveryNoteId &&
+          !isCustomerInfoPath && (
+            <div className="ContainerHeader">
+              {iconLeftHeader && (
+                <span onClick={onRegisterCustomer || onDeleteDeliveryNote} className="IconLeftHeader" title={location.pathname === "/deca" ? "Volver a Inicio" : ""}>
+                  {iconLeftHeader}
+                  {location.pathname === "/deca" && <span>Inicio</span>}
+                </span>
+              )}
+              {iconUser && <div className="IconUser">{iconUser}</div>}
+              <div className="Children">{children}</div>
+            </div>
+          )}
       </div>
 
-      <span className="IconExit" title={location.pathname === "/" ? "Cerrar sesión" : "Volver atrás"}>
+      <span
+        className="IconExit"
+        onClick={location.pathname === "/" ? handleLogout : () => navigate(-1)}
+        title={location.pathname === "/" ? "Cerrar sesión" : "Volver atrás"}
+      >
         {location.pathname === "/" ? (
-          <GiExitDoor onClick={handleLogout} />
+          <>
+            <GiExitDoor className="shrink-0" />
+            <span>Salir</span>
+          </>
         ) : (
-          showBackButton && <TiArrowBack onClick={() => navigate(-1)} />
+          showBackButton && (
+            <>
+              <FaArrowLeft className="shrink-0" />
+              <span>Atrás</span>
+            </>
+          )
         )}
       </span>
 

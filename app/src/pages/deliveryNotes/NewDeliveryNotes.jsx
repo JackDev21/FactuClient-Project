@@ -41,7 +41,13 @@ export default function NewDeliveryNotes() {
   }, [])
 
   const filterCustomers = () =>
-    customers.filter((customer) => customer.companyName.toLowerCase().includes(searchTerm.toLowerCase()))
+    customers.filter((customer) => {
+      if (!customer) return false
+      const name = String(customer.companyName || customer.fullName || customer.username || "").toLowerCase()
+      const tax = String(customer.taxId || "").toLowerCase()
+      const term = (searchTerm || "").trim().toLowerCase()
+      return name.includes(term) || tax.includes(term)
+    })
 
   return (
     <>
@@ -95,11 +101,11 @@ export default function NewDeliveryNotes() {
                 >
                   <div className="flex items-center gap-3.5 min-w-0 flex-1">
                     <div className="w-11 h-11 rounded-xl bg-gradient-to-tr from-amber-500 to-yellow-400 text-white font-black text-lg flex items-center justify-center shadow-xs shrink-0">
-                      {customer?.companyName ? customer.companyName.charAt(0).toUpperCase() : "C"}
+                      {(customer?.companyName || customer?.fullName || customer?.username || "C").charAt(0).toUpperCase()}
                     </div>
                     <div className="flex flex-col min-w-0 flex-1">
                       <span className="font-extrabold text-sm sm:text-base text-slate-900 leading-snug break-words">
-                        {customer.companyName}
+                        {customer?.companyName || customer?.fullName || customer?.username || "Cliente"}
                       </span>
                       <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-slate-400 mt-0.5 font-medium">
                         {customer.taxId && <span>{customer.taxId}</span>}

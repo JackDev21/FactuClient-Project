@@ -166,13 +166,13 @@ export default function DecaInfo() {
         iconLeftHeader={<FaArrowLeft />}
         onDeleteDeliveryNote={() => navigate(-1)}
       >
-        <div className="flex flex-col items-center justify-center">
-          <span className="text-xs font-bold text-amber-700 uppercase tracking-wider">
-            Documento de Control
+        <div className="flex flex-col items-center justify-center max-w-[62vw] sm:max-w-md">
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-slate-950/25 border border-slate-950/20 text-slate-950 text-[10px] sm:text-xs font-black uppercase tracking-wider mb-0.5 shadow-2xs">
+            <FaFileShield className="text-xs shrink-0" /> Documento DeCA
           </span>
-          <span className="text-sm sm:text-base font-extrabold text-slate-900 truncate max-w-[60vw]">
+          <h1 className="text-sm sm:text-base font-black text-slate-950 tracking-tight leading-tight truncate max-w-full">
             {deca.number}
-          </span>
+          </h1>
         </div>
       </Header>
 
@@ -338,9 +338,9 @@ export default function DecaInfo() {
                 <button
                   type="button"
                   onClick={() => setShowEditModal(true)}
-                  className="flex items-center gap-1 text-xs font-bold text-amber-700 bg-amber-50 hover:bg-amber-100 px-2.5 py-1 rounded-xl border border-amber-200 transition-all"
+                  className="flex items-center gap-1.5 text-xs sm:text-sm font-bold text-amber-800 bg-amber-50 hover:bg-amber-100 px-3 py-1.5 rounded-xl border border-amber-200 transition-all shadow-2xs"
                 >
-                  <FaPencil className="w-3 h-3" />
+                  <FaPencil className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-800" />
                   <span>Modificar en Ruta</span>
                 </button>
               )}

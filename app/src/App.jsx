@@ -22,6 +22,7 @@ import ResetPassword from "./pages/auth/ResetPassword"
 import DecaList from "./pages/deca/DecaList"
 import DecaForm from "./pages/deca/DecaForm"
 import DecaInfo from "./pages/deca/DecaInfo"
+import DriverList from "./pages/drivers/DriverList"
 import logic from "./logic/index"
 import "./global.css"
 
@@ -59,6 +60,8 @@ function App() {
           <Route path="/deca" element={<DecaList />} />
           <Route path="/deca/new/:deliveryNoteId" element={<DecaForm />} />
           <Route path="/deca/:decaId" element={<DecaInfo />} />
+
+          <Route path="/drivers" element={<DriverList />} />
 
           <Route path="/request-password-reset" element={<RequestPassword />} />
           <Route path="/reset-password/:userId/:token" element={<ResetPassword />} />

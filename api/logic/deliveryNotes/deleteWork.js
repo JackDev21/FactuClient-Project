@@ -21,8 +21,15 @@ const deleteWork = (userId, deliveryNoteId, workId) => {
             throw new NotFoundError("Delivery note not found")
           }
 
-          if (deliveryNote.company.toString() !== userId) {
+          const isDriver = user.role === "driver"
+          const companyId = isDriver && user.manager ? user.manager.toString() : userId
+
+          if (deliveryNote.company.toString() !== companyId) {
             throw new MatchError("Can not delete work from another company's delivery note")
+          }
+
+          if (isDriver && deliveryNote.createdBy && deliveryNote.createdBy.toString() !== userId) {
+            throw new MatchError("Driver can only delete work from their own delivery notes")
           }
 
           if (deliveryNote.isInvoiced) {

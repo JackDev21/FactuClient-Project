@@ -10,7 +10,7 @@ import useContext from "../../useContext"
 import { SystemError } from "com/errors"
 
 import { GoNote } from "react-icons/go"
-import { FaChevronDown } from "react-icons/fa6"
+import { FaChevronDown, FaTruckFast } from "react-icons/fa6"
 
 import logic from "../../logic"
 
@@ -71,6 +71,9 @@ export default function DeliveryNoteList() {
     }
   }, [])
 
+  const userRole = logic.getInfo()?.role
+  const isDriver = userRole === "driver"
+
   // Filtrado por búsqueda y por estado
   const filteredDeliveryNotes = deliveryNotes.filter((deliveryNote) => {
     const matchesSearch =
@@ -81,8 +84,13 @@ export default function DeliveryNoteList() {
 
     if (!matchesSearch) return false
 
-    if (statusFilter === "pending") return !deliveryNote.isInvoiced
-    if (statusFilter === "invoiced") return !!deliveryNote.isInvoiced
+    if (isDriver) {
+      if (statusFilter === "pending") return deliveryNote.isValued === false
+      if (statusFilter === "invoiced") return deliveryNote.isValued !== false
+    } else {
+      if (statusFilter === "pending") return !deliveryNote.isInvoiced
+      if (statusFilter === "invoiced") return !!deliveryNote.isInvoiced
+    }
     return true
   })
 
@@ -106,8 +114,13 @@ export default function DeliveryNoteList() {
     })
   }
 
-  const pendingCount = deliveryNotes.filter((d) => !d.isInvoiced).length
-  const invoicedCount = deliveryNotes.filter((d) => d.isInvoiced).length
+  const pendingCount = isDriver
+    ? deliveryNotes.filter((d) => d.isValued === false).length
+    : deliveryNotes.filter((d) => !d.isInvoiced).length
+
+  const completedCount = isDriver
+    ? deliveryNotes.filter((d) => d.isValued !== false).length
+    : deliveryNotes.filter((d) => d.isInvoiced).length
 
   return (
     <>
@@ -140,7 +153,7 @@ export default function DeliveryNoteList() {
                   : "text-amber-700 hover:bg-amber-50/50"
               }`}
             >
-              ⏳ Pendientes ({loading ? "..." : pendingCount})
+              ⏳ {isDriver ? "Pendientes Precio" : "Pendientes"} ({loading ? "..." : pendingCount})
             </button>
             <button
               onClick={() => setStatusFilter("invoiced")}
@@ -150,7 +163,7 @@ export default function DeliveryNoteList() {
                   : "text-emerald-700 hover:bg-emerald-50/50"
               }`}
             >
-              ✅ Facturados ({loading ? "..." : invoicedCount})
+              ✅ {isDriver ? "Valorados" : "Facturados"} ({loading ? "..." : completedCount})
             </button>
           </div>
 
@@ -177,9 +190,13 @@ export default function DeliveryNoteList() {
                   <Link className="DeliveryLink" to={`/delivery-notes/${deliveryNote.id}`} key={deliveryNote.id}>
                     <li
                       className={`DeliveryNoteCard ${
-                        deliveryNote.isInvoiced
-                          ? "border-l-4 border-l-emerald-500"
-                          : "border-l-4 border-l-amber-500"
+                        isDriver
+                          ? deliveryNote.isValued !== false
+                            ? "border-l-4 border-l-emerald-500"
+                            : "border-l-4 border-l-amber-500"
+                          : deliveryNote.isInvoiced
+                            ? "border-l-4 border-l-emerald-500"
+                            : "border-l-4 border-l-amber-500"
                       }`}
                     >
                       <div className="flex flex-col items-start gap-1 flex-1 pr-2">
@@ -196,20 +213,42 @@ export default function DeliveryNoteList() {
                         <span className="text-sm font-semibold text-slate-600 text-left leading-snug">
                           {deliveryNote.customer?.companyName || deliveryNote.customerName || "Cliente"}
                         </span>
+
+                        <div className="flex items-center gap-1.5 flex-wrap mt-0.5">
+                          {deliveryNote.createdByName && (
+                            <span className="text-[10px] font-bold text-violet-700 bg-violet-50 border border-violet-200 px-1.5 py-0.5 rounded-md flex items-center gap-1">
+                              <FaTruckFast className="text-[9px]" />
+                              {deliveryNote.createdByName}
+                            </span>
+                          )}
+                          {!isDriver && deliveryNote.isValued === false && (
+                            <span className="text-[10px] font-bold text-amber-800 bg-amber-50 border border-amber-300 px-1.5 py-0.5 rounded-md">
+                              Sin valorar
+                            </span>
+                          )}
+                        </div>
                       </div>
 
                       <span
                         className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-bold tracking-wider ${
-                          deliveryNote.isInvoiced
-                            ? "bg-emerald-100/90 text-emerald-800 border border-emerald-200"
-                            : "bg-amber-100/90 text-amber-800 border border-amber-200 uppercase"
+                          isDriver
+                            ? deliveryNote.isValued !== false
+                              ? "bg-emerald-100/90 text-emerald-800 border border-emerald-200"
+                              : "bg-amber-100/90 text-amber-800 border border-amber-200 uppercase"
+                            : deliveryNote.isInvoiced
+                              ? "bg-emerald-100/90 text-emerald-800 border border-emerald-200"
+                              : "bg-amber-100/90 text-amber-800 border border-amber-200 uppercase"
                         }`}
                       >
-                        {deliveryNote.isInvoiced
-                          ? deliveryNote.invoiceNumber
-                            ? `Fra. ${deliveryNote.invoiceNumber}`
-                            : "Facturado"
-                          : "Pendiente"}
+                        {isDriver
+                          ? deliveryNote.isValued !== false
+                            ? "Valorado"
+                            : "Pendiente precio"
+                          : deliveryNote.isInvoiced
+                            ? deliveryNote.invoiceNumber
+                              ? `Fra. ${deliveryNote.invoiceNumber}`
+                              : "Facturado"
+                            : "Pendiente"}
                       </span>
                     </li>
                   </Link>
