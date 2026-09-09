@@ -3,11 +3,11 @@ import { useNavigate, useParams } from "react-router-dom"
 import useContext from "../../useContext"
 import { SystemError } from "com/errors"
 
-import Title from "../Title"
-import Main from "../core/Main"
-import Button from "../core/Button"
-import Footer from "../core/Footer"
-import PasswordField from "../PasswordField"
+import Title from "../../components/Title"
+import Main from "../../components/core/Main"
+import Button from "../../components/core/Button"
+import Footer from "../../components/core/Footer"
+import PasswordField from "../../components/PasswordField"
 
 import logic from "../../logic"
 

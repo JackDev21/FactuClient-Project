@@ -5,12 +5,12 @@
 // import useContext from "../../useContext"
 // import { SystemError } from "com/errors"
 
-// import Title from "../Title"
-// import Field from "../core/Field"
-// import Button from "../core/Button"
-// import Main from "../core/Main"
-// import PasswordField from "../PasswordField"
-// import Footer from "../core/Footer"
+// import Title from "../../components/Title"
+// import Field from "../../components/core/Field"
+// import Button from "../../components/core/Button"
+// import Main from "../../components/core/Main"
+// import PasswordField from "../../components/PasswordField"
+// import Footer from "../../components/core/Footer"
 
 // import "./Register.css"
 

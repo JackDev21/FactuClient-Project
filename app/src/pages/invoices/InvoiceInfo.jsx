@@ -8,16 +8,16 @@ import { FaSpinner } from "react-icons/fa"
 
 import { MdDeleteForever } from "react-icons/md"
 
-import Header from "../Header"
-import Main from "../core/Main"
-import Title from "../Title"
-import Confirm from "../Confirm"
-import InvoicePDF from "./InvoicePDF"
+import Header from "../../components/Header"
+import Main from "../../components/core/Main"
+import Title from "../../components/Title"
+import Confirm from "../../components/Confirm"
+import InvoicePDF from "../../components/pdf/InvoicePDF"
 
 import logic from "../../logic/index"
 
 import "./InvoiceInfo.css"
-import Time from "../core/Time"
+import Time from "../../components/core/Time"
 
 export default function InvoiceInfo() {
   const navigate = useNavigate()

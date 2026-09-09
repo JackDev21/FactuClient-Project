@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react"
 
-import Header from "../Header"
-import Main from "../core/Main"
-import Footer from "../core/Footer"
+import Header from "../../components/Header"
+import Main from "../../components/core/Main"
+import Footer from "../../components/core/Footer"
 
 import { FaUserPen } from "react-icons/fa6"
 

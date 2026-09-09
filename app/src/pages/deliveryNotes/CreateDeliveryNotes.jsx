@@ -4,11 +4,11 @@ import { FaPlus, FaCheck, FaXmark, FaPencil, FaTrashCan, FaCommentDots, FaArrowR
 
 import logic from "../../logic/index"
 import useContext from "../../useContext"
-import Header from "../Header"
-import Main from "../core/Main"
-import Footer from "../core/Footer"
-import Time from "../core/Time"
-import Confirm from "../Confirm"
+import Header from "../../components/Header"
+import Main from "../../components/core/Main"
+import Footer from "../../components/core/Footer"
+import Time from "../../components/core/Time"
+import Confirm from "../../components/Confirm"
 
 export default function CreateDeliveryNotes() {
   const { customerId } = useParams()

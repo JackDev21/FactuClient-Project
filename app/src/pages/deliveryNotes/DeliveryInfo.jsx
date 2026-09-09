@@ -9,11 +9,11 @@ import { MdDeleteForever } from "react-icons/md"
 import useContext from "../../useContext"
 import { SystemError } from "com/errors"
 
-import Header from "../Header"
-import Main from "../core/Main"
-import Time from "../core/Time"
-import Confirm from "../Confirm"
-import DeliveryNotePDF from "./DeliveryNotePDF"
+import Header from "../../components/Header"
+import Main from "../../components/core/Main"
+import Time from "../../components/core/Time"
+import Confirm from "../../components/Confirm"
+import DeliveryNotePDF from "../../components/pdf/DeliveryNotePDF"
 
 import logic from "../../logic/index"
 

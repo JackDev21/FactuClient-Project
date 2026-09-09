@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
 
-import Header from "../Header"
-import Main from "../core/Main"
-import Footer from "../core/Footer"
-import SearchFilter from "../SearchFilter"
+import Header from "../../components/Header"
+import Main from "../../components/core/Main"
+import Footer from "../../components/core/Footer"
+import SearchFilter from "../../components/SearchFilter"
 
 import useContext from "../../useContext"
 import { SystemError } from "com/errors"

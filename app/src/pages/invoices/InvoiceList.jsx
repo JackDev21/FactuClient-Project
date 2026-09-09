@@ -6,14 +6,14 @@ import { FaChevronDown } from "react-icons/fa6"
 import useContext from "../../useContext"
 import { SystemError } from "com/errors"
 
-import Header from "../Header"
-import Main from "../core/Main"
-import Footer from "../core/Footer"
+import Header from "../../components/Header"
+import Main from "../../components/core/Main"
+import Footer from "../../components/core/Footer"
 
 import logic from "../../logic"
 
 import "./InvoiceList.css"
-import SearchFilter from "../SearchFilter"
+import SearchFilter from "../../components/SearchFilter"
 
 const PAGE_SIZE = 8
 

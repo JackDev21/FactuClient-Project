@@ -7,12 +7,12 @@ import logic from "../../logic"
 
 import "./Login.css"
 
-import Title from "../Title"
-import Button from "../core/Button"
-import Field from "../core/Field"
-import Main from "../core/Main"
-import Footer from "../core/Footer"
-import PasswordField from "../PasswordField"
+import Title from "../../components/Title"
+import Button from "../../components/core/Button"
+import Field from "../../components/core/Field"
+import Main from "../../components/core/Main"
+import Footer from "../../components/core/Footer"
+import PasswordField from "../../components/PasswordField"
 
 export default function Login() {
   const { alert } = useContext()

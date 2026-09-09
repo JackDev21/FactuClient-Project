@@ -8,11 +8,11 @@ import { FaUserPen, FaChevronRight, FaFileInvoiceDollar, FaReceipt, FaBuilding, 
 import useContext from "../../useContext"
 import { SystemError } from "com/errors"
 
-import Header from "../Header"
-import Footer from "../core/Footer"
-import Main from "../core/Main"
-import Confirm from "../Confirm"
-import UpdateProfileCustomerForm from "../UpdateProfileCustomerForm"
+import Header from "../../components/Header"
+import Footer from "../../components/core/Footer"
+import Main from "../../components/core/Main"
+import Confirm from "../../components/Confirm"
+import UpdateProfileCustomerForm from "../../components/UpdateProfileCustomerForm"
 
 import logic from "../../logic"
 import "./CustomerProfile.css"

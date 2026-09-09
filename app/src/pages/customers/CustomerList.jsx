@@ -8,14 +8,14 @@ import { FaChevronDown, FaChevronRight } from "react-icons/fa6"
 import useContext from "../../useContext"
 import { SystemError } from "com/errors"
 
-import Header from "../Header"
-import Footer from "../core/Footer"
-import Main from "../core/Main"
+import Header from "../../components/Header"
+import Footer from "../../components/core/Footer"
+import Main from "../../components/core/Main"
 
 import logic from "../../logic/index"
 
 import "./CustomerList.css"
-import SearchFilter from "../SearchFilter"
+import SearchFilter from "../../components/SearchFilter"
 
 const PAGE_SIZE = 8
 

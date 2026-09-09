@@ -18,9 +18,9 @@ import {
 import { FaSpinner } from "react-icons/fa"
 
 import useContext from "../../useContext"
-import Header from "../Header"
-import Main from "../core/Main"
-import Confirm from "../Confirm"
+import Header from "../../components/Header"
+import Main from "../../components/core/Main"
+import Confirm from "../../components/Confirm"
 import logic from "../../logic/index"
 
 export default function DecaInfo() {

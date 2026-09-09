@@ -5,12 +5,12 @@ import { FaChevronRight, FaFileInvoiceDollar, FaReceipt, FaCheck, FaRotateLeft, 
 import useContext from "../../useContext"
 import { NotFoundError, SystemError } from "com/errors"
 
-import Header from "../Header"
-import Main from "../core/Main"
-import Footer from "../core/Footer"
-import Time from "../core/Time"
-import MonthFilter from "../MonthFilter"
-import SearchFilter from "../SearchFilter"
+import Header from "../../components/Header"
+import Main from "../../components/core/Main"
+import Footer from "../../components/core/Footer"
+import Time from "../../components/core/Time"
+import MonthFilter from "../../components/MonthFilter"
+import SearchFilter from "../../components/SearchFilter"
 
 import logic from "../../logic/index"
 
