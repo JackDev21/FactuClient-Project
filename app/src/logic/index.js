@@ -1,90 +1,94 @@
-import isUserLoggedIn from "./isUserLoggedIn.js"
-import registerUser from "./registerUser.js"
-import loginUser from "./loginUser.js"
-import getUserName from "./getUserName.js"
-import logoutUser from "./logoutUser.js"
-import getInfo from "./getInfo.js"
+// --- 1. Autenticación y Sesión ---
+import isUserLoggedIn from "./auth/isUserLoggedIn.js"
+import registerUser from "./auth/registerUser.js"
+import loginUser from "./auth/loginUser.js"
+import logoutUser from "./auth/logoutUser.js"
+import requestPasswordReset from "./auth/requestPasswordReset.js"
+import resetPassword from "./auth/resetPassword.js"
 
-import getAllCustomers from "./getAllCustomers.js"
-import registerCustomer from "./registerCustomer.js"
-import deleteCustomer from "./deleteCustomer.js"
+// --- 2. Perfil de Empresa y Usuario ---
+import getInfo from "./users/getInfo.js"
+import getUserName from "./users/getUserName.js"
+import getProfileUser from "./users/getProfileUser.js"
+import updateProfile from "./users/updateProfile.js"
 
-import updateProfile from "./updateProfile.js"
-import getProfileUser from "./getProfileUser.js"
+// --- 3. Clientes ---
+import getAllCustomers from "./customers/getAllCustomers.js"
+import registerCustomer from "./customers/registerCustomer.js"
+import deleteCustomer from "./customers/deleteCustomer.js"
+import updateCustomerProfile from "./customers/updateCustomerProfile.js"
 
-import getAllDeliveryNotesCustomer from "./getAllDeliveryNotesCustomer.js"
-import getAllDeliveryNotes from "./getAllDeliveryNotes.js"
-import getDeliveryNote from "./getDeliveryNote.js"
-import deleteDeliveryNote from "./deleteDeliveryNote.js"
-import updateDeliveryNoteDate from "./updateDeliveryNoteDate.js"
-import updateInvoiceDate from "./updateInvoiceDate.js"
+// --- 4. Albaranes y Partidas (Works) ---
+import getAllDeliveryNotes from "./deliveryNotes/getAllDeliveryNotes.js"
+import getAllDeliveryNotesCustomer from "./deliveryNotes/getAllDeliveryNotesCustomer.js"
+import getDeliveryNote from "./deliveryNotes/getDeliveryNote.js"
+import createDeliveryNote from "./deliveryNotes/createDeliveryNote.js"
+import deleteDeliveryNote from "./deliveryNotes/deleteDeliveryNote.js"
+import updateDeliveryNoteDate from "./deliveryNotes/updateDeliveryNoteDate.js"
+import addNewObservation from "./deliveryNotes/addNewObservation.js"
+import createWork from "./deliveryNotes/createWork.js"
+import updateWork from "./deliveryNotes/updateWork.js"
+import deleteWork from "./deliveryNotes/deleteWork.js"
 
-import createDeliveryNote from "./createDeliveryNote.js"
-import createWork from "./createWork.js"
-import updateWork from "./updateWork.js"
-import deleteWork from "./deleteWork.js"
-import updateInvoicePaymentType from "./updateInvoicePaymentType.js"
+// --- 5. Facturas y Cobros ---
+import getAllInvoices from "./invoices/getAllInvoices.js"
+import getAllInvoicesCustomer from "./invoices/getAllInvoicesCustomer.js"
+import getInvoice from "./invoices/getInvoice.js"
+import createInvoice from "./invoices/createInvoice.js"
+import deleteInvoice from "./invoices/deleteInvoice.js"
+import updateInvoiceDate from "./invoices/updateInvoiceDate.js"
+import updateInvoicePaymentType from "./invoices/updateInvoicePaymentType.js"
 
-import getAllInvoices from "./getAllInvoices.js"
-import getInvoice from "./getInvoice.js"
-import createInvoice from "./createInvoice.js"
-import deleteInvoice from "./deleteInvoice.js"
-import getAllInvoicesCustomer from "./getAllInvoicesCustomer.js"
-import updateCustomerProfile from "./updateCustomerProfile.js"
-
-import addNewObservation from "./addNewObservation.js"
-
-import requestPasswordReset from "./requestPasswordReset.js"
-import resetPassword from "./resetPassword.js"
-
-import createDeca from "./createDeca.js"
-import getDeca from "./getDeca.js"
-import getAllDecas from "./getAllDecas.js"
-import updateDeca from "./updateDeca.js"
-import updateDecaTransportEnd from "./updateDecaTransportEnd.js"
-
+// --- 6. DeCA (Documento Electrónico de Control Administrativo) ---
+import createDeca from "./deca/createDeca.js"
+import getDeca from "./deca/getDeca.js"
+import getAllDecas from "./deca/getAllDecas.js"
+import updateDeca from "./deca/updateDeca.js"
+import updateDecaTransportEnd from "./deca/updateDecaTransportEnd.js"
 
 const logic = {
+  // Auth
   isUserLoggedIn,
   loginUser,
   registerUser,
   logoutUser,
-  getUserName,
+  requestPasswordReset,
+  resetPassword,
+
+  // Users
   getInfo,
-
-  registerCustomer,
-  updateInvoicePaymentType,
-
-  updateProfile,
+  getUserName,
   getProfileUser,
+  updateProfile,
+
+  // Customers
   getAllCustomers,
+  registerCustomer,
   deleteCustomer,
   updateCustomerProfile,
 
-  getAllDeliveryNotesCustomer,
+  // Delivery Notes
   getAllDeliveryNotes,
+  getAllDeliveryNotesCustomer,
   getDeliveryNote,
+  createDeliveryNote,
   deleteDeliveryNote,
   updateDeliveryNoteDate,
-  updateInvoiceDate,
-
-
-  createDeliveryNote,
+  addNewObservation,
   createWork,
   updateWork,
   deleteWork,
 
+  // Invoices
   getAllInvoices,
+  getAllInvoicesCustomer,
   getInvoice,
   createInvoice,
   deleteInvoice,
-  getAllInvoicesCustomer,
+  updateInvoiceDate,
+  updateInvoicePaymentType,
 
-  addNewObservation,
-
-  requestPasswordReset,
-  resetPassword,
-
+  // DeCA
   createDeca,
   getDeca,
   getAllDecas,

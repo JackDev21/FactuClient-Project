@@ -1,5 +1,5 @@
 import errors, { SystemError } from "com/errors.js"
-import extractPayloadJwt from "../../utils/extractPayloadJwt.js"
+import extractPayloadJwt from "../../../utils/extractPayloadJwt.js"
 
 const getUserName = () => {
 

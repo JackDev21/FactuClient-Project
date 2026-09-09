@@ -1,4 +1,4 @@
-import extractPayloadJwt from "../../utils/extractPayloadJwt.js"
+import extractPayloadJwt from "../../../utils/extractPayloadJwt.js"
 
 const getInfo = () => {
 
