@@ -1,4 +1,5 @@
 import { Link, useNavigate } from "react-router-dom"
+import { FaKey } from "react-icons/fa"
 
 import useContext from "../../useContext"
 import { SystemError } from "com/errors"
@@ -59,10 +60,12 @@ export default function Login() {
         <form className="LoginForm" onSubmit={handleLoginSubmit}>
           <Field id="username" type="text" placeholder="Username"></Field>
           <PasswordField id="password" placeholder="Password"></PasswordField>
-          <Link to="/request-password-reset">
-            <span className="-mt-8 w-[16rem] text-right font-medium">
-              <em>Olvidé mi contraseña</em>
-            </span>
+          <Link
+            to="/request-password-reset"
+            className="-mt-5 flex w-[18rem] items-center justify-center gap-2 rounded-xl border border-stone-300/80 bg-stone-100/90 py-2.5 px-3 text-sm font-bold text-stone-700 shadow-sm transition-all hover:border-amber-600/40 hover:bg-amber-50 hover:text-amber-950 active:scale-95"
+          >
+            <FaKey className="text-amber-700 text-xs shrink-0" />
+            <span>¿Has olvidado tu contraseña?</span>
           </Link>
           <Button type="submit">Login</Button>
           {/* <div className="Link">
