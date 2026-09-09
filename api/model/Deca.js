@@ -92,6 +92,16 @@ const decaSchema = new Schema({
     default: "",
   },
 
+  // Horarios de carga y descarga (Opcionales - Ley de Paralizaciones 15/2009)
+  loadingTime: {
+    type: String,
+    default: "",
+  },
+  unloadingTime: {
+    type: String,
+    default: "",
+  },
+
   // --- GESTIÓN DEL ARCHIVO PDF Y ACCESO PÚBLICO (INSPECCIÓN) ---
   pdfFilename: {
     type: String,

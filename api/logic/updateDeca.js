@@ -58,6 +58,14 @@ const updateDeca = async (userId, decaId, updates, reason = "Actualización de d
     deca.driverName = updates.driverName.trim()
     modifiedFields.push("driverName")
   }
+  if (updates.loadingTime !== undefined && updates.loadingTime.trim() !== deca.loadingTime) {
+    deca.loadingTime = updates.loadingTime.trim()
+    modifiedFields.push("loadingTime")
+  }
+  if (updates.unloadingTime !== undefined && updates.unloadingTime.trim() !== deca.unloadingTime) {
+    deca.unloadingTime = updates.unloadingTime.trim()
+    modifiedFields.push("unloadingTime")
+  }
   if (updates.observations !== undefined && updates.observations.trim() !== deca.observations) {
     deca.observations = updates.observations.trim()
     modifiedFields.push("observations")

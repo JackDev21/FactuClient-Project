@@ -39,6 +39,8 @@ export default function DecaForm() {
   const [trailerPlate, setTrailerPlate] = useState("")
   const [driverName, setDriverName] = useState("")
   const [transportDate, setTransportDate] = useState(new Date().toISOString().split("T")[0])
+  const [loadingTime, setLoadingTime] = useState("")
+  const [unloadingTime, setUnloadingTime] = useState("")
   const [observations, setObservations] = useState("")
 
   useEffect(() => {
@@ -147,6 +149,8 @@ export default function DecaForm() {
       trailerPlate: trailerPlate.trim(),
       driverName: driverName.trim(),
       transportDate,
+      loadingTime: loadingTime.trim(),
+      unloadingTime: unloadingTime.trim(),
       observations: observations.trim(),
     }
 
@@ -419,6 +423,32 @@ export default function DecaForm() {
                     onChange={(e) => setTrailerPlate(e.target.value.toUpperCase())}
                     placeholder="Ej. R-5678-ABC"
                     className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-bold text-slate-800 uppercase focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-600 mb-1 flex items-center justify-between">
+                    <span>Hora Llegada / Carga</span>
+                    <span className="text-[10px] font-bold text-amber-600">Opcional (Ley 15/2009)</span>
+                  </label>
+                  <input
+                    type="time"
+                    value={loadingTime}
+                    onChange={(e) => setLoadingTime(e.target.value)}
+                    className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-600 mb-1 flex items-center justify-between">
+                    <span>Hora Salida / Descarga</span>
+                    <span className="text-[10px] font-bold text-amber-600">Opcional (Ley 15/2009)</span>
+                  </label>
+                  <input
+                    type="time"
+                    value={unloadingTime}
+                    onChange={(e) => setUnloadingTime(e.target.value)}
+                    className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500"
                   />
                 </div>
               </div>

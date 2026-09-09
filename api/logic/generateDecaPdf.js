@@ -191,7 +191,9 @@ export default async function generateDecaPdf(decaData, outputPath, publicDownlo
     doc.fontSize(8).font("Helvetica")
     const origH = doc.heightOfString(originText, { width: colWidth - 20 })
     const destH = doc.heightOfString(destText, { width: colWidth - 20 })
-    const routeHeight = Math.max(68, Math.max(origH, destH) + 48)
+    const hasHours = Boolean(decaData.loadingTime || decaData.unloadingTime)
+    const extraHoursH = hasHours ? 16 : 0
+    const routeHeight = Math.max(68 + extraHoursH, Math.max(origH, destH) + 48 + extraHoursH)
 
     doc
       .roundedRect(35, curY, pageWidth, routeHeight, 3)
@@ -204,9 +206,21 @@ export default async function generateDecaPdf(decaData, outputPath, publicDownlo
     doc.fontSize(7).font("Helvetica-Bold").fillColor(secondaryColor).text("LUGAR DE ORIGEN (CARGA):", 45, curY + 18)
     doc.fontSize(8).font("Helvetica").fillColor(primaryColor).text(originText, 45, curY + 28, { width: colWidth - 20 })
 
+    if (decaData.loadingTime) {
+      const origHoursY = curY + 28 + origH + 3
+      doc.fontSize(6.8).font("Helvetica-Bold").fillColor(secondaryColor).text("HORA LLEGADA/CARGA:", 45, origHoursY)
+      doc.fontSize(7.5).font("Helvetica-Bold").fillColor(accentColor).text(decaData.loadingTime, 142, origHoursY)
+    }
+
     // Destino
     doc.fontSize(7).font("Helvetica-Bold").fillColor(secondaryColor).text("LUGAR DE DESTINO (DESCARGA):", col2X + 10, curY + 18)
     doc.fontSize(8).font("Helvetica").fillColor(primaryColor).text(destText, col2X + 10, curY + 28, { width: colWidth - 20 })
+
+    if (decaData.unloadingTime) {
+      const destHoursY = curY + 28 + destH + 3
+      doc.fontSize(6.8).font("Helvetica-Bold").fillColor(secondaryColor).text("HORA SALIDA/DESCARGA:", col2X + 10, destHoursY)
+      doc.fontSize(7.5).font("Helvetica-Bold").fillColor(accentColor).text(decaData.unloadingTime, col2X + 120, destHoursY)
+    }
 
     // Matrícula y Conductor en la fila inferior de la caja
     const routeBottomY = curY + routeHeight - 18

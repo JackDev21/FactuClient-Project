@@ -134,6 +134,8 @@ const createDeca = async (userId, deliveryNoteId, decaData, customBaseUrl) => {
     vehiclePlate: (decaData.vehiclePlate || "").trim().toUpperCase(),
     trailerPlate: (decaData.trailerPlate || "").trim().toUpperCase(),
     driverName: (decaData.driverName || "").trim(),
+    loadingTime: (decaData.loadingTime || "").trim(),
+    unloadingTime: (decaData.unloadingTime || "").trim(),
     transportDate: decaData.transportDate ? new Date(decaData.transportDate) : generatedAt,
     pdfFilename,
     pdfPath,

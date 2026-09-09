@@ -38,6 +38,8 @@ export default function DecaInfo() {
   const [showEditModal, setShowEditModal] = useState(false)
   const [editPlate, setEditPlate] = useState("")
   const [editDestination, setEditDestination] = useState("")
+  const [editLoadingTime, setEditLoadingTime] = useState("")
+  const [editUnloadingTime, setEditUnloadingTime] = useState("")
   const [editReason, setEditReason] = useState("")
   const [savingEdit, setSavingEdit] = useState(false)
 
@@ -47,6 +49,8 @@ export default function DecaInfo() {
         setDeca(d)
         setEditPlate(d.vehiclePlate || "")
         setEditDestination(d.destination || "")
+        setEditLoadingTime(d.loadingTime || "")
+        setEditUnloadingTime(d.unloadingTime || "")
         setLoading(false)
       })
       .catch((err) => {
@@ -120,6 +124,8 @@ export default function DecaInfo() {
         {
           vehiclePlate: editPlate.trim(),
           destination: editDestination.trim(),
+          loadingTime: editLoadingTime.trim(),
+          unloadingTime: editUnloadingTime.trim(),
         },
         editReason.trim()
       )
@@ -344,10 +350,20 @@ export default function DecaInfo() {
               <div>
                 <span className="font-bold text-slate-500 block mb-0.5">Lugar de Origen (Carga):</span>
                 <span className="font-semibold text-slate-800">{deca.origin}</span>
+                {deca.loadingTime && (
+                  <span className="text-[11px] text-amber-800 font-bold block mt-0.5">
+                    Hora carga: {deca.loadingTime} h
+                  </span>
+                )}
               </div>
               <div>
                 <span className="font-bold text-slate-500 block mb-0.5">Lugar de Destino (Descarga):</span>
                 <span className="font-semibold text-slate-800">{deca.destination}</span>
+                {deca.unloadingTime && (
+                  <span className="text-[11px] text-amber-800 font-bold block mt-0.5">
+                    Hora descarga: {deca.unloadingTime} h
+                  </span>
+                )}
               </div>
               <div>
                 <span className="font-bold text-slate-500 block mb-0.5">Mercancía Transportada:</span>
@@ -448,6 +464,31 @@ export default function DecaInfo() {
                   onChange={(e) => setEditDestination(e.target.value)}
                   className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs font-medium focus:ring-2 focus:ring-amber-500"
                 />
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                    Hora Carga (Opcional)
+                  </label>
+                  <input
+                    type="time"
+                    value={editLoadingTime}
+                    onChange={(e) => setEditLoadingTime(e.target.value)}
+                    className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs font-medium focus:ring-2 focus:ring-amber-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                    Hora Descarga (Opcional)
+                  </label>
+                  <input
+                    type="time"
+                    value={editUnloadingTime}
+                    onChange={(e) => setEditUnloadingTime(e.target.value)}
+                    className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs font-medium focus:ring-2 focus:ring-amber-500"
+                  />
+                </div>
               </div>
 
               <div>
