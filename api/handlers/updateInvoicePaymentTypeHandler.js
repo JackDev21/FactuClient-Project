@@ -1,4 +1,4 @@
-import updateInvoicePaymentType from "../logic/updateInvoicePaymentType.js"
+import updateInvoicePaymentType from "../logic/invoices/updateInvoicePaymentType.js"
 
 export default async function updateInvoicePaymentTypeHandler(req, res) {
   try {

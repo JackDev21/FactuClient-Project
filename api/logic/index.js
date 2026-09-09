@@ -1,88 +1,36 @@
-import registerUser from "./registerUser.js"
-import authenticateUser from "./authenticateUser.js"
-import getUserName from "./getUserName.js"
+import authLogic from "./auth/index.js"
+import userLogic from "./users/index.js"
+import customerLogic from "./customers/index.js"
+import deliveryNoteLogic from "./deliveryNotes/index.js"
+import invoiceLogic from "./invoices/index.js"
+import decaLogic from "./deca/index.js"
 
-import updateProfile from "./updateProfile.js"
+// Re-export individual functions
+export * from "./auth/index.js"
+export * from "./users/index.js"
+export * from "./customers/index.js"
+export * from "./deliveryNotes/index.js"
+export * from "./invoices/index.js"
+export * from "./deca/index.js"
 
-import registerCustomer from "./registerCustomer.js"
-import getAllCustomers from "./getAllCustomers.js"
-import getProfileUser from "./getProfileUser.js"
-import deleteCustomer from "./deleteCustomer.js"
+// Re-export domain bundles
+export {
+  authLogic,
+  userLogic,
+  customerLogic,
+  deliveryNoteLogic,
+  invoiceLogic,
+  decaLogic,
+}
 
-import deleteDeliveryNote from "./deleteDeliveryNote.js"
-import getAllDeliveryNotes from "./getAllDeliveryNotes.js"
-import getDeliveryNote from "./getDeliveryNote.js"
-import getAllDeliveryNotesCustomer from "./getAllDeliveryNotesCustomer.js"
-import updateCustomerProfile from "./updateCustomerProfile.js"
-
-import createDeliveryNote from "./createDeliveryNote.js"
-import createWork from "./createWork.js"
-import updateWork from "./updateWork.js"
-import deleteWork from "./deleteWork.js"
-
-import getAllInvoices from "./getAllInvoices.js"
-import getInvoice from "./getInvoice.js"
-import createInvoice from "./createInvoice.js"
-import deleteInvoice from "./deleteInvoice.js"
-import getAllInvoicesCustomer from "./getAllInvoicesCustomer.js"
-import updateDeliveryNoteDate from "./updateDeliveryNoteDate.js"
-import updateInvoiceDate from "./updateInvoiceDate.js"
-
-import addNewObservation from "./addNewObservation.js"
-
-import requestPasswordReset from "./requestPasswordReset.js"
-import resetPassword from "./resetPassword.js"
-
-import createDeca from "./createDeca.js"
-import getDeca from "./getDeca.js"
-import getDecaByToken from "./getDecaByToken.js"
-import getAllDecas from "./getAllDecas.js"
-import updateDeca from "./updateDeca.js"
-import updateDecaTransportEnd from "./updateDecaTransportEnd.js"
-
-
+// Unified master object for backward compatibility
 const logic = {
-  registerUser,
-  authenticateUser,
-  getUserName,
-
-  updateProfile,
-
-  registerCustomer,
-  getAllCustomers,
-  getProfileUser,
-  deleteCustomer,
-  updateCustomerProfile,
-
-  getAllDeliveryNotes,
-  getDeliveryNote,
-  deleteDeliveryNote,
-  getAllDeliveryNotesCustomer,
-  updateDeliveryNoteDate,
-
-  createDeliveryNote,
-  createWork,
-  updateWork,
-  deleteWork,
-
-  getAllInvoices,
-  getInvoice,
-  createInvoice,
-  deleteInvoice,
-  getAllInvoicesCustomer,
-  updateInvoiceDate,
-
-  addNewObservation,
-
-  requestPasswordReset,
-  resetPassword,
-
-  createDeca,
-  getDeca,
-  getDecaByToken,
-  getAllDecas,
-  updateDeca,
-  updateDecaTransportEnd,
+  ...authLogic,
+  ...userLogic,
+  ...customerLogic,
+  ...deliveryNoteLogic,
+  ...invoiceLogic,
+  ...decaLogic,
 }
 
 export default logic
