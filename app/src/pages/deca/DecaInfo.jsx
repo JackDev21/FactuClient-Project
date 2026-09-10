@@ -11,6 +11,7 @@ import {
   FaFlagCheckered,
   FaClock,
   FaShieldHalved,
+  FaFileShield,
   FaTriangleExclamation,
   FaPencil,
   FaXmark,
