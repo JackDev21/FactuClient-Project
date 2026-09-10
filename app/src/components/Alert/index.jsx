@@ -6,16 +6,20 @@ import {
   FaCircleInfo,
   FaXmark,
 } from "react-icons/fa6"
+import formatErrorMessage from "../../utils/formatError"
 import "./index.css"
 
 function Alert({ message, onAccept }) {
-  const lowerMsg = (message || "").toLowerCase()
+  const formattedMessage = formatErrorMessage(message)
+  const lowerMsg = (formattedMessage || "").toLowerCase()
 
   const isError =
     lowerMsg.includes("error") ||
     lowerMsg.includes("fallo") ||
     lowerMsg.includes("incorrect") ||
     lowerMsg.includes("no se pudo") ||
+    lowerMsg.includes("no es válido") ||
+    lowerMsg.includes("no válida") ||
     lowerMsg.includes("denegad")
 
   const isSuccess =
@@ -104,7 +108,7 @@ function Alert({ message, onAccept }) {
 
         {/* Mensaje descriptivo */}
         <p className="text-sm font-semibold text-slate-600 leading-relaxed px-2 mt-1">
-          {message}
+          {formattedMessage}
         </p>
 
         {/* Botón Aceptar moderno */}

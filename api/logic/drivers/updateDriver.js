@@ -11,8 +11,10 @@ const updateDriver = (userId, driverId, { password, fullName, phone, username, e
     validate.name(fullName, "fullName")
   }
 
+  let normalizedUsername
   if (username !== undefined) {
-    validate.username(username, "username")
+    normalizedUsername = typeof username === "string" ? username.trim().toLowerCase() : username
+    validate.username(normalizedUsername, "username")
   }
 
   if (email !== undefined && email.trim() !== "") {
@@ -48,13 +50,12 @@ const updateDriver = (userId, driverId, { password, fullName, phone, username, e
           const promises = []
 
           if (username !== undefined) {
-            const normalizedUsername = username.trim().toLowerCase()
             if (normalizedUsername !== driver.username) {
               promises.push(
                 User.findOne({ username: normalizedUsername, _id: { $ne: driver._id } })
                   .catch(error => { throw new SystemError(error.message) })
                   .then(existing => {
-                    if (existing) throw new DuplicityError("Username already in use")
+                    if (existing) throw new DuplicityError("El nombre de usuario ya está en uso")
                     driver.username = normalizedUsername
                   })
               )

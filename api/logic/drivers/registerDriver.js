@@ -5,14 +5,19 @@ import bcrypt from "bcryptjs"
 
 const registerDriver = (userId, username, password, fullName, phone = "", email = "") => {
   validate.id(userId)
-  validate.username(username)
+
+  const normalizedUsername = typeof username === "string" ? username.trim().toLowerCase() : username
+  const normalizedFullName = typeof fullName === "string" ? fullName.trim() : fullName
+  const normalizedPhone = typeof phone === "string" ? phone.trim() : ""
+  const normalizedEmail = (email && typeof email === "string" && email.trim()) 
+    ? email.trim().toLowerCase() 
+    : `${normalizedUsername}@driver.factuclient.local`
+
+  validate.username(normalizedUsername)
   validate.password(password)
-  validate.name(fullName, "fullName")
+  validate.name(normalizedFullName, "fullName")
 
-  const normalizedUsername = username.trim().toLowerCase()
-  const normalizedEmail = (email && email.trim()) ? email.trim().toLowerCase() : `${normalizedUsername}@driver.factuclient.local`
-
-  if (email && email.trim()) {
+  if (email && typeof email === "string" && email.trim()) {
     validate.email(normalizedEmail)
   }
 
@@ -38,6 +43,12 @@ const registerDriver = (userId, username, password, fullName, phone = "", email 
     .then(existingDriver => {
       if (existingDriver) {
         if (existingDriver.active) {
+          if (existingDriver.username === normalizedUsername) {
+            throw new DuplicityError("El nombre de usuario ya está registrado por otro chofer o usuario")
+          }
+          if (existingDriver.email === normalizedEmail) {
+            throw new DuplicityError("El correo electrónico ya está registrado en el sistema")
+          }
           throw new DuplicityError("Username or email already in use")
         }
 

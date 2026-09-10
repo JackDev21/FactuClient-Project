@@ -55,8 +55,63 @@ export default function DriverList() {
     loadDrivers()
   }, [])
 
+  const sanitizeUsername = (val) => {
+    if (!val) return ""
+    return val
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "") // elimina tildes: á->a, é->e, etc.
+      .replace(/ñ/g, "n")
+      .replace(/Ñ/g, "n")
+      .replace(/^@+/, "") // elimina @ inicial
+      .replace(/\s+/g, "_") // reemplaza espacios por _
+      .replace(/[^a-z0-9_.-]/g, "") // deja solo caracteres permitidos
+  }
+
+  const translateDriverError = (msg) => {
+    if (!msg) return "Ha ocurrido un error inesperado al procesar el chofer."
+    const m = msg.toLowerCase()
+    if (m.includes("username or email already in use")) {
+      return "El nombre de usuario o el correo electrónico ya están registrados por otra persona. Por favor, utiliza un nombre de usuario diferente."
+    }
+    if (m.includes("username is not valid")) {
+      return "El nombre de usuario no es válido. Solo puede contener letras, números, puntos o guiones bajos (sin espacios ni acentos)."
+    }
+    if (m.includes("fullname is not valid") || m.includes("name is not valid")) {
+      return "El nombre completo no es válido. Por favor, revísalo."
+    }
+    if (m.includes("password is not valid")) {
+      return "La contraseña no es válida. Debe tener al menos 4 caracteres."
+    }
+    if (m.includes("email is not valid")) {
+      return "El formato del correo electrónico no es válido."
+    }
+    if (m.includes("only company owners can register drivers")) {
+      return "Solo el autónomo o titular de la empresa puede registrar chóferes."
+    }
+    return msg
+  }
+
   const handleInputChange = (e) => {
     const { name, value } = e.target
+
+    if (name === "username") {
+      setFormData(prev => ({ ...prev, username: sanitizeUsername(value) }))
+      return
+    }
+
+    if (name === "fullName") {
+      setFormData(prev => {
+        const next = { ...prev, fullName: value }
+        // Auto-sugerir username a partir del nombre completo si el usuario no ha escrito uno personalizado
+        if (!prev.username || prev.username === sanitizeUsername(prev.fullName)) {
+          next.username = sanitizeUsername(value)
+        }
+        return next
+      })
+      return
+    }
+
     setFormData(prev => ({ ...prev, [name]: value }))
   }
 
@@ -64,23 +119,32 @@ export default function DriverList() {
     e.preventDefault()
     setSubmitting(true)
 
+    const finalUsername = sanitizeUsername(formData.username)
+    const finalFullName = (formData.fullName || "").trim()
+
+    if (!finalUsername) {
+      alert("Por favor, introduce un nombre de usuario válido para el chofer.")
+      setSubmitting(false)
+      return
+    }
+
     try {
       logic.registerDriver(
-        formData.username,
+        finalUsername,
         formData.password,
-        formData.fullName,
-        formData.phone,
-        formData.email
+        finalFullName,
+        formData.phone ? formData.phone.trim() : "",
+        formData.email ? formData.email.trim() : ""
       )
         .then(() => {
           setShowModal(false)
           setFormData({ fullName: "", username: "", password: "", phone: "", email: "" })
           loadDrivers()
         })
-        .catch(error => alert(error.message))
+        .catch(error => alert(translateDriverError(error.message)))
         .finally(() => setSubmitting(false))
     } catch (error) {
-      alert(error.message)
+      alert(translateDriverError(error.message))
       setSubmitting(false)
     }
   }
@@ -92,9 +156,9 @@ export default function DriverList() {
           setDeleteDriverId(null)
           loadDrivers()
         })
-        .catch(error => alert(error.message))
+        .catch(error => alert(translateDriverError(error.message)))
     } catch (error) {
-      alert(error.message)
+      alert(translateDriverError(error.message))
     }
   }
 
@@ -112,6 +176,10 @@ export default function DriverList() {
 
   const handleEditInputChange = (e) => {
     const { name, value } = e.target
+    if (name === "username") {
+      setEditFormData(prev => ({ ...prev, username: sanitizeUsername(value) }))
+      return
+    }
     setEditFormData(prev => ({ ...prev, [name]: value }))
   }
 
@@ -119,11 +187,13 @@ export default function DriverList() {
     e.preventDefault()
     setUpdating(true)
 
+    const finalUsername = sanitizeUsername(editFormData.username)
+
     const payload = {
-      fullName: editFormData.fullName,
-      username: editFormData.username,
-      phone: editFormData.phone,
-      email: editFormData.email
+      fullName: (editFormData.fullName || "").trim(),
+      username: finalUsername,
+      phone: (editFormData.phone || "").trim(),
+      email: (editFormData.email || "").trim()
     }
     if (editFormData.newPassword && editFormData.newPassword.trim()) {
       payload.password = editFormData.newPassword.trim()
@@ -136,10 +206,10 @@ export default function DriverList() {
           setEditFormData({ fullName: "", username: "", phone: "", email: "", newPassword: "" })
           loadDrivers()
         })
-        .catch(error => alert(error.message))
+        .catch(error => alert(translateDriverError(error.message)))
         .finally(() => setUpdating(false))
     } catch (error) {
-      alert(error.message)
+      alert(translateDriverError(error.message))
       setUpdating(false)
     }
   }
@@ -291,7 +361,10 @@ export default function DriverList() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Nombre de Usuario (Login) *</label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-xs font-bold text-slate-700">Nombre de Usuario (Login) *</label>
+                    <span className="text-[10px] text-amber-700 font-semibold">Sin espacios ni acentos</span>
+                  </div>
                   <div className="relative">
                     <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 text-xs">@</span>
                     <input
@@ -301,9 +374,12 @@ export default function DriverList() {
                       value={formData.username}
                       onChange={handleInputChange}
                       placeholder="paco_chofer"
-                      className="w-full rounded-xl border border-slate-300 pl-7 pr-3 py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                      className="w-full rounded-xl border border-slate-300 pl-7 pr-3 py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 font-mono"
                     />
                   </div>
+                  <span className="text-[11px] text-slate-500 mt-1 block">
+                    Con este usuario y su contraseña el chofer entrará a la aplicación.
+                  </span>
                 </div>
 
                 <div>
@@ -410,7 +486,10 @@ export default function DriverList() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Nombre de Usuario (Login) *</label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-xs font-bold text-slate-700">Nombre de Usuario (Login) *</label>
+                    <span className="text-[10px] text-amber-700 font-semibold">Sin espacios ni acentos</span>
+                  </div>
                   <div className="relative">
                     <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 text-xs">@</span>
                     <input
@@ -420,7 +499,7 @@ export default function DriverList() {
                       value={editFormData.username}
                       onChange={handleEditInputChange}
                       placeholder="usuario_chofer"
-                      className="w-full rounded-xl border border-slate-300 pl-7 pr-3 py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                      className="w-full rounded-xl border border-slate-300 pl-7 pr-3 py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 font-mono"
                     />
                   </div>
                 </div>

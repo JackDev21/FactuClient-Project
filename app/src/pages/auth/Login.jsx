@@ -38,10 +38,11 @@ export default function Login() {
           }
         })
         .catch((error) => {
-          if(error instanceof SystemError) {
-            alert(error.message)
+          if (error instanceof SystemError) {
+            alert("No se ha podido conectar con el servidor. Por favor, comprueba tu conexión a internet o inténtalo más tarde.")
+          } else {
+            alert("Usuario o contraseña incorrectos. Por favor, comprueba tus datos de acceso.")
           }
-          alert("Invalid username or password")
         })
     } catch (error) {
       alert(error.message)
