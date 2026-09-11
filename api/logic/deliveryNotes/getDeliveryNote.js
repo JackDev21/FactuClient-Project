@@ -18,7 +18,7 @@ function getDeliveryNote(userId, deliveryNoteId) {
           .populate("customer")
           .populate("company")
           .populate("works")
-          .populate("createdBy", "fullName username role")
+          .populate("createdBy", "fullName username role vehiclePlate trailerPlate")
           .select("-__v")
           .lean(),
         Invoice.findOne({ deliveryNotes: deliveryNoteId }).select("number").lean()

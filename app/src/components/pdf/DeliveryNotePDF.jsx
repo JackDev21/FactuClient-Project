@@ -292,9 +292,17 @@ export default function DeliveryNotePDF({ deliveryNote }) {
             <Text style={styles.docMetaText}>Nº: {deliveryNote?.number || ""}</Text>
             <Text style={styles.docMetaText}>Fecha: {formattedDate}</Text>
             {deliveryNote?.createdBy?.role === "driver" && (
-              <Text style={styles.docMetaText}>
-                Chofer: {deliveryNote.createdBy.fullName || deliveryNote.createdBy.username}
-              </Text>
+              <>
+                <Text style={styles.docMetaText}>
+                  Chofer: {deliveryNote.createdBy.fullName || deliveryNote.createdBy.username}
+                </Text>
+                {deliveryNote.createdBy.vehiclePlate ? (
+                  <Text style={styles.docMetaText}>
+                    Vehículo: {deliveryNote.createdBy.vehiclePlate}
+                    {deliveryNote.createdBy.trailerPlate ? ` / Remolque: ${deliveryNote.createdBy.trailerPlate}` : ""}
+                  </Text>
+                ) : null}
+              </>
             )}
           </View>
         </View>

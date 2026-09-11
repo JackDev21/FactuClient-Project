@@ -3,7 +3,7 @@ import { User } from "../../model/index.js"
 import { NotFoundError, SystemError, CredentialsError, MatchError, DuplicityError } from "com/errors.js"
 import bcrypt from "bcryptjs"
 
-const updateDriver = (userId, driverId, { password, fullName, phone, username, email } = {}) => {
+const updateDriver = (userId, driverId, { password, fullName, phone, username, email, vehiclePlate, trailerPlate } = {}) => {
   validate.id(userId)
   validate.id(driverId, "driverId")
 
@@ -75,6 +75,14 @@ const updateDriver = (userId, driverId, { password, fullName, phone, username, e
 
               if (phone !== undefined) {
                 driver.phone = phone ? phone.trim() : ""
+              }
+
+              if (vehiclePlate !== undefined) {
+                driver.vehiclePlate = typeof vehiclePlate === "string" ? vehiclePlate.trim().toUpperCase() : ""
+              }
+
+              if (trailerPlate !== undefined) {
+                driver.trailerPlate = typeof trailerPlate === "string" ? trailerPlate.trim().toUpperCase() : ""
               }
 
               if (password !== undefined && password !== "") {

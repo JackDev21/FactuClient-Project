@@ -38,6 +38,7 @@ export default function DecaForm() {
   const [vehiclePlate, setVehiclePlate] = useState("")
   const [trailerPlate, setTrailerPlate] = useState("")
   const [driverName, setDriverName] = useState("")
+  const [companyDrivers, setCompanyDrivers] = useState([])
   const [transportDate, setTransportDate] = useState(new Date().toISOString().split("T")[0])
   const [loadingTime, setLoadingTime] = useState("")
   const [unloadingTime, setUnloadingTime] = useState("")
@@ -83,10 +84,23 @@ export default function DecaForm() {
         setOrigin(sAddress)
         setDestination(dn?.customer?.address || "")
 
-        // Pre-rellenar Conductor si es chofer
+        // Pre-rellenar Conductor y Matrículas
         if (isDriver) {
           const dName = prof?.fullName || prof?.username || dn?.createdBy?.fullName || ""
           if (dName) setDriverName(dName)
+          if (prof?.vehiclePlate) setVehiclePlate(prof.vehiclePlate)
+          if (prof?.trailerPlate) setTrailerPlate(prof.trailerPlate)
+        } else {
+          // Si es empresa / admin:
+          // 1. Si el albarán base fue creado por un chofer, pre-rellenar sus datos y matrículas
+          if (dn?.createdBy?.fullName) setDriverName(dn.createdBy.fullName)
+          if (dn?.createdBy?.vehiclePlate) setVehiclePlate(dn.createdBy.vehiclePlate)
+          if (dn?.createdBy?.trailerPlate) setTrailerPlate(dn.createdBy.trailerPlate)
+
+          // 2. Cargar plantilla de choferes para el selector rápido de asignación
+          logic.getAllDrivers()
+            .then(drivers => setCompanyDrivers(drivers || []))
+            .catch(() => {})
         }
 
         // Pre-rellenar Naturaleza de la Mercancía desde conceptos del albarán
@@ -389,6 +403,36 @@ export default function DecaForm() {
                     className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500"
                   />
                 </div>
+
+                {companyDrivers.length > 0 && (
+                  <div className="rounded-xl bg-amber-50/80 p-3 border border-amber-200">
+                    <label className="block text-[11px] font-bold text-amber-900 mb-1 flex items-center gap-1.5">
+                      <FaTruck className="text-amber-700" />
+                      <span>Asignar chofer de la plantilla (Auto-rellenar)</span>
+                    </label>
+                    <select
+                      onChange={(e) => {
+                        const selectedId = e.target.value
+                        if (!selectedId) return
+                        const drv = companyDrivers.find((d) => (d.id || d._id) === selectedId)
+                        if (drv) {
+                          setDriverName(drv.fullName || drv.username)
+                          if (drv.vehiclePlate) setVehiclePlate(drv.vehiclePlate)
+                          if (drv.trailerPlate) setTrailerPlate(drv.trailerPlate)
+                        }
+                      }}
+                      defaultValue=""
+                      className="w-full rounded-lg border border-amber-300 bg-white px-2.5 py-1.5 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    >
+                      <option value="">-- Seleccionar chofer para rellenar datos --</option>
+                      {companyDrivers.map((drv) => (
+                        <option key={drv.id || drv._id} value={drv.id || drv._id}>
+                          {drv.fullName || drv.username} {drv.vehiclePlate ? `[${drv.vehiclePlate}${drv.trailerPlate ? ` / ${drv.trailerPlate}` : ""}]` : ""}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
 
                 <div>
                   <label className="block text-[11px] font-semibold text-slate-600 mb-1">

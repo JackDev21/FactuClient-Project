@@ -1,7 +1,7 @@
 import validate from "com/validate.js"
 import errors, { SystemError } from "com/errors.js"
 
-const updateDriver = (driverId, { password, fullName, phone, username, email } = {}) => {
+const updateDriver = (driverId, { password, fullName, phone, username, email, vehiclePlate, trailerPlate } = {}) => {
   validate.id(driverId, "driverId")
 
   if (fullName !== undefined) {
@@ -26,7 +26,7 @@ const updateDriver = (driverId, { password, fullName, phone, username, email } =
       Authorization: `Bearer ${sessionStorage.token}`,
       "Content-Type": "application/json"
     },
-    body: JSON.stringify({ password, fullName, phone, username, email })
+    body: JSON.stringify({ password, fullName, phone, username, email, vehiclePlate, trailerPlate })
   })
     .catch(() => { throw new SystemError("connection error") })
     .then(response => {

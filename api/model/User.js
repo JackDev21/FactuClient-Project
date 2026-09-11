@@ -52,6 +52,14 @@ const user = new Schema({
   irpf: {
     type: Number,
   },
+  vehiclePlate: {
+    type: String,
+    trim: true,
+  },
+  trailerPlate: {
+    type: String,
+    trim: true,
+  },
 })
 
 const User = model("User", user)

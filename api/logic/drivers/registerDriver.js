@@ -3,12 +3,14 @@ import { User } from "../../model/index.js"
 import { MatchError, NotFoundError, SystemError, CredentialsError, DuplicityError } from "com/errors.js"
 import bcrypt from "bcryptjs"
 
-const registerDriver = (userId, username, password, fullName, phone = "", email = "") => {
+const registerDriver = (userId, username, password, fullName, phone = "", email = "", vehiclePlate = "", trailerPlate = "") => {
   validate.id(userId)
 
   const normalizedUsername = typeof username === "string" ? username.trim().toLowerCase() : username
   const normalizedFullName = typeof fullName === "string" ? fullName.trim() : fullName
   const normalizedPhone = typeof phone === "string" ? phone.trim() : ""
+  const normalizedVehiclePlate = typeof vehiclePlate === "string" ? vehiclePlate.trim().toUpperCase() : ""
+  const normalizedTrailerPlate = typeof trailerPlate === "string" ? trailerPlate.trim().toUpperCase() : ""
   const normalizedEmail = (email && typeof email === "string" && email.trim()) 
     ? email.trim().toLowerCase() 
     : `${normalizedUsername}@driver.factuclient.local`
@@ -50,6 +52,8 @@ const registerDriver = (userId, username, password, fullName, phone = "", email 
               existingDriver.fullName = normalizedFullName
               existingDriver.email = normalizedEmail
               existingDriver.phone = normalizedPhone || existingDriver.phone
+              existingDriver.vehiclePlate = normalizedVehiclePlate || existingDriver.vehiclePlate
+              existingDriver.trailerPlate = normalizedTrailerPlate || existingDriver.trailerPlate
               return existingDriver.save()
             })
             .catch(error => { throw new SystemError(error.message) })
@@ -67,6 +71,8 @@ const registerDriver = (userId, username, password, fullName, phone = "", email 
             fullName,
             email: normalizedEmail,
             phone: phone || "",
+            vehiclePlate: normalizedVehiclePlate,
+            trailerPlate: normalizedTrailerPlate,
             role: "driver",
             manager: userId,
             active: true

@@ -34,7 +34,7 @@ const getAllDeliveryNotes = (userId) => {
       return Promise.all([
         DeliveryNote.find(query)
           .populate("customer", "username companyName")
-          .populate("createdBy", "fullName username role")
+          .populate("createdBy", "fullName username role vehiclePlate trailerPlate")
           .sort({ number: -1 })
           .select("-__v")
           .lean(),
@@ -77,6 +77,8 @@ const getAllDeliveryNotes = (userId) => {
                 deliveryNote.customerName = deliveryNote.customer?.companyName || deliveryNote.customer?.username
                 deliveryNote.createdByName = deliveryNote.createdBy?.fullName || deliveryNote.createdBy?.username || null
                 deliveryNote.isDriverNote = deliveryNote.createdBy?.role === "driver"
+                deliveryNote.driverVehiclePlate = deliveryNote.createdBy?.vehiclePlate || null
+                deliveryNote.driverTrailerPlate = deliveryNote.createdBy?.trailerPlate || null
 
                 return deliveryNote
               })

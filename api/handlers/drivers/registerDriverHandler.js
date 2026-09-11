@@ -8,13 +8,13 @@ const { JWT_SECRET } = process.env
 export default (req, res, next) => {
   try {
     const token = req.headers.authorization?.slice(7)
-    const { username, password, fullName, phone, email } = req.body
+    const { username, password, fullName, phone, email, vehiclePlate, trailerPlate } = req.body
 
     jwt.verify(token, JWT_SECRET)
       .then(payload => {
         const { sub: userId } = payload
         try {
-          return logic.registerDriver(userId, username, password, fullName, phone, email)
+          return logic.registerDriver(userId, username, password, fullName, phone, email, vehiclePlate, trailerPlate)
             .then(() => res.status(201).send())
             .catch(error => next(error))
         } catch (error) {

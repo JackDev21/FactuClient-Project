@@ -19,12 +19,22 @@ export default function DriverList() {
     username: "",
     password: "",
     phone: "",
-    email: ""
+    email: "",
+    vehiclePlate: "",
+    trailerPlate: ""
   })
 
   // Estado para editar chofer y cambiar contraseña
   const [editingDriver, setEditingDriver] = useState(null)
-  const [editFormData, setEditFormData] = useState({ fullName: "", username: "", phone: "", email: "", newPassword: "" })
+  const [editFormData, setEditFormData] = useState({
+    fullName: "",
+    username: "",
+    phone: "",
+    email: "",
+    vehiclePlate: "",
+    trailerPlate: "",
+    newPassword: ""
+  })
   const [updating, setUpdating] = useState(false)
 
   const { alert } = useContext()
@@ -120,6 +130,11 @@ export default function DriverList() {
       return
     }
 
+    if (name === "vehiclePlate" || name === "trailerPlate") {
+      setFormData(prev => ({ ...prev, [name]: value.toUpperCase() }))
+      return
+    }
+
     setFormData(prev => ({ ...prev, [name]: value }))
   }
 
@@ -142,11 +157,13 @@ export default function DriverList() {
         formData.password,
         finalFullName,
         formData.phone ? formData.phone.trim() : "",
-        formData.email ? formData.email.trim() : ""
+        formData.email ? formData.email.trim() : "",
+        formData.vehiclePlate ? formData.vehiclePlate.trim().toUpperCase() : "",
+        formData.trailerPlate ? formData.trailerPlate.trim().toUpperCase() : ""
       )
         .then(() => {
           setShowModal(false)
-          setFormData({ fullName: "", username: "", password: "", phone: "", email: "" })
+          setFormData({ fullName: "", username: "", password: "", phone: "", email: "", vehiclePlate: "", trailerPlate: "" })
           loadDrivers()
         })
         .catch(error => alert(translateDriverError(error.message)))
@@ -178,6 +195,8 @@ export default function DriverList() {
       username: driver.username || "",
       phone: driver.phone || "",
       email: isDummyEmail ? "" : (driver.email || ""),
+      vehiclePlate: driver.vehiclePlate || "",
+      trailerPlate: driver.trailerPlate || "",
       newPassword: ""
     })
   }
@@ -186,6 +205,10 @@ export default function DriverList() {
     const { name, value } = e.target
     if (name === "username") {
       setEditFormData(prev => ({ ...prev, username: sanitizeUsername(value) }))
+      return
+    }
+    if (name === "vehiclePlate" || name === "trailerPlate") {
+      setEditFormData(prev => ({ ...prev, [name]: value.toUpperCase() }))
       return
     }
     setEditFormData(prev => ({ ...prev, [name]: value }))
@@ -201,7 +224,9 @@ export default function DriverList() {
       fullName: (editFormData.fullName || "").trim(),
       username: finalUsername,
       phone: (editFormData.phone || "").trim(),
-      email: (editFormData.email || "").trim()
+      email: (editFormData.email || "").trim(),
+      vehiclePlate: (editFormData.vehiclePlate || "").trim().toUpperCase(),
+      trailerPlate: (editFormData.trailerPlate || "").trim().toUpperCase()
     }
     if (editFormData.newPassword && editFormData.newPassword.trim()) {
       payload.password = editFormData.newPassword.trim()
@@ -211,7 +236,7 @@ export default function DriverList() {
       logic.updateDriver(editingDriver.id, payload)
         .then(() => {
           setEditingDriver(null)
-          setEditFormData({ fullName: "", username: "", phone: "", email: "", newPassword: "" })
+          setEditFormData({ fullName: "", username: "", phone: "", email: "", vehiclePlate: "", trailerPlate: "", newPassword: "" })
           loadDrivers()
         })
         .catch(error => alert(translateDriverError(error.message)))
@@ -312,6 +337,19 @@ export default function DriverList() {
                       </span>
                     </div>
                   </div>
+
+                  {/* Matrículas asignadas al chofer */}
+                  {(driver.vehiclePlate || driver.trailerPlate) && (
+                    <div className="flex items-center gap-1.5 flex-wrap pt-0.5 text-xs">
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-50 border border-amber-200 text-amber-900 font-bold text-[11px]">
+                        <FaTruck className="text-amber-600 text-xs shrink-0" />
+                        <span>Camión: {driver.vehiclePlate || "No asignado"}</span>
+                        {driver.trailerPlate && (
+                          <span className="text-amber-800 font-medium">· Remolque: {driver.trailerPlate}</span>
+                        )}
+                      </span>
+                    </div>
+                  )}
 
                   {/* Fila de acciones */}
                   <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
@@ -432,6 +470,36 @@ export default function DriverList() {
                     </div>
                   </div>
 
+                  <div className="grid grid-cols-2 gap-3 pt-2 border-t border-slate-100">
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">
+                        Matrícula Camión (Opcional)
+                      </label>
+                      <input
+                        type="text"
+                        name="vehiclePlate"
+                        value={formData.vehiclePlate}
+                        onChange={handleInputChange}
+                        placeholder="Ej. 1234-BBB"
+                        className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 uppercase font-mono"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">
+                        Semirremolque (Opcional)
+                      </label>
+                      <input
+                        type="text"
+                        name="trailerPlate"
+                        value={formData.trailerPlate}
+                        onChange={handleInputChange}
+                        placeholder="Ej. R-5678-BBB"
+                        className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 uppercase font-mono"
+                      />
+                    </div>
+                  </div>
+
                   <p className="text-[11px] text-slate-400 italic mt-1">
                     Nota: El chofer solo podrá registrar albaranes sin valorar y consultar sus propios transportes. No tendrá acceso a datos fiscales ni facturas.
                   </p>
@@ -536,6 +604,36 @@ export default function DriverList() {
                         onChange={handleEditInputChange}
                         placeholder="chofer@empresa.es"
                         className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3 pt-2 border-t border-slate-100">
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">
+                        Matrícula Camión (Opcional)
+                      </label>
+                      <input
+                        type="text"
+                        name="vehiclePlate"
+                        value={editFormData.vehiclePlate}
+                        onChange={handleEditInputChange}
+                        placeholder="Ej. 1234-BBB"
+                        className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 uppercase font-mono"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">
+                        Semirremolque (Opcional)
+                      </label>
+                      <input
+                        type="text"
+                        name="trailerPlate"
+                        value={editFormData.trailerPlate}
+                        onChange={handleEditInputChange}
+                        placeholder="Ej. R-5678-BBB"
+                        className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 uppercase font-mono"
                       />
                     </div>
                   </div>

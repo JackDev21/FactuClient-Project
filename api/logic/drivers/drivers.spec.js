@@ -59,13 +59,18 @@ describe("Drivers logic suite", () => {
         "chofer_paco",
         "1234",
         "Francisco Chofer",
-        "612345678"
+        "612345678",
+        "",
+        " 1234-xyz ",
+        " r-5678-abc "
       )
         .then(() => User.findOne({ username: "chofer_paco" }))
         .then(driver => {
           expect(driver).to.exist
           expect(driver.role).to.equal("driver")
           expect(driver.fullName).to.equal("Francisco Chofer")
+          expect(driver.vehiclePlate).to.equal("1234-XYZ")
+          expect(driver.trailerPlate).to.equal("R-5678-ABC")
           expect(driver.manager.toString()).to.equal(ownerUser.id)
           expect(driver.active).to.be.true
           return bcrypt.compare("1234", driver.password)
@@ -189,12 +194,16 @@ describe("Drivers logic suite", () => {
           updateDriver(ownerUser.id, driver.id, {
             password: "nuevaclave5678",
             fullName: "Nombre Modificado",
-            phone: "699999999"
+            phone: "699999999",
+            vehiclePlate: "9876-ZZZ",
+            trailerPlate: "R-1111-AAA"
           })
             .then(() => User.findById(driver.id))
             .then(updatedDriver => {
               expect(updatedDriver.fullName).to.equal("Nombre Modificado")
               expect(updatedDriver.phone).to.equal("699999999")
+              expect(updatedDriver.vehiclePlate).to.equal("9876-ZZZ")
+              expect(updatedDriver.trailerPlate).to.equal("R-1111-AAA")
               return bcrypt.compare("nuevaclave5678", updatedDriver.password)
                 .then(match => {
                   expect(match).to.be.true
