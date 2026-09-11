@@ -232,10 +232,13 @@ export default function DeliveryNoteList() {
                     className="w-full rounded-2xl bg-white/80 p-4 border border-slate-200/70 shadow-xs animate-pulse flex items-center justify-between"
                   >
                     <div className="flex flex-col gap-2 flex-1 pr-4">
-                      <div className="h-4 bg-slate-200 rounded-md w-1/3"></div>
+                      <div className="h-4 bg-slate-200 rounded-md w-2/5"></div>
                       <div className="h-3 bg-slate-100 rounded-md w-3/5"></div>
                     </div>
-                    <div className="h-6 w-20 bg-slate-200 rounded-full"></div>
+                    <div className="flex flex-col items-end gap-1.5 shrink-0">
+                      <div className="h-5 w-20 bg-slate-200 rounded-full"></div>
+                      <div className="h-4 w-16 bg-slate-100 rounded-full"></div>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -254,18 +257,11 @@ export default function DeliveryNoteList() {
                             : "border-l-4 border-l-amber-500"
                       }`}
                     >
-                      <div className="flex flex-col items-start gap-1 flex-1 pr-2">
-                        <div className="flex items-center gap-2">
-                          <span className="text-base font-bold text-slate-900">
-                            A/Nº: {deliveryNote.number}
-                          </span>
-                          {deliveryNote.date && (
-                            <span className="text-xs font-medium text-slate-400">
-                              · {formatDate(deliveryNote.date)}
-                            </span>
-                          )}
-                        </div>
-                        <span className="text-sm font-semibold text-slate-600 text-left leading-snug">
+                      <div className="flex flex-col items-start gap-1 flex-1 pr-2 min-w-0">
+                        <span className="text-base font-bold text-slate-900 whitespace-nowrap">
+                          A/Nº: {deliveryNote.number}
+                        </span>
+                        <span className="text-sm font-semibold text-slate-600 text-left leading-snug truncate max-w-full">
                           {deliveryNote.customer?.companyName || deliveryNote.customerName || "Cliente"}
                         </span>
 
@@ -284,27 +280,34 @@ export default function DeliveryNoteList() {
                         </div>
                       </div>
 
-                      <span
-                        className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-bold tracking-wider ${
-                          isDriver
+                      <div className="flex flex-col items-end gap-1 shrink-0">
+                        <span
+                          className={`rounded-full px-2.5 py-1 text-xs font-bold tracking-wide whitespace-nowrap ${
+                            isDriver
+                              ? deliveryNote.isValued !== false
+                                ? "bg-emerald-100/90 text-emerald-800 border border-emerald-200"
+                                : "bg-amber-100/90 text-amber-800 border border-amber-200 uppercase"
+                              : deliveryNote.isInvoiced
+                                ? "bg-emerald-100/90 text-emerald-800 border border-emerald-200"
+                                : "bg-amber-100/90 text-amber-800 border border-amber-200 uppercase"
+                          }`}
+                        >
+                          {isDriver
                             ? deliveryNote.isValued !== false
-                              ? "bg-emerald-100/90 text-emerald-800 border border-emerald-200"
-                              : "bg-amber-100/90 text-amber-800 border border-amber-200 uppercase"
+                              ? "Valorado"
+                              : "Pendiente precio"
                             : deliveryNote.isInvoiced
-                              ? "bg-emerald-100/90 text-emerald-800 border border-emerald-200"
-                              : "bg-amber-100/90 text-amber-800 border border-amber-200 uppercase"
-                        }`}
-                      >
-                        {isDriver
-                          ? deliveryNote.isValued !== false
-                            ? "Valorado"
-                            : "Pendiente precio"
-                          : deliveryNote.isInvoiced
-                            ? deliveryNote.invoiceNumber
-                              ? `Fra. ${deliveryNote.invoiceNumber}`
-                              : "Facturado"
-                            : "Pendiente"}
-                      </span>
+                              ? deliveryNote.invoiceNumber
+                                ? `Fra. ${deliveryNote.invoiceNumber}`
+                                : "Facturado"
+                              : "Pendiente"}
+                        </span>
+                        {deliveryNote.date && (
+                          <span className="rounded-full bg-slate-100 border border-slate-200 px-2.5 py-0.5 text-xs font-semibold text-slate-600 whitespace-nowrap">
+                            {formatDate(deliveryNote.date)}
+                          </span>
+                        )}
+                      </div>
                     </li>
                   </Link>
                 ))}
