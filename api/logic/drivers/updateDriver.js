@@ -64,16 +64,7 @@ const updateDriver = (userId, driverId, { password, fullName, phone, username, e
 
           if (email !== undefined) {
             const normalizedEmail = email.trim() ? email.trim().toLowerCase() : `${driver.username}@driver.factuclient.local`
-            if (normalizedEmail !== driver.email) {
-              promises.push(
-                User.findOne({ email: normalizedEmail, _id: { $ne: driver._id } })
-                  .catch(error => { throw new SystemError(error.message) })
-                  .then(existing => {
-                    if (existing) throw new DuplicityError("Email already in use")
-                    driver.email = normalizedEmail
-                  })
-              )
-            }
+            driver.email = normalizedEmail
           }
 
           return Promise.all(promises)

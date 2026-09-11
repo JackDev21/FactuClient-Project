@@ -32,40 +32,30 @@ const registerDriver = (userId, username, password, fullName, phone = "", email 
         throw new CredentialsError("Only company owners can register drivers")
       }
 
-      return User.findOne({
-        $or: [
-          { username: normalizedUsername },
-          { email: normalizedEmail }
-        ]
-      })
+      return User.findOne({ username: normalizedUsername })
       .catch(error => { throw new SystemError(error.message) })
     })
     .then(existingDriver => {
       if (existingDriver) {
         if (existingDriver.active) {
-          if (existingDriver.username === normalizedUsername) {
-            throw new DuplicityError("El nombre de usuario ya está registrado por otro chofer o usuario")
-          }
-          if (existingDriver.email === normalizedEmail) {
-            throw new DuplicityError("El correo electrónico ya está registrado en el sistema")
-          }
-          throw new DuplicityError("Username or email already in use")
+          throw new DuplicityError("El nombre de usuario ya está registrado por otro chofer o usuario")
         }
 
-        // Si existía pero estaba desactivado y pertenece a la misma empresa, reactivarlo
-        if (existingDriver.manager && existingDriver.manager.toString() === userId) {
+        // Si existía pero estaba desactivado y pertenece a la misma empresa y es chofer, reactivarlo
+        if (existingDriver.role === "driver" && existingDriver.manager && existingDriver.manager.toString() === userId) {
           return bcrypt.hash(password, 10)
             .then(hash => {
               existingDriver.active = true
               existingDriver.password = hash
-              existingDriver.fullName = fullName
-              existingDriver.phone = phone || existingDriver.phone
+              existingDriver.fullName = normalizedFullName
+              existingDriver.email = normalizedEmail
+              existingDriver.phone = normalizedPhone || existingDriver.phone
               return existingDriver.save()
             })
             .catch(error => { throw new SystemError(error.message) })
             .then(() => {})
         } else {
-          throw new DuplicityError("Username or email already in use")
+          throw new DuplicityError("El nombre de usuario ya está registrado por otro chofer o usuario")
         }
       }
 

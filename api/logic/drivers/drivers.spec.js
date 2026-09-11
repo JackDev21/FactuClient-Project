@@ -99,6 +99,25 @@ describe("Drivers logic suite", () => {
           expect(error).to.be.instanceOf(DuplicityError)
         })
     )
+
+    it("succeeds on registering a driver with the same email and fullName as an existing customer", () =>
+      registerDriver(
+        ownerUser.id,
+        "chofer_cliente_mismo_email",
+        "1234",
+        customerUser.fullName,
+        "612345678",
+        customerUser.email
+      )
+        .then(() => User.findOne({ username: "chofer_cliente_mismo_email" }))
+        .then(driver => {
+          expect(driver).to.exist
+          expect(driver.role).to.equal("driver")
+          expect(driver.fullName).to.equal(customerUser.fullName)
+          expect(driver.email).to.equal(customerUser.email)
+          expect(driver.manager.toString()).to.equal(ownerUser.id)
+        })
+    )
   })
 
   describe("getAllDrivers", () => {
@@ -196,6 +215,20 @@ describe("Drivers logic suite", () => {
               expect(error).to.be.an.instanceOf(CredentialsError)
             })
         })
+    )
+
+    it("succeeds on updating driver email to match an existing customer email", () =>
+      registerDriver(ownerUser.id, "chofer_update_email", "clave1234", "Chofer Email Test", "600000001")
+        .then(() => User.findOne({ username: "chofer_update_email" }))
+        .then(driver =>
+          updateDriver(ownerUser.id, driver.id, {
+            email: customerUser.email
+          })
+            .then(() => User.findById(driver.id))
+            .then(updatedDriver => {
+              expect(updatedDriver.email).to.equal(customerUser.email)
+            })
+        )
     )
   })
 })

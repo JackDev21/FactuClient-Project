@@ -71,8 +71,16 @@ export default function DriverList() {
   const translateDriverError = (msg) => {
     if (!msg) return "Ha ocurrido un error inesperado al procesar el chofer."
     const m = msg.toLowerCase()
-    if (m.includes("username or email already in use")) {
-      return "El nombre de usuario o el correo electrónico ya están registrados por otra persona. Por favor, utiliza un nombre de usuario diferente."
+    if (
+      m.includes("ya está registrado por otro chofer o usuario") ||
+      m.includes("ya está en uso") ||
+      m.includes("username or email already in use") ||
+      m.includes("user already exists")
+    ) {
+      return "El nombre de usuario ya está en uso. El chofer puede tener el mismo nombre y email que un cliente, pero el usuario debe ser único para el login (ej: prueba añadiendo _chofer)."
+    }
+    if (m.includes("correo electrónico ya está registrado") || m.includes("email already in use")) {
+      return "El correo electrónico indicado ya está en uso por otra cuenta."
     }
     if (m.includes("username is not valid")) {
       return "El nombre de usuario no es válido. Solo puede contener letras, números, puntos o guiones bajos (sin espacios ni acentos)."
@@ -86,8 +94,8 @@ export default function DriverList() {
     if (m.includes("email is not valid")) {
       return "El formato del correo electrónico no es válido."
     }
-    if (m.includes("only company owners can register drivers")) {
-      return "Solo el autónomo o titular de la empresa puede registrar chóferes."
+    if (m.includes("only company owners can register drivers") || m.includes("only company owners can update drivers")) {
+      return "Solo el autónomo o titular de la empresa puede gestionar chóferes."
     }
     return msg
   }
@@ -378,7 +386,7 @@ export default function DriverList() {
                     />
                   </div>
                   <span className="text-[11px] text-slate-500 mt-1 block">
-                    Con este usuario y su contraseña el chofer entrará a la aplicación.
+                    Con este usuario y contraseña el chofer entrará a la app. Puede compartir nombre y email con un cliente, pero el usuario debe ser único (ej: paco_chofer).
                   </span>
                 </div>
 
