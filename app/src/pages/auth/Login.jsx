@@ -9,6 +9,7 @@ import logic from "../../logic"
 
 import Main from "../../components/core/Main"
 import Footer from "../../components/core/Footer"
+import Title from "../../components/Title"
 
 export default function Login() {
   const { alert: showAlert } = useContext()
@@ -61,16 +62,10 @@ export default function Login() {
 
   return (
     <>
-      {/* Cabecera Principal con la identidad visual corporativa */}
       <div className="Header">
-        <div className="flex flex-col items-center justify-center">
-          <span className="text-2xl sm:text-3xl font-black text-white tracking-wider drop-shadow-sm uppercase">
-            FactuClient
-          </span>
-          <span className="text-[11px] sm:text-xs font-semibold text-amber-100/90 tracking-normal mt-0.5">
-            Gestión de Albaranes, Facturas y DeCA
-          </span>
-        </div>
+        <Title level={1} className="FactuClient">
+          FACTUCLIENT
+        </Title>
       </div>
 
       <Main className="LoginMain">

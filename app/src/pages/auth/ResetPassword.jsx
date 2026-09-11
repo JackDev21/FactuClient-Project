@@ -7,6 +7,7 @@ import useContext from "../../useContext"
 import { CredentialsError, SystemError } from "com/errors"
 import Main from "../../components/core/Main"
 import Footer from "../../components/core/Footer"
+import Title from "../../components/Title"
 import logic from "../../logic"
 
 export default function ResetPassword() {
@@ -64,14 +65,9 @@ export default function ResetPassword() {
   return (
     <>
       <div className="Header">
-        <div className="flex flex-col items-center justify-center">
-          <span className="text-2xl sm:text-3xl font-black text-white tracking-wider drop-shadow-sm uppercase">
-            FactuClient
-          </span>
-          <span className="text-[11px] sm:text-xs font-semibold text-amber-100/90 tracking-normal mt-0.5">
-            Nueva Contraseña
-          </span>
-        </div>
+        <Title level={1} className="FactuClient">
+          FACTUCLIENT
+        </Title>
       </div>
 
       <Main className="LoginMain">

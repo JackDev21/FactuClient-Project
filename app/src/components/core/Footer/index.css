@@ -2,64 +2,131 @@
 
 .ContainerFooter {
   position: fixed;
-  bottom: 0;
+  bottom: 0.65rem;
   display: flex;
   width: 100%;
   justify-content: center;
+  align-items: center;
   pointer-events: none;
+  z-index: 35;
+  padding: 0 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .ContainerFooter {
+    bottom: 0.95rem;
+  }
 }
 
 .Footer {
   display: flex;
-  height: 3rem;
-  width: 92%;
+  height: 2.75rem;
+  width: auto;
   max-width: 32rem;
   align-items: center;
   justify-content: center;
+  padding-left: 1.15rem;
+  padding-right: 1.15rem;
   background-image: linear-gradient(to right, #7a4902, #7f5003, #835604, #885d06, #8c6408, #946c09, #9b740b, #a37c0c, #b0870c, #bd930b, #cb9e0a, #d8aa09);
-  font-size: 1.35rem;
   color: #ffffff;
-  -webkit-text-stroke: 1px #000000;
-  paint-order: stroke fill;
-  text-shadow:
-    -1.5px -1.5px 0 #000000,
-     1.5px -1.5px 0 #000000,
-    -1.5px  1.5px 0 #000000,
-     1.5px  1.5px 0 #000000,
-     0 2px 4px rgba(0, 0, 0, 0.4);
-  box-shadow: 0 -2px 10px 0 rgba(0, 0, 0, 0.2);
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.45), 0 2px 6px -1px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   pointer-events: auto;
-  border-top-left-radius: 50% 100%;
-  border-top-right-radius: 50% 100%;
-  font-family: "Permanent Marker", cursive;
-  font-weight: 400;
-  font-style: normal;
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+
+.Footer:active {
+  transform: scale(0.97);
+}
+
+@media (min-width: 640px) {
+  .Footer {
+    height: 3rem;
+    padding-left: 1.4rem;
+    padding-right: 1.4rem;
+  }
 }
 
 .Footer .Title,
 .Footer .FactuClient-Footer {
   color: #ffffff !important;
-  font-size: 1.35rem;
-  line-height: 1;
-  -webkit-text-stroke: 1px #000000;
+  font-family: "Permanent Marker", cursive;
+  font-size: 0.95rem;
+  line-height: 1.2;
+  white-space: nowrap;
+  letter-spacing: 0.02em;
+  -webkit-text-stroke: 0.6px #000000;
   paint-order: stroke fill;
   text-shadow:
-    -1.5px -1.5px 0 #000000,
-     1.5px -1.5px 0 #000000,
-    -1.5px  1.5px 0 #000000,
-     1.5px  1.5px 0 #000000,
+    -1px -1px 0 #000000,
+     1px -1px 0 #000000,
+    -1px  1px 0 #000000,
+     1px  1px 0 #000000,
      0 2px 4px rgba(0, 0, 0, 0.4);
 }
 
 @media (min-width: 640px) {
-  .Footer {
-    height: 3.5rem;
-    width: 85%;
-    font-size: 1.5rem;
-  }
-
   .Footer .Title,
   .Footer .FactuClient-Footer {
-    font-size: 1.5rem;
+    font-size: 1.15rem;
   }
 }
+
+/* Estilos para la Guía Interactiva Contextual del Footer (Píldora Flotante) */
+.FooterGuideContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 100%;
+  gap: 0.15rem;
+}
+
+.FooterGuideText {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 0.775rem;
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1.15;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  letter-spacing: -0.01em;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+  user-select: none;
+}
+
+@media (min-width: 640px) {
+  .FooterGuideText {
+    font-size: 0.875rem;
+  }
+}
+
+.FooterGuideDots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  margin-top: 0.05rem;
+}
+
+.FooterDot {
+  width: 5px;
+  height: 5px;
+  border-radius: 9999px;
+  background-color: rgba(255, 255, 255, 0.4);
+  transition: all 250ms ease-in-out;
+}
+
+.FooterDotActive {
+  width: 16px;
+  background-color: #ffffff;
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.85);
+}
+

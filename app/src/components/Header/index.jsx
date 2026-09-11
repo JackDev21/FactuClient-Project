@@ -13,6 +13,7 @@ import UpdateProfileForm from "../UpdateProfileForm"
 export default function Header({
   className,
   iconUser,
+  userActionLabel,
   children,
   iconLeftHeader,
   onRegisterCustomer,
@@ -77,9 +78,26 @@ export default function Header({
     ? "translate-y-0 opacity-100"
     : "-translate-y-full opacity-0 pointer-events-none"
 
+  const isHomePage = location.pathname === "/"
+  const isDriver = logic.isUserLoggedIn() && logic.getInfo()?.role === "driver"
+  const effectiveUserActionLabel = userActionLabel || (isHomePage && !isDriver ? "Editar perfil" : null)
+
   const centerBadge = (
     <>
-      {iconUser && <div className="IconUser">{iconUser}</div>}
+      {iconUser && (
+        effectiveUserActionLabel ? (
+          <div className="inline-flex items-center justify-center gap-1.5 mb-1 px-3.5 py-1 rounded-full bg-black/35 group-hover:bg-black/50 border border-white/40 backdrop-blur-xs transition-all shadow-sm group-active:scale-95">
+            <span className="text-base sm:text-lg text-white flex items-center shrink-0 drop-shadow-[0_1px_1.5px_rgba(0,0,0,0.8)]">
+              {iconUser}
+            </span>
+            <span className="text-xs sm:text-sm font-black text-white tracking-wide drop-shadow-[0_1px_1.5px_rgba(0,0,0,0.8)]">
+              {effectiveUserActionLabel}
+            </span>
+          </div>
+        ) : (
+          <div className="IconUser">{iconUser}</div>
+        )
+      )}
       <div className="Children">{children}</div>
     </>
   )
@@ -108,14 +126,14 @@ export default function Header({
         )}
 
         {location.pathname === "/" && (
-          (logic.isUserLoggedIn() && logic.getInfo()?.role === "driver") ? (
+          isDriver ? (
             <div className="w-full flex justify-center select-none">
               <div className="ContainerHeader">
                 {centerBadge}
               </div>
             </div>
           ) : (
-            <Link to="/users/profile" className="w-full flex justify-center" title="Mi Perfil">
+            <Link to="/users/profile" className="w-full flex justify-center group cursor-pointer" title="Mi Perfil - Editar Datos">
               <div className="ContainerHeader">
                 {centerBadge}
               </div>

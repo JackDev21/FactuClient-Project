@@ -4,6 +4,7 @@ import { Navigate } from "react-router-dom"
 import Header from "../../components/Header"
 import Main from "../../components/core/Main"
 import Footer from "../../components/core/Footer"
+import UpdateProfileForm from "../../components/UpdateProfileForm"
 
 import { FaUserPen } from "react-icons/fa6"
 
@@ -19,6 +20,7 @@ export default function UserProfile() {
   }
 
   const [user, setUser] = useState(null)
+  const [showEditProfile, setShowEditProfile] = useState(false)
 
   const { sub: userId } = extractPayloadJwt(sessionStorage.token)
 
@@ -36,6 +38,17 @@ export default function UserProfile() {
       alert(error.message)
     }
   }, [userId])
+
+  const handleProfileUpdated = () => {
+    setShowEditProfile(false)
+    try {
+      logic.getProfileUser(userId)
+        .then((u) => setUser(u))
+        .catch(console.error)
+    } catch (e) {
+      console.error(e)
+    }
+  }
 
   return (
     <>
@@ -80,6 +93,15 @@ export default function UserProfile() {
                 </span>
               )}
             </div>
+
+            <button
+              type="button"
+              onClick={() => setShowEditProfile(true)}
+              className="mt-1 flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white text-xs sm:text-sm font-extrabold shadow-sm transition-all active:scale-95 cursor-pointer"
+            >
+              <FaUserPen className="text-sm" />
+              <span>Editar Datos de Empresa</span>
+            </button>
           </div>
 
           {/* Tarjeta 1: Datos Fiscales y de Empresa */}
@@ -141,6 +163,16 @@ export default function UserProfile() {
           </div>
         </div>
       </Main>
+
+      {showEditProfile && (
+        <div className="UpdateProfile">
+          <UpdateProfileForm
+            onUpdateProfile={handleProfileUpdated}
+            onCloseEditProfile={() => setShowEditProfile(false)}
+          />
+        </div>
+      )}
+
       <Footer>FactuClient</Footer>
     </>
   )

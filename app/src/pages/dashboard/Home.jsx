@@ -161,7 +161,7 @@ export default function Home() {
   // --- VISTA PARA AUTÓNOMO / ADMINISTRADOR ---
   return (
     <>
-      <Header iconUser={<FaUserEdit />}>{userName || "FactuClient"}</Header>
+      <Header iconUser={<FaUserEdit />} userActionLabel="Editar perfil">{userName || "FactuClient"}</Header>
 
       <Main className="MainHome">
         <div className="w-full max-w-md flex flex-col justify-evenly flex-1 gap-3 sm:gap-4 px-3 sm:px-4 py-1">
