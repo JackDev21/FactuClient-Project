@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
 import { FaChevronRight, FaPlus, FaBuilding } from "react-icons/fa6"
+import { GoNote } from "react-icons/go"
 
 import Header from "../../components/Header"
 import Main from "../../components/core/Main"
@@ -51,8 +52,8 @@ export default function NewDeliveryNotes() {
 
   return (
     <>
-      <Header>
-        <h1>Crear Albarán</h1>
+      <Header iconUser={<GoNote />}>
+        Crear Albarán
       </Header>
 
       <Main className="MainCreateDelivery">

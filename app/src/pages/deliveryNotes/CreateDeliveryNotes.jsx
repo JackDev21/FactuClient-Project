@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { FaPlus, FaCheck, FaXmark, FaPencil, FaTrashCan, FaCommentDots, FaArrowRight } from "react-icons/fa6"
+import { GoNote } from "react-icons/go"
 
 import logic from "../../logic/index"
 import useContext from "../../useContext"
@@ -299,15 +300,8 @@ export default function CreateDeliveryNotes() {
 
   return (
     <>
-      <Header>
-        <div className="flex flex-col items-center justify-center max-w-[62vw] sm:max-w-md">
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-slate-950/25 border border-slate-950/20 text-slate-950 text-[10px] sm:text-xs font-black uppercase tracking-wider mb-0.5 shadow-2xs">
-            Nuevo Albarán
-          </span>
-          <h1 className="text-xs sm:text-base font-black text-slate-950 tracking-tight leading-tight truncate max-w-full">
-            {deliveryNote?.customer?.companyName || deliveryNote?.customer?.fullName || "Crear Albarán"}
-          </h1>
-        </div>
+      <Header iconUser={<GoNote />}>
+        Nuevo Albarán
       </Header>
 
       <Main className="MainCreateDelivery">

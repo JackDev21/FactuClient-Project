@@ -7,6 +7,7 @@ import { FaRegFilePdf, FaPencil } from "react-icons/fa6"
 import { FaSpinner } from "react-icons/fa"
 
 import { MdDeleteForever } from "react-icons/md"
+import { LiaFileInvoiceSolid } from "react-icons/lia"
 
 import Header from "../../components/Header"
 import Main from "../../components/core/Main"
@@ -86,16 +87,10 @@ export default function InvoiceInfo() {
     <>
       <Header
         iconLeftHeader={logic.getInfo().role === "user" && <MdDeleteForever className="shrink-0" />}
+        iconUser={<LiaFileInvoiceSolid />}
         onDeleteInvoice={handleShowConfirmDelete}
       >
-        <div className="flex flex-col items-center justify-center max-w-full">
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-slate-100 border border-slate-300 text-slate-800 text-[10px] sm:text-xs font-black uppercase tracking-wider mb-0.5">
-            Factura Nº {invoice?.number || ""}
-          </span>
-          <h1 className="text-xs sm:text-base font-black text-slate-950 tracking-tight leading-tight truncate max-w-full">
-            {invoice?.customer?.companyName || "Detalle de Factura"}
-          </h1>
-        </div>
+        Factura Nº {invoice?.number || ""}
       </Header>
 
       <Main className="MainInvoiceInfo">

@@ -60,16 +60,10 @@ export default function DecaList() {
     <>
       <Header
         iconLeftHeader={<FaHouse />}
+        iconUser={<FaFileShield />}
         onDeleteDeliveryNote={() => navigate("/")}
       >
-        <div className="flex flex-col items-center justify-center max-w-full">
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-100 border border-amber-300 text-amber-900 text-[10px] sm:text-xs font-black uppercase tracking-wider mb-0.5">
-            <FaFileShield className="text-xs shrink-0 text-amber-600" /> Control de Transportes
-          </span>
-          <h1 className="text-sm sm:text-base font-black text-slate-950 tracking-tight leading-tight truncate max-w-full">
-            Documentos DeCA
-          </h1>
-        </div>
+        Documentos DeCA
       </Header>
 
       <Main>

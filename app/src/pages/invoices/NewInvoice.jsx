@@ -208,8 +208,8 @@ export default function NewInvoice() {
 
   return (
     <>
-      <Header>
-        <h1>Crear Factura</h1>
+      <Header iconUser={<FaFileInvoiceDollar />}>
+        Crear Factura
       </Header>
 
       <Main className="MainCreateInvoice">

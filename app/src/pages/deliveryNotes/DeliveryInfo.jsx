@@ -5,6 +5,7 @@ import { FaRegFilePdf, FaHouse, FaPlus, FaPencil, FaTrashCan, FaCheck, FaXmark, 
 import { FaSpinner } from "react-icons/fa"
 
 import { MdDeleteForever } from "react-icons/md"
+import { GoNote } from "react-icons/go"
 
 import useContext from "../../useContext"
 import { SystemError } from "com/errors"
@@ -308,16 +309,10 @@ export default function DeliveryInfo() {
     <>
       <Header
         iconLeftHeader={isOwner && isEditable && <MdDeleteForever className="shrink-0" />}
+        iconUser={<GoNote />}
         onDeleteDeliveryNote={isOwner && isEditable ? handleShowConfirmDelete : undefined}
       >
-        <div className="flex flex-col items-center justify-center max-w-full">
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-slate-100 border border-slate-300 text-slate-800 text-[10px] sm:text-xs font-black uppercase tracking-wider mb-0.5">
-            Albarán Nº {deliveryNote?.number || ""}
-          </span>
-          <h1 className="text-xs sm:text-base font-black text-slate-950 tracking-tight leading-tight truncate max-w-full">
-            {deliveryNote?.customer?.companyName || deliveryNote?.customerName || "Detalle de Albarán"}
-          </h1>
-        </div>
+        Albarán Nº {deliveryNote?.number || ""}
       </Header>
 
       <Main className="MainDeliveryInfo">
