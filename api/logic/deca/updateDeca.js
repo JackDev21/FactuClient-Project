@@ -1,6 +1,6 @@
 import validate from "com/validate.js"
 import { NotFoundError, SystemError, MatchError } from "com/errors.js"
-import { Deca } from "../../model/index.js"
+import { Deca, User } from "../../model/index.js"
 import generateDecaPdf from "./generateDecaPdf.js"
 import getBaseUrl from "../../utils/getBaseUrl.js"
 
@@ -15,7 +15,15 @@ const updateDeca = async (userId, decaId, updates, reason = "Actualización de d
     throw new MatchError("Datos a actualizar requeridos")
   }
 
-  const deca = await Deca.findOne({ _id: decaId, company: userId })
+  const user = await User.findById(userId).lean().catch((err) => {
+    throw new SystemError(err.message)
+  })
+  if (!user) throw new NotFoundError("Usuario no encontrado")
+
+  const isDriver = user.role === "driver"
+  const companyId = isDriver && user.manager ? user.manager.toString() : userId
+
+  const deca = await Deca.findOne({ _id: decaId, company: companyId })
     .populate({
       path: "deliveryNote",
       populate: { path: "works" },

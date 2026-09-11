@@ -11,9 +11,11 @@ import Main from "../../components/core/Main"
 import Footer from "../../components/core/Footer"
 import SearchFilter from "../../components/SearchFilter"
 import YearFilter from "../../components/YearFilter"
+import MonthFilter from "../../components/MonthFilter"
 
 import logic from "../../logic"
 import getDocYear from "../../utils/getDocYear"
+import getDocMonth from "../../utils/getDocMonth"
 
 import "./InvoiceList.css"
 
@@ -26,6 +28,7 @@ export default function InvoiceList() {
   const [loading, setLoading] = useState(true)
   const currentYear = new Date().getFullYear()
   const [selectedYear, setSelectedYear] = useState(currentYear)
+  const [selectedMonth, setSelectedMonth] = useState("all")
   const [searchTerm, setSearchTerm] = useState("")
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
 
@@ -77,17 +80,28 @@ export default function InvoiceList() {
     return getDocYear(invoice) === Number(selectedYear)
   })
 
-  // 2. Filtrado por búsqueda dentro del año seleccionado
-  const filteredInvoices = invoicesInYear.filter(
+  // Meses disponibles en el año seleccionado
+  const availableMonths = Array.from(
+    new Set(invoicesInYear.map((inv) => getDocMonth(inv)).filter((m) => m !== null))
+  )
+
+  // 2. Filtrado por mes seleccionado
+  const invoicesInMonth = invoicesInYear.filter((invoice) => {
+    if (selectedMonth === "all") return true
+    return getDocMonth(invoice) === Number(selectedMonth)
+  })
+
+  // 3. Filtrado por búsqueda dentro del año y mes seleccionado
+  const filteredInvoices = invoicesInMonth.filter(
     (invoice) =>
       invoice.number.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (invoice.customer?.companyName || "").toLowerCase().includes(searchTerm.toLowerCase())
   )
 
-  // Reiniciar paginación al cambiar filtros o año
+  // Reiniciar paginación al cambiar filtros, mes o año
   useEffect(() => {
     setVisibleCount(PAGE_SIZE)
-  }, [searchTerm, selectedYear])
+  }, [searchTerm, selectedYear, selectedMonth])
 
   const visibleInvoices = filteredInvoices.slice(0, visibleCount)
 
@@ -114,9 +128,18 @@ export default function InvoiceList() {
           {/* Selector de Ejercicio Fiscal Híbrido */}
           <YearFilter
             selectedYear={selectedYear}
-            onSelectYear={setSelectedYear}
+            onSelectYear={(year) => {
+              setSelectedYear(year)
+              setSelectedMonth("all")
+            }}
             availableYears={availableYears}
             currentYear={currentYear}
+          />
+
+          <MonthFilter
+            selectedMonth={selectedMonth}
+            onSelectMonth={setSelectedMonth}
+            availableMonths={availableMonths}
           />
 
           <SearchFilter
@@ -127,7 +150,7 @@ export default function InvoiceList() {
 
           <div className="flex w-full justify-between items-center px-1 text-xs sm:text-sm font-semibold text-slate-200 relative z-0">
             <span className="rounded-full bg-slate-900/60 px-3.5 py-1.5 backdrop-blur">
-              {loading ? "Cargando facturas..." : `Total: ${invoicesInYear.length} facturas`}
+              {loading ? "Cargando facturas..." : `Total: ${invoicesInMonth.length} facturas`}
             </span>
             <span className="rounded-full bg-slate-900/60 px-3.5 py-1.5 backdrop-blur">
               {loading ? "..." : `Mostrando: ${visibleInvoices.length}`}

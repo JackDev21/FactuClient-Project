@@ -61,6 +61,9 @@ const createDeca = async (userId, deliveryNoteId, decaData, customBaseUrl) => {
   })
   if (!user) throw new NotFoundError("Usuario no encontrado")
 
+  const isDriver = user.role === "driver"
+  const companyId = isDriver && user.manager ? user.manager.toString() : userId
+
   // 2. Verificar albarán
   const deliveryNote = await DeliveryNote.findById(deliveryNoteId)
     .populate("works")
@@ -72,7 +75,7 @@ const createDeca = async (userId, deliveryNoteId, decaData, customBaseUrl) => {
     })
 
   if (!deliveryNote) throw new NotFoundError("Albarán no encontrado")
-  if (deliveryNote.company._id.toString() !== userId) {
+  if (deliveryNote.company._id.toString() !== companyId) {
     throw new MatchError("No tienes permiso para emitir DeCA sobre este albarán")
   }
 
@@ -86,7 +89,7 @@ const createDeca = async (userId, deliveryNoteId, decaData, customBaseUrl) => {
 
   // 4. Generar número correlativo
   const currentYear = new Date().getFullYear()
-  const allDecas = await Deca.find({ company: userId }).select("number").lean().catch((err) => {
+  const allDecas = await Deca.find({ company: companyId }).select("number").lean().catch((err) => {
     throw new SystemError(err.message)
   })
   const nextSeq = getNextDecaSeq(allDecas, currentYear)
@@ -98,7 +101,7 @@ const createDeca = async (userId, deliveryNoteId, decaData, customBaseUrl) => {
   const pdfFilename = `${sanitizedNumber}_${publicToken.slice(0, 8)}.pdf`
 
   // Ruta física del PDF
-  const uploadsDir = path.resolve(process.cwd(), "uploads", "deca", userId)
+  const uploadsDir = path.resolve(process.cwd(), "uploads", "deca", companyId)
   const pdfPath = path.join(uploadsDir, pdfFilename)
 
   // URL pública de inspección (directa sin credenciales)
@@ -115,7 +118,7 @@ const createDeca = async (userId, deliveryNoteId, decaData, customBaseUrl) => {
     generatedAt,
     deliveryNote,
     deliveryNoteNumber: deliveryNote.number,
-    company: userId,
+    company: companyId,
     customer: deliveryNote.customer._id || deliveryNote.customer,
     shipper: {
       name: decaData.shipper.name.trim(),

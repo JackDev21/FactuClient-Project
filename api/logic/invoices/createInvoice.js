@@ -43,6 +43,10 @@ const createInvoice = (userId, customerId, deliveryNoteIds = [], invoiceDate) =>
         throw new NotFoundError("User not found")
       }
 
+      if (user.role === "driver" || user.role === "customer") {
+        throw new CredentialsError("Only company owners can create invoices")
+      }
+
       const currentYear = new Date().getFullYear()
 
       // 1. Validar y reservar albaranes de forma atómica (si se seleccionaron albaranes)

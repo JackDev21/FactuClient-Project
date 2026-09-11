@@ -241,5 +241,48 @@ describe("DeCA logic suite", () => {
     })
   })
 
+  describe("Driver DeCA workflow", () => {
+    let driver
+
+    beforeEach(async () => {
+      const hash = await bcrypt.hash("1234", 10)
+      driver = await User.create({
+        username: "chofer_juan",
+        email: "chofer@logistica.es",
+        password: hash,
+        fullName: "Juan Chofer",
+        role: "driver",
+        manager: user._id,
+      })
+    })
+
+    it("permite a un chofer emitir un DeCA para un albarán de su empresa y hereda la titularidad de la empresa", async () => {
+      const deca = await createDeca(driver.id, deliveryNote.id, validPayload)
+
+      expect(deca).to.exist
+      expect(deca.number).to.include("DECA-")
+      expect(deca.company._id.toString()).to.equal(user.id.toString())
+    })
+
+    it("permite a un chofer consultar y listar los DeCA de su empresa", async () => {
+      const created = await createDeca(driver.id, deliveryNote.id, validPayload)
+
+      const fetched = await getDeca(driver.id, created.id)
+      expect(fetched.id).to.equal(created.id)
+
+      const list = await getAllDecas(driver.id)
+      expect(list.length).to.equal(1)
+      expect(list[0].id).to.equal(created.id)
+    })
+
+    it("permite a un chofer finalizar el porte del DeCA", async () => {
+      const created = await createDeca(driver.id, deliveryNote.id, validPayload)
+      const finished = await updateDecaTransportEnd(driver.id, created.id)
+
+      expect(finished.status).to.equal("completed")
+      expect(finished.transportEndDate).to.exist
+    })
+  })
+
   after(() => mongoose.disconnect())
 })

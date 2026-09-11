@@ -48,6 +48,13 @@ const getDecaByToken = async (publicToken, customBaseUrl) => {
 
   let finalPdfPath = deca.pdfPath && fs.existsSync(deca.pdfPath) ? deca.pdfPath : localPdfPath
 
+  // Garantizar que la ruta resuelta permanezca estrictamente dentro de uploads/ (prevención path traversal)
+  const baseUploadsDir = path.resolve(process.cwd(), "uploads")
+  const resolvedPath = path.resolve(finalPdfPath)
+  if (!resolvedPath.startsWith(baseUploadsDir)) {
+    finalPdfPath = localPdfPath
+  }
+
   // Si no existe físicamente en el disco, regenerar al vuelo a partir de los datos en MongoDB
   if (!fs.existsSync(finalPdfPath)) {
     const baseUrl = getBaseUrl(null, customBaseUrl)

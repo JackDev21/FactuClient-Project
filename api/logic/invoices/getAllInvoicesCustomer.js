@@ -1,6 +1,6 @@
 import { User, Invoice } from "../../model/index.js"
 import validate from "com/validate.js"
-import { NotFoundError, SystemError } from "com/errors.js"
+import { NotFoundError, SystemError, MatchError } from "com/errors.js"
 
 const parseInvoiceNumber = (numStr) => {
   if (!numStr) return { year: 0, seq: 0 }
@@ -31,6 +31,13 @@ const getAllInvoicesCustomer = (userId, customerId) => {
         .then(customer => {
           if (!customer) {
             throw new NotFoundError("Customer not found")
+          }
+
+          const isSelf = userId === customerId
+          const isManager = customer.manager && customer.manager.toString() === userId
+
+          if (!isSelf && !isManager) {
+            throw new MatchError("Can not access invoices from another customer")
           }
 
           return Invoice.find({ customer: customerId })

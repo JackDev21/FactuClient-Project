@@ -6,6 +6,7 @@ import Main from "../../components/core/Main"
 import Footer from "../../components/core/Footer"
 import SearchFilter from "../../components/SearchFilter"
 import YearFilter from "../../components/YearFilter"
+import MonthFilter from "../../components/MonthFilter"
 
 import useContext from "../../useContext"
 import { SystemError } from "com/errors"
@@ -15,6 +16,7 @@ import { FaChevronDown, FaTruckFast } from "react-icons/fa6"
 
 import logic from "../../logic"
 import getDocYear from "../../utils/getDocYear"
+import getDocMonth from "../../utils/getDocMonth"
 
 import "./DeliveryNotesList.css"
 
@@ -40,6 +42,7 @@ export default function DeliveryNoteList() {
   const [loading, setLoading] = useState(true)
   const currentYear = new Date().getFullYear()
   const [selectedYear, setSelectedYear] = useState(currentYear)
+  const [selectedMonth, setSelectedMonth] = useState("all")
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState("all") // 'all', 'pending', 'invoiced'
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
@@ -89,8 +92,19 @@ export default function DeliveryNoteList() {
     return getDocYear(deliveryNote) === Number(selectedYear)
   })
 
-  // 2. Filtrado por búsqueda y por estado dentro del año seleccionado
-  const filteredDeliveryNotes = deliveryNotesInYear.filter((deliveryNote) => {
+  // Meses disponibles en el año seleccionado
+  const availableMonths = Array.from(
+    new Set(deliveryNotesInYear.map((dn) => getDocMonth(dn)).filter((m) => m !== null))
+  )
+
+  // 2. Filtrado por mes seleccionado
+  const deliveryNotesInMonth = deliveryNotesInYear.filter((deliveryNote) => {
+    if (selectedMonth === "all") return true
+    return getDocMonth(deliveryNote) === Number(selectedMonth)
+  })
+
+  // 3. Filtrado por búsqueda y por estado dentro del año y mes seleccionado
+  const filteredDeliveryNotes = deliveryNotesInMonth.filter((deliveryNote) => {
     const matchesSearch =
       deliveryNote.number.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (deliveryNote.customer?.companyName || deliveryNote.customerName || "")
@@ -109,10 +123,10 @@ export default function DeliveryNoteList() {
     return true
   })
 
-  // Reiniciar paginación al cambiar filtros o año
+  // Reiniciar paginación al cambiar filtros, mes o año
   useEffect(() => {
     setVisibleCount(PAGE_SIZE)
-  }, [searchTerm, statusFilter, selectedYear])
+  }, [searchTerm, statusFilter, selectedYear, selectedMonth])
 
   const visibleDeliveryNotes = filteredDeliveryNotes.slice(0, visibleCount)
 
@@ -130,12 +144,12 @@ export default function DeliveryNoteList() {
   }
 
   const pendingCount = isDriver
-    ? deliveryNotesInYear.filter((d) => d.isValued === false).length
-    : deliveryNotesInYear.filter((d) => !d.isInvoiced).length
+    ? deliveryNotesInMonth.filter((d) => d.isValued === false).length
+    : deliveryNotesInMonth.filter((d) => !d.isInvoiced).length
 
   const completedCount = isDriver
-    ? deliveryNotesInYear.filter((d) => d.isValued !== false).length
-    : deliveryNotesInYear.filter((d) => d.isInvoiced).length
+    ? deliveryNotesInMonth.filter((d) => d.isValued !== false).length
+    : deliveryNotesInMonth.filter((d) => d.isInvoiced).length
 
   return (
     <>
@@ -145,9 +159,18 @@ export default function DeliveryNoteList() {
           {/* Selector de Ejercicio Fiscal Híbrido */}
           <YearFilter
             selectedYear={selectedYear}
-            onSelectYear={setSelectedYear}
+            onSelectYear={(year) => {
+              setSelectedYear(year)
+              setSelectedMonth("all")
+            }}
             availableYears={availableYears}
             currentYear={currentYear}
+          />
+
+          <MonthFilter
+            selectedMonth={selectedMonth}
+            onSelectMonth={setSelectedMonth}
+            availableMonths={availableMonths}
           />
 
           <SearchFilter
@@ -166,7 +189,7 @@ export default function DeliveryNoteList() {
                   : "text-slate-600 hover:text-slate-900"
               }`}
             >
-              Todos ({loading ? "..." : deliveryNotesInYear.length})
+              Todos ({loading ? "..." : deliveryNotesInMonth.length})
             </button>
             <button
               onClick={() => setStatusFilter("pending")}

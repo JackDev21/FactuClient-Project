@@ -102,6 +102,7 @@ describe("getDeliveryNotesCustomer", () => {
             username: "Jack",
             email: "jack@email.es",
             password: hash,
+            manager: companyUser.id
           }))
           .then(customerUser => [companyUser, customerUser])
       })

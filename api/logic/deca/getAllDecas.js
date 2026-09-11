@@ -1,12 +1,20 @@
 import validate from "com/validate.js"
-import { SystemError } from "com/errors.js"
-import { Deca } from "../../model/index.js"
+import { SystemError, NotFoundError } from "com/errors.js"
+import { Deca, User } from "../../model/index.js"
 import getBaseUrl from "../../utils/getBaseUrl.js"
 
 const getAllDecas = async (userId, customBaseUrl) => {
   validate.id(userId, "userId")
 
-  const decas = await Deca.find({ company: userId })
+  const user = await User.findById(userId).lean().catch((err) => {
+    throw new SystemError(err.message)
+  })
+  if (!user) throw new NotFoundError("Usuario no encontrado")
+
+  const isDriver = user.role === "driver"
+  const companyId = isDriver && user.manager ? user.manager.toString() : userId
+
+  const decas = await Deca.find({ company: companyId })
     .populate("deliveryNote", "number date isInvoiced")
     .populate("customer", "companyName fullName taxId email")
     .sort({ generatedAt: -1 })

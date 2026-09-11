@@ -14,22 +14,58 @@ describe("getProfileUser", () => {
   before(() => mongoose.connect(MONGODB_URL_TEST).then(() => User.deleteMany()))
   beforeEach(() => User.deleteMany())
 
-  it("succeeds on get profile user", () =>
+  it("succeeds on get own profile user and does not leak password", () =>
     bcrypt.hash("1234", 8)
-      .then(hash => Promise.all([User.create({
+      .then(hash => User.create({
         username: "Peter",
         email: "peter@parker.com",
         password: hash
-      }), User.create({
-        username: "Jack",
-        email: "jack@sparrow.com",
-        password: hash
-      })]))
-      .then(([user, targetUser]) => getProfileUser(user.id, targetUser.id))
+      }))
+      .then(user => getProfileUser(user.id, user.id))
       .then(user => {
         expect(user).to.be.an.instanceOf(Object)
-        expect(user.username).to.be.equal("Jack")
-        expect(user.email).to.be.equal("jack@sparrow.com")
+        expect(user.username).to.be.equal("Peter")
+        expect(user.email).to.be.equal("peter@parker.com")
+        expect(user.password).to.be.undefined
+      })
+  )
+
+  it("succeeds when manager gets profile of their customer", () =>
+    bcrypt.hash("1234", 8)
+      .then(hash => User.create({
+        username: "ManagerUser",
+        email: "manager@test.com",
+        password: hash,
+        role: "user"
+      }))
+      .then(manager =>
+        bcrypt.hash("1234", 8)
+          .then(hash => User.create({
+            username: "CustomerUser",
+            email: "cust@test.com",
+            password: hash,
+            role: "customer",
+            manager: manager._id
+          }))
+          .then(customer => getProfileUser(manager.id, customer.id))
+          .then(profile => {
+            expect(profile).to.be.an.instanceOf(Object)
+            expect(profile.username).to.be.equal("CustomerUser")
+            expect(profile.password).to.be.undefined
+          })
+      )
+  )
+
+  it("fails when attempting to view profile of an unrelated user", () =>
+    bcrypt.hash("1234", 8)
+      .then(hash => Promise.all([
+        User.create({ username: "UserA", email: "a@test.com", password: hash }),
+        User.create({ username: "UserB", email: "b@test.com", password: hash })
+      ]))
+      .then(([userA, userB]) => getProfileUser(userA.id, userB.id))
+      .then(() => { throw new Error("should not succeed") })
+      .catch(error => {
+        expect(error.message).to.equal("No permission to view this profile")
       })
   )
 

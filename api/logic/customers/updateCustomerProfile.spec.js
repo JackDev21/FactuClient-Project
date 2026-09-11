@@ -259,6 +259,45 @@ describe("updateCustomerProfile", () => {
       })
   })
 
+  it("fails when updating a customer from another user", () =>
+    bcrypt.hash("1234", 10)
+      .then(hash => Promise.all([
+        User.create({ username: "OwnerA", email: "a@test.com", password: hash, role: "user" }),
+        User.create({ username: "OwnerB", email: "b@test.com", password: hash, role: "user" })
+      ]))
+      .then(([ownerA, ownerB]) =>
+        User.create({
+          username: "CustomerB",
+          email: "custB@test.com",
+          password: "1234",
+          role: "customer",
+          manager: ownerB._id,
+          fullName: "Cliente B"
+        })
+          .then(customerB =>
+            updateCustomerProfile(ownerA.id, customerB.id, { fullName: "Hacked" })
+              .then(() => { throw new Error("should not succeed") })
+              .catch(err => {
+                expect(err.message).to.equal("Can not update Customer from another user")
+              })
+          )
+      )
+  )
+
+  it("fails when target user is not a customer", () =>
+    bcrypt.hash("1234", 10)
+      .then(hash => Promise.all([
+        User.create({ username: "Owner1", email: "owner1@test.com", password: hash, role: "user" }),
+        User.create({ username: "Owner2", email: "owner2@test.com", password: hash, role: "user" })
+      ]))
+      .then(([owner1, owner2]) =>
+        updateCustomerProfile(owner1.id, owner2.id, { fullName: "Hacked Admin" })
+          .then(() => { throw new Error("should not succeed") })
+          .catch(err => {
+            expect(err.message).to.equal("Target user is not a customer")
+          })
+      )
+  )
 
   after(() => User.deleteMany().then(() => mongoose.disconnect()))
 })

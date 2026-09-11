@@ -15,7 +15,11 @@ import { FaSpinner } from "react-icons/fa"
 import useContext from "../../useContext"
 import Header from "../../components/Header"
 import Main from "../../components/core/Main"
+import YearFilter from "../../components/YearFilter"
+import MonthFilter from "../../components/MonthFilter"
 import logic from "../../logic/index"
+import getDocYear from "../../utils/getDocYear"
+import getDocMonth from "../../utils/getDocMonth"
 
 export default function DecaList() {
   const { alert: showAlert } = useContext()
@@ -24,6 +28,9 @@ export default function DecaList() {
   const [decas, setDecas] = useState([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
+  const currentYear = new Date().getFullYear()
+  const [selectedYear, setSelectedYear] = useState(currentYear)
+  const [selectedMonth, setSelectedMonth] = useState("all")
   const [statusFilter, setStatusFilter] = useState("all") // "all" | "active" | "completed"
 
   useEffect(() => {
@@ -38,7 +45,25 @@ export default function DecaList() {
       })
   }, [])
 
-  const filteredDecas = decas.filter((d) => {
+  const availableYears = Array.from(
+    new Set(decas.map((d) => getDocYear(d)).filter(Boolean))
+  )
+
+  const decasInYear = decas.filter((d) => {
+    if (selectedYear === "all") return true
+    return getDocYear(d) === Number(selectedYear)
+  })
+
+  const availableMonths = Array.from(
+    new Set(decasInYear.map((d) => getDocMonth(d)).filter((m) => m !== null))
+  )
+
+  const decasInMonth = decasInYear.filter((d) => {
+    if (selectedMonth === "all") return true
+    return getDocMonth(d) === Number(selectedMonth)
+  })
+
+  const filteredDecas = decasInMonth.filter((d) => {
     const term = searchTerm.toLowerCase()
     const matchSearch =
       (d.number || "").toLowerCase().includes(term) ||
@@ -68,6 +93,23 @@ export default function DecaList() {
 
       <Main>
         <div className="w-full max-w-2xl flex flex-col gap-3 px-2 sm:px-4 py-2 pb-16 text-left">
+          {/* Selector de Ejercicio Fiscal */}
+          <YearFilter
+            selectedYear={selectedYear}
+            onSelectYear={(year) => {
+              setSelectedYear(year)
+              setSelectedMonth("all")
+            }}
+            availableYears={availableYears}
+            currentYear={currentYear}
+          />
+
+          <MonthFilter
+            selectedMonth={selectedMonth}
+            onSelectMonth={setSelectedMonth}
+            availableMonths={availableMonths}
+          />
+
           {/* Barra de búsqueda y filtros */}
           <div className="rounded-2xl border border-slate-200 bg-white p-3 sm:p-4 shadow-xs flex flex-col gap-3">
             <div className="relative">
@@ -91,7 +133,7 @@ export default function DecaList() {
                     : "text-slate-500 hover:text-slate-800"
                 }`}
               >
-                Todos ({decas.length})
+                Todos ({decasInMonth.length})
               </button>
               <button
                 type="button"
@@ -102,7 +144,7 @@ export default function DecaList() {
                     : "text-slate-500 hover:text-slate-800"
                 }`}
               >
-                En Ruta ({decas.filter((d) => d.status !== "completed").length})
+                En Ruta ({decasInMonth.filter((d) => d.status !== "completed").length})
               </button>
               <button
                 type="button"
@@ -113,7 +155,7 @@ export default function DecaList() {
                     : "text-slate-500 hover:text-slate-800"
                 }`}
               >
-                Finalizados ({decas.filter((d) => d.status === "completed").length})
+                Finalizados ({decasInMonth.filter((d) => d.status === "completed").length})
               </button>
             </div>
           </div>

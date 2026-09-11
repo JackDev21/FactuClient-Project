@@ -1,6 +1,6 @@
 import validate from "com/validate.js"
 import { User } from "../../model/index.js"
-import { MatchError, NotFoundError, SystemError } from "com/errors.js"
+import { MatchError, NotFoundError, SystemError, CredentialsError } from "com/errors.js"
 import bcrypt from "bcryptjs"
 
 const registerCustomer = (userId, username, password, fullName, companyName, email, taxId, address, phone) => {
@@ -21,6 +21,10 @@ const registerCustomer = (userId, username, password, fullName, companyName, ema
     .then(user => {
       if (!user) {
         throw new NotFoundError('User not found')
+      }
+
+      if (user.role === "driver" || user.role === "customer") {
+        throw new CredentialsError("Only company owners can register customers")
       }
 
       return User.findOne({ email: normalizedEmail, manager: userId, taxId })

@@ -45,9 +45,11 @@ export default function DecaForm() {
 
   useEffect(() => {
     let currentUserId
+    let currentUserRole
     try {
       const info = logic.getInfo()
       currentUserId = info?.userId
+      currentUserRole = info?.role
     } catch {
       // Ignorar error al leer info si no hay sesión
     }
@@ -58,10 +60,13 @@ export default function DecaForm() {
     ])
       .then(([dn, prof]) => {
         setDeliveryNote(dn)
-        const companyInfo = prof || dn?.company
+
+        // Si el usuario es chofer, los datos fiscales de la empresa están en dn.company (o manager), no en el perfil del chofer
+        const isDriver = currentUserRole === "driver"
+        const companyInfo = (isDriver && dn?.company ? dn.company : prof) || dn?.company || prof
         setProfile(companyInfo)
 
-        // Pre-rellenar Cargador
+        // Pre-rellenar Cargador (Empresa)
         const sName = companyInfo?.companyName || companyInfo?.fullName || ""
         const sTaxId = companyInfo?.taxId || ""
         const sAddress = companyInfo?.address || ""
@@ -77,6 +82,12 @@ export default function DecaForm() {
         // Pre-rellenar Origen y Destino
         setOrigin(sAddress)
         setDestination(dn?.customer?.address || "")
+
+        // Pre-rellenar Conductor si es chofer
+        if (isDriver) {
+          const dName = prof?.fullName || prof?.username || dn?.createdBy?.fullName || ""
+          if (dName) setDriverName(dName)
+        }
 
         // Pre-rellenar Naturaleza de la Mercancía desde conceptos del albarán
         if (dn?.works && dn.works.length > 0) {

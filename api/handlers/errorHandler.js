@@ -13,6 +13,11 @@ export default (error, req, res, next) => {
     status = 401
   } else if (error instanceof NotFoundError) {
     status = 404
+  } else if (error.name === "JsonWebTokenError" || error.name === "TokenExpiredError") {
+    status = 401
+  } else if (error instanceof TypeError && error.message?.includes("slice")) {
+    status = 401
+    return res.status(401).json({ error: "CredentialsError", message: "Token missing or malformed" })
   }
 
   res.status(status).json({ error: error.constructor.name, message: error.message })

@@ -58,6 +58,29 @@ describe("getDeliveryNote", () => {
       })
   })
 
+  it("fails when a user tries to access a delivery note from another company", () => {
+    return bcrypt.hash("1234", 8)
+      .then(hash => Promise.all([
+        User.create({ username: "Owner1", email: "owner1@test.com", password: hash, role: "company" }),
+        User.create({ username: "Owner2", email: "owner2@test.com", password: hash, role: "company" }),
+        User.create({ username: "Cust1", email: "cust1@test.com", password: hash, role: "customer" })
+      ]))
+      .then(([owner1, owner2, cust1]) =>
+        DeliveryNote.create({
+          date: new Date(),
+          number: "2026/001",
+          customer: cust1.id,
+          company: owner1.id,
+          works: [],
+          observations: "Secret note"
+        }).then(dn => getDeliveryNote(owner2.id, dn.id))
+      )
+      .then(() => { throw new Error("should not succeed") })
+      .catch(error => {
+        expect(error.message).to.equal("Can not access delivery note from another company")
+      })
+  })
+
   it("fails on non-existing user", () => {
     let errorThrown
 

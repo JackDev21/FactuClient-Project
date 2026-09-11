@@ -1,6 +1,6 @@
 import validate from "com/validate.js"
 import { User, DeliveryNote } from "../../model/index.js"
-import { NotFoundError, SystemError } from "com/errors.js"
+import { NotFoundError, SystemError, CredentialsError } from "com/errors.js"
 
 const MAX_RETRIES = 5
 
@@ -43,6 +43,10 @@ const createDeliveryNote = (userId, customerId) => {
     .then(user => {
       if (!user) {
         throw new NotFoundError("User not found")
+      }
+
+      if (user.role === "customer") {
+        throw new CredentialsError("Customers can not create delivery notes")
       }
 
       const isDriver = user.role === "driver"

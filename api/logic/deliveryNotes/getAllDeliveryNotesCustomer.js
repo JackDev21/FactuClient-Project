@@ -1,6 +1,6 @@
 import { User, DeliveryNote, Invoice } from "../../model/index.js"
 import validate from "com/validate.js"
-import { NotFoundError, SystemError } from "com/errors.js"
+import { NotFoundError, SystemError, MatchError } from "com/errors.js"
 
 const parseDeliveryNoteNumber = (numStr) => {
   if (!numStr) return { year: 0, seq: 0 }
@@ -31,6 +31,14 @@ function getAllDeliveryNotesCustomer(userId, customerId) {
         .then(customer => {
           if (!customer) {
             throw new NotFoundError("Customer not found")
+          }
+
+          const isSelf = userId === customerId
+          const isManager = customer.manager && customer.manager.toString() === userId
+          const isDriverOfCompany = user.role === "driver" && user.manager && customer.manager && customer.manager.toString() === user.manager.toString()
+
+          if (!isSelf && !isManager && !isDriverOfCompany) {
+            throw new MatchError("Can not access delivery notes from another customer")
           }
 
           return Promise.all([

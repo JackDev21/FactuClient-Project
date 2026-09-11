@@ -8,9 +8,10 @@
 export default function getDocYear(doc) {
   if (!doc) return null
 
-  // 1. Prioridad: Fecha contable del documento
-  if (doc.date) {
-    const d = new Date(doc.date)
+  // 1. Prioridad: Fecha contable o de generación del documento
+  const rawDate = doc.date || doc.generatedAt || doc.transportDate
+  if (rawDate) {
+    const d = new Date(rawDate)
     if (!isNaN(d.getTime())) {
       return d.getFullYear()
     }

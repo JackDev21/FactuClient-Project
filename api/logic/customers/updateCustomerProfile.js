@@ -1,4 +1,4 @@
-import { NotFoundError, SystemError } from "com/errors.js"
+import { NotFoundError, SystemError, MatchError } from "com/errors.js"
 import { User } from "../../model/index.js"
 import validate from "com/validate.js"
 import bcrypt from "bcryptjs"
@@ -49,16 +49,28 @@ const updateCustomerProfile = (userId, customerId, updates) => {
         throw new NotFoundError("User not found")
       }
 
-      return User.findByIdAndUpdate(customerId, updateFields, { new: true }).select("-__v").lean()
+      return User.findById(customerId)
         .catch(error => { throw new SystemError(error.message) })
         .then(customer => {
           if (!customer) {
             throw new NotFoundError("Customer not found")
           }
-          return
+
+          if (customer.role !== "customer") {
+            throw new MatchError("Target user is not a customer")
+          }
+
+          if (!customer.manager || customer.manager.toString() !== userId) {
+            throw new MatchError("Can not update Customer from another user")
+          }
+
+          Object.assign(customer, updateFields)
+
+          return customer.save()
+            .catch(error => { throw new SystemError(error.message) })
+            .then(() => {})
         })
     })
-
 }
 
 export default updateCustomerProfile

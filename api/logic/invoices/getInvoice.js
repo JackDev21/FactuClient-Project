@@ -1,6 +1,6 @@
 import { User, Invoice } from "../../model/index.js"
 import validate from "com/validate.js"
-import { NotFoundError, SystemError } from "com/errors.js"
+import { NotFoundError, SystemError, MatchError } from "com/errors.js"
 
 function getInvoice(userId, invoiceid) {
   validate.id(userId, "userId")
@@ -19,6 +19,15 @@ function getInvoice(userId, invoiceid) {
           if (!invoice) {
             throw new NotFoundError("Invoice not found")
           }
+
+          const isCompany = invoice.company && (invoice.company._id?.toString() === userId || invoice.company.toString() === userId)
+          const isCustomer = invoice.customer && (invoice.customer._id?.toString() === userId || invoice.customer.toString() === userId)
+          const isCompanyDriver = user.role === "driver" && user.manager && (invoice.company._id?.toString() === user.manager.toString() || invoice.company.toString() === user.manager.toString())
+
+          if (!isCompany && !isCustomer && !isCompanyDriver) {
+            throw new MatchError("Can not access invoice from another company")
+          }
+
           invoice.id = invoice._id.toString()
           delete invoice._id
 
