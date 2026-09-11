@@ -40,6 +40,7 @@ export default function CreateDeliveryNotes() {
   // State for deleting line
   const [deletingWorkId, setDeletingWorkId] = useState(null)
   const [workToDelete, setWorkToDelete] = useState(null)
+  const [confirmModalConfig, setConfirmModalConfig] = useState(null)
 
   const [observationText, setObservationText] = useState("")
 
@@ -123,10 +124,12 @@ export default function CreateDeliveryNotes() {
     let price = 0
     if (!isDriver) {
       const cleanPrc = String(workPrice).replace(",", ".").trim()
-      price = parseFloat(cleanPrc)
-      if (isNaN(price)) {
-        showAlert("El precio unitario debe ser un número válido.")
-        return
+      if (cleanPrc !== "") {
+        price = parseFloat(cleanPrc)
+        if (isNaN(price) || price < 0) {
+          showAlert("El precio unitario debe ser un número válido.")
+          return
+        }
       }
     }
 
@@ -192,10 +195,12 @@ export default function CreateDeliveryNotes() {
     let price = 0
     if (!isDriver) {
       const cleanPrc = String(editPrice).replace(",", ".").trim()
-      price = parseFloat(cleanPrc)
-      if (isNaN(price)) {
-        showAlert("El precio unitario debe ser un número válido.")
-        return
+      if (cleanPrc !== "") {
+        price = parseFloat(cleanPrc)
+        if (isNaN(price) || price < 0) {
+          showAlert("El precio unitario debe ser un número válido.")
+          return
+        }
       }
     }
 
@@ -296,6 +301,74 @@ export default function CreateDeliveryNotes() {
     } catch (error) {
       showAlert(error.message)
     }
+  }
+
+  const proceedToPdf = () => {
+    navigatedToPdfRef.current = true
+    navigate(`/delivery-notes/${deliveryNote.id || deliveryNote._id}`)
+  }
+
+  const checkWorksAndProceed = () => {
+    const works = deliveryNote?.works || []
+
+    // Si no hay líneas guardadas
+    if (works.length === 0) {
+      if (isDriver) {
+        showAlert("No has indicado ningún concepto en este albarán. Añade al menos qué mercancía o servicio se ha entregado.")
+      } else {
+        showAlert("No has guardado ninguna línea de concepto en este albarán. Añade al menos una línea antes de generar el albarán.")
+      }
+      return
+    }
+
+    // Para chofer: solo validar que haya concepto (ya comprobado con works.length > 0)
+    if (isDriver) {
+      proceedToPdf()
+      return
+    }
+
+    // Para admin / autónomo: avisar amigablemente si hay conceptos con precio a 0 o total 0
+    const hasZeroPrice = works.some(
+      (w) => !w.price || Number(w.price) === 0 || isNaN(Number(w.price))
+    )
+
+    if (hasZeroPrice || total === 0) {
+      setConfirmModalConfig({
+        type: "warning",
+        title: "¿Emitir albarán sin precio?",
+        message: "Has dejado conceptos con precio a 0,00 €. El albarán se registrará como 'Sin valorar' para que puedas asignarle precio más adelante.",
+        confirmText: "Sí, emitir sin precio",
+        cancelText: "Volver y poner precio",
+        onConfirm: () => {
+          setConfirmModalConfig(null)
+          proceedToPdf()
+        }
+      })
+      return
+    }
+
+    proceedToPdf()
+  }
+
+  const handleFinalizeDeliveryNote = () => {
+    // 1. Si el usuario escribió un concepto en el formulario pero olvidó pulsar "Guardar Línea"
+    const hasUnsavedConcept = workConcept.trim().length > 0
+    if (hasUnsavedConcept) {
+      setConfirmModalConfig({
+        type: "warning",
+        title: "¿Línea sin guardar?",
+        message: `Has escrito "${workConcept.trim()}" pero no has pulsado "Guardar Línea". ¿Deseas continuar sin añadirla o volver para guardarla?`,
+        confirmText: "Continuar sin ella",
+        cancelText: "Volver y guardar",
+        onConfirm: () => {
+          setConfirmModalConfig(null)
+          checkWorksAndProceed()
+        }
+      })
+      return
+    }
+
+    checkWorksAndProceed()
   }
 
   return (
@@ -464,9 +537,9 @@ export default function CreateDeliveryNotes() {
                                 type="number"
                                 step="any"
                                 inputMode="decimal"
-                                required
                                 value={editPrice}
                                 onChange={(e) => setEditPrice(e.target.value)}
+                                placeholder="0.00 (opcional)"
                                 className="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500"
                               />
                             </div>
@@ -587,16 +660,15 @@ export default function CreateDeliveryNotes() {
                   {!isDriver && (
                     <div>
                       <label className="block text-[11px] font-semibold text-slate-500 mb-1">
-                        Precio Unitario (€) *
+                        Precio Unitario (€)
                       </label>
                       <input
                         type="number"
                         step="any"
                         inputMode="decimal"
-                        required
                         value={workPrice}
                         onChange={(e) => setWorkPrice(e.target.value)}
-                        placeholder="0.00"
+                        placeholder="0.00 (opcional)"
                         className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500"
                       />
                     </div>
@@ -705,15 +777,7 @@ export default function CreateDeliveryNotes() {
           {deliveryNote && (
             <button
               type="button"
-              onClick={() => {
-                const worksCount = deliveryNote.works?.length || 0
-                if (worksCount === 0) {
-                  showAlert("No has guardado ninguna línea de concepto en este albarán. Añade al menos una línea antes de generar el PDF.")
-                  return
-                }
-                navigatedToPdfRef.current = true
-                navigate(`/delivery-notes/${deliveryNote.id || deliveryNote._id}`)
-              }}
+              onClick={handleFinalizeDeliveryNote}
               className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 py-3.5 px-6 text-sm sm:text-base font-bold text-white shadow-md transition-all active:scale-95 hover:from-amber-600 hover:to-orange-600"
             >
               <span>Ver Albarán y Generar PDF</span>
@@ -724,6 +788,17 @@ export default function CreateDeliveryNotes() {
             <Confirm
               setShowConfirmDelete={() => setWorkToDelete(null)}
               handleDeleteDeliveryNote={handleConfirmDeleteWork}
+            />
+          )}
+          {confirmModalConfig && (
+            <Confirm
+              type={confirmModalConfig.type || "warning"}
+              title={confirmModalConfig.title}
+              message={confirmModalConfig.message}
+              confirmText={confirmModalConfig.confirmText || "Continuar"}
+              cancelText={confirmModalConfig.cancelText || "Cancelar"}
+              onConfirm={confirmModalConfig.onConfirm}
+              onClose={() => setConfirmModalConfig(null)}
             />
           )}
         </div>
