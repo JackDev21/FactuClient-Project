@@ -187,7 +187,7 @@ export default function CustomerProfile() {
               <div className="w-full flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 shadow-xs">
                 <div className="flex items-center gap-3 min-w-0">
                   <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 text-white font-black text-xl flex items-center justify-center shadow-xs shrink-0">
-                    {customer?.companyName ? customer.companyName.charAt(0).toUpperCase() : "C"}
+                    {(customer?.companyName || customer?.fullName || customer?.username || "C").trim().charAt(0).toUpperCase() || "C"}
                   </div>
                   <div className="flex flex-col text-left min-w-0">
                     <h2 className="text-base sm:text-lg font-black text-slate-900 leading-tight truncate">
@@ -245,8 +245,8 @@ export default function CustomerProfile() {
                   </div>
                   <div className="flex justify-between items-center border-b border-slate-100 pb-2">
                     <span className="font-semibold text-slate-500">📞 Teléfono:</span>
-                    {customer?.phone ? (
-                      <a href={`tel:${customer.phone}`} className="font-bold text-blue-600 hover:underline text-right">{customer.phone}</a>
+                    {customer?.phone && customer.phone.replace(/[^0-9+]/g, "").length >= 3 ? (
+                      <a href={`tel:${customer.phone.trim()}`} className="font-bold text-blue-600 hover:underline text-right">{customer.phone.trim()}</a>
                     ) : (
                       <span className="font-bold text-slate-400">No especificado</span>
                     )}

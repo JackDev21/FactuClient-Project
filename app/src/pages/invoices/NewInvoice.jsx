@@ -261,15 +261,17 @@ export default function NewInvoice() {
                     >
                       <div className="flex items-center gap-3.5 min-w-0 flex-1">
                         <div className="w-11 h-11 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 text-white font-black text-lg flex items-center justify-center shadow-xs shrink-0">
-                          {customer?.companyName ? customer.companyName.charAt(0).toUpperCase() : "C"}
+                          {(customer?.companyName || customer?.fullName || customer?.username || "C").trim().charAt(0).toUpperCase() || "C"}
                         </div>
                         <div className="flex flex-col min-w-0 flex-1">
                           <span className="font-extrabold text-sm sm:text-base text-slate-900 leading-snug break-words">
-                            {customer.companyName}
+                            {customer?.companyName || customer?.fullName || "Cliente"}
                           </span>
                           <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-slate-400 mt-0.5 font-medium">
                             {customer.taxId && <span>{customer.taxId}</span>}
-                            {customer.phone && <span>• 📞 {customer.phone}</span>}
+                            {customer.phone && customer.phone.replace(/[^0-9+]/g, "").length >= 3 && (
+                              <span>• 📞 {customer.phone.trim()}</span>
+                            )}
                           </div>
                         </div>
                       </div>

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
 import { LiaFileInvoiceSolid } from "react-icons/lia"
-import { FaChevronDown } from "react-icons/fa6"
+import { FaChevronDown, FaPlus } from "react-icons/fa6"
 
 import useContext from "../../useContext"
 import { SystemError } from "com/errors"
@@ -118,6 +118,24 @@ export default function InvoiceList() {
     })
   }
 
+  const getInvoiceTotal = (invoice) => {
+    if (typeof invoice?.totalAmount === "number") return invoice.totalAmount
+    let subtotal = 0
+    if (Array.isArray(invoice?.deliveryNotes)) {
+      invoice.deliveryNotes.forEach((dn) => {
+        if (Array.isArray(dn?.works)) {
+          dn.works.forEach((w) => {
+            subtotal += (Number(w.quantity) || 0) * (Number(w.price) || 0)
+          })
+        }
+      })
+    }
+    const iva = subtotal * 0.21
+    const irpfPercentage = Number(invoice?.company?.irpf) || 0
+    const irpfAmount = subtotal * (irpfPercentage / 100)
+    return subtotal + iva - irpfAmount
+  }
+
   return (
     <>
       <Header className="HeaderInvoices" iconUser={<LiaFileInvoiceSolid />}>
@@ -157,6 +175,16 @@ export default function InvoiceList() {
             </span>
           </div>
 
+          {logic.getInfo()?.role === "user" && (
+            <Link
+              to="/create/invoices"
+              className="w-full flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 py-3 px-4 text-sm sm:text-base font-bold text-white shadow-md hover:from-blue-700 hover:to-indigo-700 active:scale-98 transition-all"
+            >
+              <FaPlus className="text-sm" />
+              <span>+ Nueva Factura</span>
+            </Link>
+          )}
+
           <ul className="InvoiceList">
             {loading ? (
               <div className="flex flex-col gap-2.5 w-full">
@@ -169,7 +197,10 @@ export default function InvoiceList() {
                       <div className="h-4 bg-slate-200 rounded-md w-2/5"></div>
                       <div className="h-3 bg-slate-100 rounded-md w-3/5"></div>
                     </div>
-                    <div className="h-6 w-20 bg-slate-200 rounded-full"></div>
+                    <div className="flex flex-col items-end gap-1.5">
+                      <div className="h-5 w-16 bg-slate-200 rounded-md"></div>
+                      <div className="h-4 w-20 bg-slate-100 rounded-full"></div>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -178,16 +209,19 @@ export default function InvoiceList() {
                 {visibleInvoices.map((invoice) => (
                   <Link className="InvoiceLink" key={invoice.id} to={`/invoices/${invoice.id}`}>
                     <li className="InvoiceCard border-l-4 border-l-blue-600">
-                      <div className="flex flex-col items-start gap-1 flex-1 pr-2">
+                      <div className="flex flex-col items-start gap-1 flex-1 pr-2 min-w-0">
                         <span className="text-base font-bold text-slate-900">
                           F/Nº: {invoice.number}
                         </span>
-                        <span className="text-sm font-semibold text-slate-600 text-left leading-snug">
+                        <span className="text-sm font-semibold text-slate-600 text-left leading-snug truncate max-w-full">
                           {invoice.customer?.companyName || "Cliente"}
                         </span>
                       </div>
                       <div className="flex flex-col items-end gap-1 shrink-0">
-                        <span className="rounded-full bg-blue-50 border border-blue-200 px-3 py-1.5 text-xs font-bold text-blue-700">
+                        <span className="text-base sm:text-lg font-black text-slate-900">
+                          {getInvoiceTotal(invoice).toLocaleString("es-ES", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €
+                        </span>
+                        <span className="rounded-full bg-blue-50 border border-blue-200 px-2.5 py-0.5 text-xs font-bold text-blue-700">
                           {formatDate(invoice.date)}
                         </span>
                       </div>

@@ -279,7 +279,7 @@ export default function DriverList() {
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-center gap-3">
                       <div className="h-10 w-10 shrink-0 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center font-bold text-sm">
-                        {driver.fullName ? driver.fullName.charAt(0).toUpperCase() : "C"}
+                        {(driver.fullName || "C").trim().charAt(0).toUpperCase() || "C"}
                       </div>
                       <div className="flex flex-col">
                         <span className="text-sm font-extrabold text-slate-900 leading-tight">
@@ -318,7 +318,7 @@ export default function DriverList() {
                     <div className="flex flex-col gap-1.5 min-w-0">
                       <span className="flex items-center gap-2 truncate">
                         <FaPhone className="text-slate-400 text-xs sm:text-sm shrink-0" />
-                        {driver.phone || "Sin teléfono"}
+                        {driver.phone && driver.phone.replace(/[^0-9+]/g, "").length >= 3 ? driver.phone.trim() : "Sin teléfono"}
                       </span>
                       <span className="flex items-center gap-2 truncate">
                         <FaEnvelope className="text-slate-400 text-xs sm:text-sm shrink-0" />

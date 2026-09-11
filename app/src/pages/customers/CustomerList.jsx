@@ -132,9 +132,9 @@ export default function CustomerList() {
                           {customer.taxId && (
                             <span>NIF/CIF: {customer.taxId}</span>
                           )}
-                          {customer.phone && (
+                          {customer.phone && customer.phone.replace(/[^0-9+]/g, "").length >= 3 && (
                             <span className="rounded-full bg-slate-100 border border-slate-200 px-2.5 py-0.5 text-[11px] font-bold text-slate-700">
-                              📞 {customer.phone}
+                              📞 {customer.phone.trim()}
                             </span>
                           )}
                         </div>

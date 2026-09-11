@@ -182,7 +182,7 @@ export default function Home() {
               </div>
             </Link>
 
-            <Link to="/delivery-notes" className="StatCard border-t-4 border-t-amber-500">
+            <Link to="/delivery-notes?status=pending" className="StatCard border-t-4 border-t-amber-500" title="Ver albaranes pendientes de facturar">
               <div className="flex flex-col items-center text-center">
                 <span className="text-2xl sm:text-3xl font-black text-amber-600 flex items-center justify-center min-h-[28px] sm:min-h-[32px]">
                   {stats.loading ? (
@@ -192,7 +192,7 @@ export default function Home() {
                   )}
                 </span>
                 <span className="text-xs sm:text-sm font-bold text-slate-600 mt-0.5">
-                  Pendientes
+                  Alb. por Facturar
                 </span>
               </div>
             </Link>

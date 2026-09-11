@@ -28,6 +28,7 @@ const getAllInvoices = (userId) => {
       return Invoice.find({ company: userId })
         .populate("company")
         .populate("customer")
+        .populate({ path: "deliveryNotes", populate: { path: "works" } })
         .select("-__v")
         .lean()
         .catch(error => { throw new SystemError(error.message) })
@@ -39,6 +40,23 @@ const getAllInvoices = (userId) => {
           invoices.forEach((invoice) => {
             invoice.id = invoice._id.toString()
             delete invoice._id
+
+            // Calcular importe total con IVA e IRPF
+            let subtotal = 0
+            if (Array.isArray(invoice.deliveryNotes)) {
+              invoice.deliveryNotes.forEach((dn) => {
+                if (Array.isArray(dn?.works)) {
+                  dn.works.forEach((w) => {
+                    subtotal += (Number(w.quantity) || 0) * (Number(w.price) || 0)
+                  })
+                }
+              })
+            }
+            const iva = subtotal * 0.21
+            const irpfPercentage = Number(invoice.company?.irpf) || 0
+            const irpfAmount = subtotal * (irpfPercentage / 100)
+            invoice.subtotal = subtotal
+            invoice.totalAmount = subtotal + iva - irpfAmount
           })
 
           // Ordenación numérica secuencial descendente

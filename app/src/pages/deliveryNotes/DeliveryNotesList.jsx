@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { Link } from "react-router-dom"
+import { Link, useSearchParams } from "react-router-dom"
 
 import Header from "../../components/Header"
 import Main from "../../components/core/Main"
@@ -44,8 +44,17 @@ export default function DeliveryNoteList() {
   const [selectedYear, setSelectedYear] = useState(currentYear)
   const [selectedMonth, setSelectedMonth] = useState("all")
   const [searchTerm, setSearchTerm] = useState("")
-  const [statusFilter, setStatusFilter] = useState("all") // 'all', 'pending', 'invoiced'
+  const [searchParams] = useSearchParams()
+  const initialStatus = searchParams.get("status") === "pending" ? "pending" : (searchParams.get("status") === "invoiced" ? "invoiced" : "all")
+  const [statusFilter, setStatusFilter] = useState(initialStatus)
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
+
+  useEffect(() => {
+    const paramStatus = searchParams.get("status")
+    if (paramStatus === "pending" || paramStatus === "invoiced" || paramStatus === "all") {
+      setStatusFilter(paramStatus)
+    }
+  }, [searchParams])
 
   useEffect(() => {
     setLoading(true)

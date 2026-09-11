@@ -161,14 +161,14 @@ export default function CustomerInfo() {
               {/* Tarjeta de Identidad */}
               <div className="w-full flex items-center gap-3.5 rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 shadow-xs text-left">
                 <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-500 text-white font-black text-2xl flex items-center justify-center shadow-sm shrink-0">
-                  {customer?.companyName ? customer.companyName.charAt(0).toUpperCase() : "C"}
+                  {(customer?.companyName || customer?.fullName || customer?.username || "C").trim().charAt(0).toUpperCase() || "C"}
                 </div>
                 <div className="flex flex-col min-w-0">
                   <h1 className="text-lg sm:text-xl font-black text-slate-900 leading-tight truncate">
                     {customer?.companyName || "Mi Empresa"}
                   </h1>
                   <span className="text-xs font-semibold text-slate-500 mt-0.5">
-                    {customer?.fullName || `@${customer?.username}`}
+                    Cliente Registrado
                   </span>
                 </div>
               </div>
@@ -182,10 +182,10 @@ export default function CustomerInfo() {
                 <div className="flex flex-col gap-2.5 text-xs sm:text-sm text-left">
                   <div className="flex justify-between items-center border-b border-slate-100 pb-2">
                     <span className="font-semibold text-slate-500">🏢 Empresa:</span>
-                    <span className="font-bold text-slate-900 text-right">{customer?.companyName || "No especificado"}</span>
+                    <span className="font-bold text-slate-900 text-right">{customer?.companyName || "No especificada"}</span>
                   </div>
                   <div className="flex justify-between items-center border-b border-slate-100 pb-2">
-                    <span className="font-semibold text-slate-500">🆔 CIF / NIF:</span>
+                    <span className="font-semibold text-slate-500">🪪 NIF / CIF:</span>
                     <span className="font-bold text-slate-900 text-right">{customer?.taxId || "No especificado"}</span>
                   </div>
                   <div className="flex justify-between items-start pt-0.5">
@@ -208,7 +208,9 @@ export default function CustomerInfo() {
                   </div>
                   <div className="flex justify-between items-center border-b border-slate-100 pb-2">
                     <span className="font-semibold text-slate-500">📞 Teléfono:</span>
-                    <span className="font-bold text-slate-900 text-right">{customer?.phone || "No especificado"}</span>
+                    <span className="font-bold text-slate-900 text-right">
+                      {customer?.phone && customer.phone.replace(/[^0-9+]/g, "").length >= 3 ? customer.phone.trim() : "No especificado"}
+                    </span>
                   </div>
                   <div className="flex justify-between items-center border-b border-slate-100 pb-2">
                     <span className="font-semibold text-slate-500">✉️ Email:</span>
