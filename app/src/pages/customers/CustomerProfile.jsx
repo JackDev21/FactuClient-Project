@@ -13,8 +13,10 @@ import Footer from "../../components/core/Footer"
 import Main from "../../components/core/Main"
 import Confirm from "../../components/Confirm"
 import UpdateProfileCustomerForm from "../../components/UpdateProfileCustomerForm"
+import YearFilter from "../../components/YearFilter"
 
 import logic from "../../logic"
+import getDocYear from "../../utils/getDocYear"
 import "./CustomerProfile.css"
 
 export default function CustomerProfile() {
@@ -28,6 +30,8 @@ export default function CustomerProfile() {
   const [activeTab, setActiveTab] = useState("Data") // "Data", "Invoices", "DeliveryNotes"
   const [showUpdateProfile, setShowUpdateProfile] = useState(false)
   const [profileUpdated, setProfileUpdated] = useState(false)
+  const currentYear = new Date().getFullYear()
+  const [selectedYear, setSelectedYear] = useState(currentYear)
   const [loadingDocs, setLoadingDocs] = useState(false)
 
   useEffect(() => {
@@ -263,7 +267,14 @@ export default function CustomerProfile() {
 
           {/* Pestaña: FACTURAS DEL CLIENTE */}
           {activeTab === "Invoices" && (
-            <div className="w-full flex flex-col gap-2.5">
+            <div className="w-full flex flex-col gap-3">
+              <YearFilter
+                selectedYear={selectedYear}
+                onSelectYear={setSelectedYear}
+                availableYears={Array.from(new Set(invoices.map((inv) => getDocYear(inv)).filter(Boolean)))}
+                currentYear={currentYear}
+              />
+
               {loadingDocs ? (
                 <div className="flex flex-col gap-2.5 w-full">
                   {[1, 2, 3].map((i) => (
@@ -279,12 +290,22 @@ export default function CustomerProfile() {
                     </div>
                   ))}
                 </div>
-              ) : invoices.length === 0 ? (
-                <div className="py-12 text-center text-slate-400 font-medium text-sm bg-white rounded-2xl border border-slate-200 p-6">
-                  No hay facturas emitidas para este cliente.
-                </div>
-              ) : (
-                invoices.map((invoice) => (
+              ) : (() => {
+                const filteredInvoices = invoices.filter(
+                  (invoice) => selectedYear === "all" || getDocYear(invoice) === Number(selectedYear)
+                )
+
+                if (filteredInvoices.length === 0) {
+                  return (
+                    <div className="py-12 text-center text-slate-400 font-medium text-sm bg-white rounded-2xl border border-slate-200 p-6">
+                      {invoices.length === 0
+                        ? "No hay facturas emitidas para este cliente."
+                        : `No hay facturas de este cliente para el ejercicio ${selectedYear === "all" ? "seleccionado" : selectedYear}.`}
+                    </div>
+                  )
+                }
+
+                return filteredInvoices.map((invoice) => (
                   <Link
                     to={`/invoices/${invoice.id || invoice._id}`}
                     key={invoice.id || invoice._id}
@@ -306,13 +327,20 @@ export default function CustomerProfile() {
                     <FaChevronRight className="text-slate-300 text-sm shrink-0 ml-2" />
                   </Link>
                 ))
-              )}
+              })()}
             </div>
           )}
 
           {/* Pestaña: ALBARANES DEL CLIENTE */}
           {activeTab === "DeliveryNotes" && (
-            <div className="w-full flex flex-col gap-2.5">
+            <div className="w-full flex flex-col gap-3">
+              <YearFilter
+                selectedYear={selectedYear}
+                onSelectYear={setSelectedYear}
+                availableYears={Array.from(new Set(deliveryNotes.map((dn) => getDocYear(dn)).filter(Boolean)))}
+                currentYear={currentYear}
+              />
+
               {loadingDocs ? (
                 <div className="flex flex-col gap-2.5 w-full">
                   {[1, 2, 3].map((i) => (
@@ -328,12 +356,22 @@ export default function CustomerProfile() {
                     </div>
                   ))}
                 </div>
-              ) : deliveryNotes.length === 0 ? (
-                <div className="py-12 text-center text-slate-400 font-medium text-sm bg-white rounded-2xl border border-slate-200 p-6">
-                  No hay albaranes registrados para este cliente.
-                </div>
-              ) : (
-                deliveryNotes.map((deliveryNote) => (
+              ) : (() => {
+                const filteredDeliveryNotes = deliveryNotes.filter(
+                  (deliveryNote) => selectedYear === "all" || getDocYear(deliveryNote) === Number(selectedYear)
+                )
+
+                if (filteredDeliveryNotes.length === 0) {
+                  return (
+                    <div className="py-12 text-center text-slate-400 font-medium text-sm bg-white rounded-2xl border border-slate-200 p-6">
+                      {deliveryNotes.length === 0
+                        ? "No hay albaranes registrados para este cliente."
+                        : `No hay albaranes de este cliente para el ejercicio ${selectedYear === "all" ? "seleccionado" : selectedYear}.`}
+                    </div>
+                  )
+                }
+
+                return filteredDeliveryNotes.map((deliveryNote) => (
                   <Link
                     to={`/delivery-notes/${deliveryNote.id || deliveryNote._id}`}
                     key={deliveryNote.id || deliveryNote._id}
@@ -362,7 +400,7 @@ export default function CustomerProfile() {
                     </div>
                   </Link>
                 ))
-              )}
+              })()}
             </div>
           )}
         </div>
