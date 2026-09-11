@@ -84,7 +84,7 @@ export default function Home() {
       <>
         <Header iconUser={<FaTruck />}>
           <div className="flex flex-col items-center">
-            <span className="text-xs font-semibold text-slate-700">Panel de Conductor</span>
+            <span className="text-xs font-bold text-slate-500">Panel de Conductor</span>
             <span className="text-sm sm:text-base font-extrabold text-slate-900">{userName || "Chofer"}</span>
           </div>
         </Header>

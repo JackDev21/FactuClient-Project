@@ -85,11 +85,11 @@ export default function InvoiceInfo() {
   return (
     <>
       <Header
-        iconLeftHeader={logic.getInfo().role === "user" && <MdDeleteForever className="text-rose-900 shrink-0" />}
+        iconLeftHeader={logic.getInfo().role === "user" && <MdDeleteForever className="shrink-0" />}
         onDeleteInvoice={handleShowConfirmDelete}
       >
-        <div className="flex flex-col items-center justify-center max-w-[62vw] sm:max-w-md">
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-slate-950/25 border border-slate-950/20 text-slate-950 text-[10px] sm:text-xs font-black uppercase tracking-wider mb-0.5 shadow-2xs">
+        <div className="flex flex-col items-center justify-center max-w-full">
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-slate-100 border border-slate-300 text-slate-800 text-[10px] sm:text-xs font-black uppercase tracking-wider mb-0.5">
             Factura Nº {invoice?.number || ""}
           </span>
           <h1 className="text-xs sm:text-base font-black text-slate-950 tracking-tight leading-tight truncate max-w-full">

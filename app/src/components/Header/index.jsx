@@ -77,6 +77,13 @@ export default function Header({
     ? "translate-y-0 opacity-100"
     : "-translate-y-full opacity-0 pointer-events-none"
 
+  const centerBadge = (
+    <>
+      {iconUser && <div className="IconUser">{iconUser}</div>}
+      <div className="Children">{children}</div>
+    </>
+  )
+
   return (
     <>
       <div className={`Header ${visibilityClass} transition-all duration-300 ease-in-out z-30 ${className ? className : ""}`}>
@@ -86,8 +93,7 @@ export default function Header({
               {iconLeftHeader}
               <span>Cliente</span>
             </span>
-            <div className="IconUser">{iconUser}</div>
-            <div className="Children">{children}</div>
+            {centerBadge}
           </div>
         )}
 
@@ -97,8 +103,7 @@ export default function Header({
               {iconLeftHeader}
               <span>Editar</span>
             </span>
-            <div className="IconUser">{iconUser}</div>
-            <div className="Children">{children}</div>
+            {centerBadge}
           </div>
         )}
 
@@ -106,15 +111,13 @@ export default function Header({
           (logic.isUserLoggedIn() && logic.getInfo()?.role === "driver") ? (
             <div className="w-full flex justify-center select-none">
               <div className="ContainerHeader">
-                <div className="IconUser">{iconUser}</div>
-                <div className="Children">{children}</div>
+                {centerBadge}
               </div>
             </div>
           ) : (
-            <Link to="/users/profile" className="w-full flex justify-center">
+            <Link to="/users/profile" className="w-full flex justify-center" title="Mi Perfil">
               <div className="ContainerHeader">
-                <div className="IconUser">{iconUser}</div>
-                <div className="Children">{children}</div>
+                {centerBadge}
               </div>
             </Link>
           )
@@ -122,69 +125,61 @@ export default function Header({
 
         {location.pathname === "/invoices" && (
           <div className="ContainerHeader">
-            <div className="IconUser">{iconUser}</div>
-            <div className="Children">{children}</div>
+            {centerBadge}
           </div>
         )}
 
         {isCustomerProfilePathInvoiceId && (
           <div className="ContainerHeader">
-            <span onClick={onDeleteInvoice} className="IconLeftHeader bg-rose-500/20 text-rose-950 border border-rose-600/30 hover:bg-rose-500/30" title="Eliminar Factura">
+            <span onClick={onDeleteInvoice} className="IconLeftHeader !border-rose-600 !text-rose-700 hover:!bg-rose-50" title="Eliminar Factura">
               {iconLeftHeader}
               <span>Borrar</span>
             </span>
-            <div className="IconUser">{iconUser}</div>
-            <div className="Children">{children}</div>
+            {centerBadge}
           </div>
         )}
 
         {location.pathname === "/delivery-notes" && (
           <div className="ContainerHeader">
-            <div className="IconUser">{iconUser}</div>
-            <div className="Children">{children}</div>
+            {centerBadge}
           </div>
         )}
 
         {location.pathname === "/create/delivery-notes" && (
           <div className="ContainerHeader">
-            <div className="IconUser">{iconUser}</div>
-            <div className="Children">{children}</div>
+            {centerBadge}
           </div>
         )}
 
         {location.pathname === "/create/invoices" && (
           <div className="ContainerHeader">
-            <div className="IconUser">{iconUser}</div>
-            <div className="Children">{children}</div>
+            {centerBadge}
           </div>
         )}
 
         {isCustomerProfilePathCustomerId && (
           <div className="ContainerHeader">
-            <span onClick={onDeleteCustomer} className="IconLeftHeader bg-rose-500/20 text-rose-950 border border-rose-600/30 hover:bg-rose-500/30" title="Eliminar Cliente">
+            <span onClick={onDeleteCustomer} className="IconLeftHeader !border-rose-600 !text-rose-700 hover:!bg-rose-50" title="Eliminar Cliente">
               {iconLeftHeader}
               <span>Borrar</span>
             </span>
-            <div className="IconUser">{iconUser}</div>
-            <div className="CustomerName Children">{children}</div>
+            {centerBadge}
           </div>
         )}
 
         {isCustomerProfilePathDeliveryNoteId && (
           <div className="ContainerHeader">
-            <span onClick={onDeleteDeliveryNote} className="IconLeftHeader bg-rose-500/20 text-rose-950 border border-rose-600/30 hover:bg-rose-500/30" title="Eliminar Albarán">
+            <span onClick={onDeleteDeliveryNote} className="IconLeftHeader !border-rose-600 !text-rose-700 hover:!bg-rose-50" title="Eliminar Albarán">
               {iconLeftHeader}
               <span>Borrar</span>
             </span>
-            <div className="IconUser">{iconUser}</div>
-            <div className="Children">{children}</div>
+            {centerBadge}
           </div>
         )}
 
         {isCustomerProfilePathCreateDeliveryNoteId && (
           <div className="ContainerHeader">
-            <div className="IconUser">{iconUser}</div>
-            <div className="Children">{children}</div>
+            {centerBadge}
           </div>
         )}
 
@@ -196,8 +191,7 @@ export default function Header({
                 <span>Chofer</span>
               </span>
             )}
-            <div className="IconUser">{iconUser}</div>
-            <div className="Children">{children}</div>
+            {centerBadge}
           </div>
         )}
 
@@ -209,8 +203,7 @@ export default function Header({
                 <span>Salir</span>
               </span>
             )}
-            <div className="IconUser">{iconUser}</div>
-            <div className="Children">{children}</div>
+            {centerBadge}
           </div>
         )}
 
@@ -237,8 +230,7 @@ export default function Header({
                   {location.pathname === "/deca" && <span>Inicio</span>}
                 </span>
               )}
-              {iconUser && <div className="IconUser">{iconUser}</div>}
-              <div className="Children">{children}</div>
+              {centerBadge}
             </div>
           )}
       </div>

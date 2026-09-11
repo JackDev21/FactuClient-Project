@@ -17,9 +17,17 @@
   align-items: center;
   justify-content: center;
   background-image: linear-gradient(to right, #7a4902, #7f5003, #835604, #885d06, #8c6408, #946c09, #9b740b, #a37c0c, #b0870c, #bd930b, #cb9e0a, #d8aa09);
-  font-size: 1.25rem;
-  color: #0f172a;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  font-size: 1.35rem;
+  color: #ffffff;
+  -webkit-text-stroke: 1px #000000;
+  paint-order: stroke fill;
+  text-shadow:
+    -1.5px -1.5px 0 #000000,
+     1.5px -1.5px 0 #000000,
+    -1.5px  1.5px 0 #000000,
+     1.5px  1.5px 0 #000000,
+     0 2px 4px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 -2px 10px 0 rgba(0, 0, 0, 0.2);
   pointer-events: auto;
   border-top-left-radius: 50% 100%;
   border-top-right-radius: 50% 100%;

@@ -145,7 +145,7 @@ export default function DecaInfo() {
     return (
       <>
         <Header>
-          <span className="text-sm font-bold text-slate-800">Detalle de DeCA</span>
+          <span className="text-sm font-bold text-white drop-shadow-sm">Detalle de DeCA</span>
         </Header>
         <Main>
           <div className="flex flex-col items-center justify-center p-12 text-slate-400 gap-3">
@@ -167,9 +167,9 @@ export default function DecaInfo() {
         iconLeftHeader={<FaArrowLeft />}
         onDeleteDeliveryNote={() => navigate(-1)}
       >
-        <div className="flex flex-col items-center justify-center max-w-[62vw] sm:max-w-md">
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-slate-950/25 border border-slate-950/20 text-slate-950 text-[10px] sm:text-xs font-black uppercase tracking-wider mb-0.5 shadow-2xs">
-            <FaFileShield className="text-xs shrink-0" /> Documento DeCA
+        <div className="flex flex-col items-center justify-center max-w-full">
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-100 border border-amber-300 text-amber-900 text-[10px] sm:text-xs font-black uppercase tracking-wider mb-0.5">
+            <FaFileShield className="text-xs shrink-0 text-amber-600" /> Documento DeCA
           </span>
           <h1 className="text-sm sm:text-base font-black text-slate-950 tracking-tight leading-tight truncate max-w-full">
             {deca.number}
