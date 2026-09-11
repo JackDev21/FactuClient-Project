@@ -338,247 +338,243 @@ export default function DriverList() {
           {showModal && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-xs p-3 sm:p-4 animate-fadeIn">
               <div className="w-full max-w-md max-h-[90vh] overflow-y-auto rounded-2xl bg-white p-5 sm:p-6 shadow-xl border border-slate-200 flex flex-col gap-4 text-left">
-              <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-                <div className="flex items-center gap-2">
-                  <div className="p-2 rounded-xl bg-amber-100 text-amber-700">
-                    <FaUserPlus />
+                <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                  <div className="flex items-center gap-2">
+                    <div className="p-2 rounded-xl bg-amber-100 text-amber-700">
+                      <FaUserPlus />
+                    </div>
+                    <span className="text-base font-extrabold text-slate-900">Alta de Chofer</span>
                   </div>
-                  <span className="text-base font-extrabold text-slate-900">Alta de Chofer</span>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setShowModal(false)}
-                  className="text-slate-400 hover:text-slate-600 text-lg font-bold"
-                >
-                  ✕
-                </button>
-              </div>
-
-              <form onSubmit={handleCreateDriver} className="flex flex-col gap-3">
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Nombre Completo *</label>
-                  <input
-                    type="text"
-                    name="fullName"
-                    required
-                    value={formData.fullName}
-                    onChange={handleInputChange}
-                    placeholder="Ej. Francisco García"
-                    className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
-                  />
-                </div>
-
-                <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <label className="block text-xs font-bold text-slate-700">Nombre de Usuario (Login) *</label>
-                    <span className="text-[10px] text-amber-700 font-semibold">Sin espacios ni acentos</span>
-                  </div>
-                  <div className="relative">
-                    <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 text-xs">@</span>
-                    <input
-                      type="text"
-                      name="username"
-                      required
-                      value={formData.username}
-                      onChange={handleInputChange}
-                      placeholder="paco_chofer"
-                      className="w-full rounded-xl border border-slate-300 pl-7 pr-3 py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 font-mono"
-                    />
-                  </div>
-                  <span className="text-[11px] text-slate-500 mt-1 block">
-                    Con este usuario y contraseña el chofer entrará a la app. Puede compartir nombre y email con un cliente, pero el usuario debe ser único (ej: paco_chofer).
-                  </span>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Contraseña de Acceso *</label>
-                  <input
-                    type="password"
-                    name="password"
-                    required
-                    minLength={4}
-                    value={formData.password}
-                    onChange={handleInputChange}
-                    placeholder="Mínimo 4 caracteres"
-                    className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">Teléfono</label>
-                    <input
-                      type="tel"
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleInputChange}
-                      placeholder="600123456"
-                      className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">Email (Opcional)</label>
-                    <input
-                      type="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      placeholder="chofer@empresa.es"
-                      className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
-                    />
-                  </div>
-                </div>
-
-                <p className="text-[11px] text-slate-400 italic mt-1">
-                  Nota: El chofer solo podrá registrar albaranes sin valorar y consultar sus propios transportes. No tendrá acceso a datos fiscales ni facturas.
-                </p>
-
-                <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
                   <button
                     type="button"
                     onClick={() => setShowModal(false)}
-                    className="rounded-xl px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 transition-colors"
+                    className="text-slate-400 hover:text-slate-600 text-lg font-bold"
                   >
-                    Cancelar
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={submitting}
-                    className="flex items-center gap-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 px-4 py-2 text-xs font-bold text-white shadow-sm transition-all disabled:opacity-50"
-                  >
-                    {submitting && <FaSpinner className="animate-spin text-xs" />}
-                    <span>{submitting ? "Guardando..." : "Crear Chofer"}</span>
+                    ✕
                   </button>
                 </div>
-              </form>
-            </div>
-          </div>
-        )}
 
-        {/* Modal: Editar Chofer / Cambiar Contraseña */}
-        {editingDriver && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-xs p-3 sm:p-4 animate-fadeIn">
-            <div className="w-full max-w-md max-h-[90vh] overflow-y-auto rounded-2xl bg-white p-5 sm:p-6 shadow-xl border border-slate-200 flex flex-col gap-4 text-left">
-              <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-                <div className="flex items-center gap-2">
-                  <div className="p-2 rounded-xl bg-amber-100 text-amber-700">
-                    <FaKey />
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-base font-extrabold text-slate-900 leading-tight">Editar Chofer</span>
-                    <span className="text-xs text-slate-400 font-medium">@{editingDriver.username}</span>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setEditingDriver(null)}
-                  className="text-slate-400 hover:text-slate-600 text-lg font-bold cursor-pointer"
-                >
-                  ✕
-                </button>
-              </div>
-
-              <form onSubmit={handleUpdateDriver} className="flex flex-col gap-3">
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Nombre Completo *</label>
-                  <input
-                    type="text"
-                    name="fullName"
-                    required
-                    value={editFormData.fullName}
-                    onChange={handleEditInputChange}
-                    placeholder="Ej. Francisco García"
-                    className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
-                  />
-                </div>
-
-                <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <label className="block text-xs font-bold text-slate-700">Nombre de Usuario (Login) *</label>
-                    <span className="text-[10px] text-amber-700 font-semibold">Sin espacios ni acentos</span>
-                  </div>
-                  <div className="relative">
-                    <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 text-xs">@</span>
+                <form onSubmit={handleCreateDriver} className="flex flex-col gap-3">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">Nombre Completo *</label>
                     <input
                       type="text"
-                      name="username"
+                      name="fullName"
                       required
-                      value={editFormData.username}
-                      onChange={handleEditInputChange}
-                      placeholder="usuario_chofer"
-                      className="w-full rounded-xl border border-slate-300 pl-7 pr-3 py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 font-mono"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">Teléfono</label>
-                    <input
-                      type="tel"
-                      name="phone"
-                      value={editFormData.phone}
-                      onChange={handleEditInputChange}
-                      placeholder="600123456"
+                      value={formData.fullName}
+                      onChange={handleInputChange}
+                      placeholder="Ej. Francisco García"
                       className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">Email</label>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="block text-xs font-bold text-slate-700">Nombre de Usuario (Login) *</label>
+                      <span className="text-[10px] text-amber-700 font-semibold">Sin espacios ni acentos</span>
+                    </div>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        name="username"
+                        required
+                        value={formData.username}
+                        onChange={handleInputChange}
+                        placeholder="paco_chofer"
+                        className="w-full rounded-xl border border-slate-300 pl-2 pr-3 py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 font-mono"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">Contraseña de Acceso *</label>
                     <input
-                      type="email"
-                      name="email"
-                      value={editFormData.email}
-                      onChange={handleEditInputChange}
-                      placeholder="chofer@empresa.es"
+                      type="password"
+                      name="password"
+                      required
+                      minLength={4}
+                      value={formData.password}
+                      onChange={handleInputChange}
+                      placeholder="Mínimo 4 caracteres"
                       className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
                     />
                   </div>
-                </div>
 
-                <div className="rounded-xl bg-amber-50/70 p-3 border border-amber-200/80 flex flex-col gap-1.5">
-                  <label className="block text-xs font-bold text-amber-950">
-                    Nueva Contraseña de Acceso
-                  </label>
-                  <input
-                    type="password"
-                    name="newPassword"
-                    minLength={4}
-                    value={editFormData.newPassword}
-                    onChange={handleEditInputChange}
-                    placeholder="Dejar en blanco para no cambiarla"
-                    className="w-full rounded-xl border border-amber-300 bg-white px-3 py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
-                  />
-                  <span className="text-[11px] text-amber-800/80">
-                    Si el chofer ha olvidado su contraseña, escribe aquí la nueva (mínimo 4 caracteres).
-                  </span>
-                </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">Teléfono</label>
+                      <input
+                        type="tel"
+                        name="phone"
+                        value={formData.phone}
+                        onChange={handleInputChange}
+                        placeholder="600123456"
+                        className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                      />
+                    </div>
 
-                <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">Email (Opcional)</label>
+                      <input
+                        type="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleInputChange}
+                        placeholder="chofer@empresa.es"
+                        className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                      />
+                    </div>
+                  </div>
+
+                  <p className="text-[11px] text-slate-400 italic mt-1">
+                    Nota: El chofer solo podrá registrar albaranes sin valorar y consultar sus propios transportes. No tendrá acceso a datos fiscales ni facturas.
+                  </p>
+
+                  <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+                    <button
+                      type="button"
+                      onClick={() => setShowModal(false)}
+                      className="rounded-xl px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 transition-colors"
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={submitting}
+                      className="flex items-center gap-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 px-4 py-2 text-xs font-bold text-white shadow-sm transition-all disabled:opacity-50"
+                    >
+                      {submitting && <FaSpinner className="animate-spin text-xs" />}
+                      <span>{submitting ? "Guardando..." : "Crear Chofer"}</span>
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
+
+          {/* Modal: Editar Chofer / Cambiar Contraseña */}
+          {editingDriver && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-xs p-3 sm:p-4 animate-fadeIn">
+              <div className="w-full max-w-md max-h-[90vh] overflow-y-auto rounded-2xl bg-white p-5 sm:p-6 shadow-xl border border-slate-200 flex flex-col gap-4 text-left">
+                <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                  <div className="flex items-center gap-2">
+                    <div className="p-2 rounded-xl bg-amber-100 text-amber-700">
+                      <FaKey />
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-base font-extrabold text-slate-900 leading-tight">Editar Chofer</span>
+                      <span className="text-xs text-slate-400 font-medium">@{editingDriver.username}</span>
+                    </div>
+                  </div>
                   <button
                     type="button"
                     onClick={() => setEditingDriver(null)}
-                    className="rounded-xl px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+                    className="text-slate-400 hover:text-slate-600 text-lg font-bold cursor-pointer"
                   >
-                    Cancelar
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={updating}
-                    className="flex items-center gap-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 px-4 py-2 text-xs font-bold text-white shadow-sm transition-all disabled:opacity-50 cursor-pointer"
-                  >
-                    {updating && <FaSpinner className="animate-spin text-xs" />}
-                    <span>{updating ? "Guardando..." : "Guardar Cambios"}</span>
+                    ✕
                   </button>
                 </div>
-              </form>
-            </div>
-          </div>
-        )}
 
-        {/* Modal: Confirmación Eliminar */}
+                <form onSubmit={handleUpdateDriver} className="flex flex-col gap-3">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">Nombre Completo *</label>
+                    <input
+                      type="text"
+                      name="fullName"
+                      required
+                      value={editFormData.fullName}
+                      onChange={handleEditInputChange}
+                      placeholder="Ej. Francisco García"
+                      className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    />
+                  </div>
+
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="block text-xs font-bold text-slate-700">Nombre de Usuario (Login) *</label>
+                      <span className="text-[10px] text-amber-700 font-semibold">Sin espacios ni acentos</span>
+                    </div>
+                    <div className="relative">
+                      <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 text-xs">@</span>
+                      <input
+                        type="text"
+                        name="username"
+                        required
+                        value={editFormData.username}
+                        onChange={handleEditInputChange}
+                        placeholder="usuario_chofer"
+                        className="w-full rounded-xl border border-slate-300 pl-7 pr-3 py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 font-mono"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">Teléfono</label>
+                      <input
+                        type="tel"
+                        name="phone"
+                        value={editFormData.phone}
+                        onChange={handleEditInputChange}
+                        placeholder="600123456"
+                        className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">Email</label>
+                      <input
+                        type="email"
+                        name="email"
+                        value={editFormData.email}
+                        onChange={handleEditInputChange}
+                        placeholder="chofer@empresa.es"
+                        className="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="rounded-xl bg-amber-50/70 p-3 border border-amber-200/80 flex flex-col gap-1.5">
+                    <label className="block text-xs font-bold text-amber-950">
+                      Nueva Contraseña de Acceso
+                    </label>
+                    <input
+                      type="password"
+                      name="newPassword"
+                      minLength={4}
+                      value={editFormData.newPassword}
+                      onChange={handleEditInputChange}
+                      placeholder="Dejar en blanco para no cambiarla"
+                      className="w-full rounded-xl border border-amber-300 bg-white px-3 py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    />
+                    <span className="text-[11px] text-amber-800/80">
+                      Si el chofer ha olvidado su contraseña, escribe aquí la nueva (mínimo 4 caracteres).
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+                    <button
+                      type="button"
+                      onClick={() => setEditingDriver(null)}
+                      className="rounded-xl px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={updating}
+                      className="flex items-center gap-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 px-4 py-2 text-xs font-bold text-white shadow-sm transition-all disabled:opacity-50 cursor-pointer"
+                    >
+                      {updating && <FaSpinner className="animate-spin text-xs" />}
+                      <span>{updating ? "Guardando..." : "Guardar Cambios"}</span>
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
+
+          {/* Modal: Confirmación Eliminar */}
           {deleteDriverId && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-xs p-4 animate-fadeIn">
               <div className="w-full max-w-sm rounded-2xl bg-white p-5 shadow-xl border border-slate-200 flex flex-col gap-3 text-center">
