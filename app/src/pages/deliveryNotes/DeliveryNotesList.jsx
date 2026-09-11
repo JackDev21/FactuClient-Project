@@ -5,6 +5,7 @@ import Header from "../../components/Header"
 import Main from "../../components/core/Main"
 import Footer from "../../components/core/Footer"
 import SearchFilter from "../../components/SearchFilter"
+import YearFilter from "../../components/YearFilter"
 
 import useContext from "../../useContext"
 import { SystemError } from "com/errors"
@@ -13,6 +14,7 @@ import { GoNote } from "react-icons/go"
 import { FaChevronDown, FaTruckFast } from "react-icons/fa6"
 
 import logic from "../../logic"
+import getDocYear from "../../utils/getDocYear"
 
 import "./DeliveryNotesList.css"
 
@@ -36,6 +38,8 @@ export default function DeliveryNoteList() {
 
   const [deliveryNotes, setDeliveryNotes] = useState([])
   const [loading, setLoading] = useState(true)
+  const currentYear = new Date().getFullYear()
+  const [selectedYear, setSelectedYear] = useState(currentYear)
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState("all") // 'all', 'pending', 'invoiced'
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
@@ -74,8 +78,19 @@ export default function DeliveryNoteList() {
   const userRole = logic.getInfo()?.role
   const isDriver = userRole === "driver"
 
-  // Filtrado por búsqueda y por estado
-  const filteredDeliveryNotes = deliveryNotes.filter((deliveryNote) => {
+  // Años disponibles en el conjunto de datos
+  const availableYears = Array.from(
+    new Set(deliveryNotes.map((d) => getDocYear(d)).filter(Boolean))
+  )
+
+  // 1. Filtrado por año seleccionado
+  const deliveryNotesInYear = deliveryNotes.filter((deliveryNote) => {
+    if (selectedYear === "all") return true
+    return getDocYear(deliveryNote) === Number(selectedYear)
+  })
+
+  // 2. Filtrado por búsqueda y por estado dentro del año seleccionado
+  const filteredDeliveryNotes = deliveryNotesInYear.filter((deliveryNote) => {
     const matchesSearch =
       deliveryNote.number.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (deliveryNote.customer?.companyName || deliveryNote.customerName || "")
@@ -94,10 +109,10 @@ export default function DeliveryNoteList() {
     return true
   })
 
-  // Reiniciar contador al buscar o cambiar filtro
+  // Reiniciar paginación al cambiar filtros o año
   useEffect(() => {
     setVisibleCount(PAGE_SIZE)
-  }, [searchTerm, statusFilter])
+  }, [searchTerm, statusFilter, selectedYear])
 
   const visibleDeliveryNotes = filteredDeliveryNotes.slice(0, visibleCount)
 
@@ -115,18 +130,26 @@ export default function DeliveryNoteList() {
   }
 
   const pendingCount = isDriver
-    ? deliveryNotes.filter((d) => d.isValued === false).length
-    : deliveryNotes.filter((d) => !d.isInvoiced).length
+    ? deliveryNotesInYear.filter((d) => d.isValued === false).length
+    : deliveryNotesInYear.filter((d) => !d.isInvoiced).length
 
   const completedCount = isDriver
-    ? deliveryNotes.filter((d) => d.isValued !== false).length
-    : deliveryNotes.filter((d) => d.isInvoiced).length
+    ? deliveryNotesInYear.filter((d) => d.isValued !== false).length
+    : deliveryNotesInYear.filter((d) => d.isInvoiced).length
 
   return (
     <>
       <Header iconUser={<GoNote />}>Albaranes</Header>
       <Main>
         <div className="w-full max-w-xl flex flex-col items-center gap-3.5 px-3">
+          {/* Selector de Ejercicio Fiscal Híbrido */}
+          <YearFilter
+            selectedYear={selectedYear}
+            onSelectYear={setSelectedYear}
+            availableYears={availableYears}
+            currentYear={currentYear}
+          />
+
           <SearchFilter
             searchTerm={searchTerm}
             setSearchTerm={setSearchTerm}
@@ -134,7 +157,7 @@ export default function DeliveryNoteList() {
           />
 
           {/* Barra de Filtros Integrada */}
-          <div className="flex w-full items-center justify-between rounded-2xl border border-slate-200/80 bg-white/90 p-1 shadow-sm backdrop-blur">
+          <div className="flex w-full items-center justify-between rounded-2xl border border-slate-200/80 bg-white/90 p-1 shadow-sm backdrop-blur relative z-0">
             <button
               onClick={() => setStatusFilter("all")}
               className={`flex-1 rounded-xl py-2.5 text-center text-xs sm:text-sm font-bold transition-all ${
@@ -143,7 +166,7 @@ export default function DeliveryNoteList() {
                   : "text-slate-600 hover:text-slate-900"
               }`}
             >
-              Todos ({loading ? "..." : deliveryNotes.length})
+              Todos ({loading ? "..." : deliveryNotesInYear.length})
             </button>
             <button
               onClick={() => setStatusFilter("pending")}

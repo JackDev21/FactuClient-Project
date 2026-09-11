@@ -2,6 +2,7 @@ import { useState, useEffect } from "react"
 import { Link, Navigate } from "react-router-dom"
 
 import logic from "../../logic/index"
+import getDocYear from "../../utils/getDocYear"
 
 import { FaUserEdit, FaSpinner } from "react-icons/fa"
 import { PiUsersThreeBold } from "react-icons/pi"
@@ -33,15 +34,19 @@ export default function Home() {
         .then((name) => setUserName(name))
         .catch(console.error)
 
+      const currentYear = new Date().getFullYear()
+
       if (role === "driver") {
-        // Para choferes, cargar solo sus albaranes
+        // Para choferes, cargar solo sus albaranes del año en curso
         logic.getAllDeliveryNotes()
           .then((notes) => {
+            const list = Array.isArray(notes) ? notes : []
+            const currentYearNotes = list.filter((d) => getDocYear(d) === currentYear)
             setStats({
               customersCount: 0,
               pendingDeliveryCount: 0,
               invoicesCount: 0,
-              driverDeliveryCount: Array.isArray(notes) ? notes.length : 0,
+              driverDeliveryCount: currentYearNotes.length,
               loading: false
             })
           })
@@ -51,7 +56,7 @@ export default function Home() {
         return
       }
 
-      // Para autónomo / admin
+      // Para autónomo / admin (filtrando albaranes y facturas del ejercicio en curso)
       Promise.allSettled([
         logic.getAllCustomers(),
         logic.getAllDeliveryNotes(),
@@ -61,10 +66,13 @@ export default function Home() {
         const deliveryNotes = delivRes.status === "fulfilled" && Array.isArray(delivRes.value) ? delivRes.value : []
         const invoices = invRes.status === "fulfilled" && Array.isArray(invRes.value) ? invRes.value : []
 
+        const currentYearDeliveryNotes = deliveryNotes.filter((d) => getDocYear(d) === currentYear)
+        const currentYearInvoices = invoices.filter((inv) => getDocYear(inv) === currentYear)
+
         setStats({
           customersCount: customers.length,
-          pendingDeliveryCount: deliveryNotes.filter((d) => !d.isInvoiced).length,
-          invoicesCount: invoices.length,
+          pendingDeliveryCount: currentYearDeliveryNotes.filter((d) => !d.isInvoiced).length,
+          invoicesCount: currentYearInvoices.length,
           driverDeliveryCount: 0,
           loading: false
         })

@@ -9,11 +9,13 @@ import { SystemError } from "com/errors"
 import Header from "../../components/Header"
 import Main from "../../components/core/Main"
 import Footer from "../../components/core/Footer"
+import SearchFilter from "../../components/SearchFilter"
+import YearFilter from "../../components/YearFilter"
 
 import logic from "../../logic"
+import getDocYear from "../../utils/getDocYear"
 
 import "./InvoiceList.css"
-import SearchFilter from "../../components/SearchFilter"
 
 const PAGE_SIZE = 8
 
@@ -22,6 +24,8 @@ export default function InvoiceList() {
 
   const [invoices, setInvoices] = useState([])
   const [loading, setLoading] = useState(true)
+  const currentYear = new Date().getFullYear()
+  const [selectedYear, setSelectedYear] = useState(currentYear)
   const [searchTerm, setSearchTerm] = useState("")
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
 
@@ -62,15 +66,28 @@ export default function InvoiceList() {
     }
   }, [])
 
-  const filteredInvoices = invoices.filter(
+  // Años disponibles en el conjunto de datos
+  const availableYears = Array.from(
+    new Set(invoices.map((inv) => getDocYear(inv)).filter(Boolean))
+  )
+
+  // 1. Filtrado por año seleccionado
+  const invoicesInYear = invoices.filter((invoice) => {
+    if (selectedYear === "all") return true
+    return getDocYear(invoice) === Number(selectedYear)
+  })
+
+  // 2. Filtrado por búsqueda dentro del año seleccionado
+  const filteredInvoices = invoicesInYear.filter(
     (invoice) =>
       invoice.number.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (invoice.customer?.companyName || "").toLowerCase().includes(searchTerm.toLowerCase())
   )
 
+  // Reiniciar paginación al cambiar filtros o año
   useEffect(() => {
     setVisibleCount(PAGE_SIZE)
-  }, [searchTerm])
+  }, [searchTerm, selectedYear])
 
   const visibleInvoices = filteredInvoices.slice(0, visibleCount)
 
@@ -94,15 +111,23 @@ export default function InvoiceList() {
       </Header>
       <Main>
         <div className="w-full max-w-xl flex flex-col items-center gap-3.5 px-3">
+          {/* Selector de Ejercicio Fiscal Híbrido */}
+          <YearFilter
+            selectedYear={selectedYear}
+            onSelectYear={setSelectedYear}
+            availableYears={availableYears}
+            currentYear={currentYear}
+          />
+
           <SearchFilter
             searchTerm={searchTerm}
             setSearchTerm={setSearchTerm}
             placeholder="Buscar por nº o cliente..."
           />
 
-          <div className="flex w-full justify-between items-center px-1 text-xs sm:text-sm font-semibold text-slate-200">
+          <div className="flex w-full justify-between items-center px-1 text-xs sm:text-sm font-semibold text-slate-200 relative z-0">
             <span className="rounded-full bg-slate-900/60 px-3.5 py-1.5 backdrop-blur">
-              {loading ? "Cargando facturas..." : `Total: ${invoices.length} facturas`}
+              {loading ? "Cargando facturas..." : `Total: ${invoicesInYear.length} facturas`}
             </span>
             <span className="rounded-full bg-slate-900/60 px-3.5 py-1.5 backdrop-blur">
               {loading ? "..." : `Mostrando: ${visibleInvoices.length}`}
