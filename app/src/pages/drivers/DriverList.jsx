@@ -229,7 +229,7 @@ export default function DriverList() {
       </Header>
 
       <Main>
-        <div className="w-full max-w-2xl flex flex-col gap-4 px-2 sm:px-4">
+        <div className="w-full max-w-xl flex flex-col gap-4 px-2 sm:px-4">
           {/* Barra superior de contadores y acción */}
           <div className="flex items-center justify-between gap-2 flex-wrap">
             <span className="rounded-full bg-slate-900/70 px-3.5 py-1.5 text-xs font-bold text-slate-200 backdrop-blur">
@@ -270,19 +270,20 @@ export default function DriverList() {
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="flex flex-col gap-3">
               {drivers.map(driver => (
                 <div
                   key={driver.id}
-                  className="flex flex-col justify-between rounded-2xl border border-slate-200 bg-white p-4 shadow-xs hover:border-amber-300 transition-colors gap-3 text-left"
+                  className="flex flex-col justify-between rounded-2xl border border-slate-200/80 border-l-4 border-l-amber-500 bg-white p-4 shadow-xs hover:border-amber-400 hover:shadow-sm transition-all gap-3 text-left"
                 >
+                  {/* Cabecera: Avatar, Nombre completo y Estado */}
                   <div className="flex items-start justify-between gap-3">
-                    <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 shrink-0 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center font-bold text-sm">
+                    <div className="flex items-center gap-3 min-w-0 flex-1">
+                      <div className="h-11 w-11 shrink-0 rounded-xl bg-gradient-to-br from-amber-100 to-amber-200 text-amber-900 flex items-center justify-center font-black text-base shadow-2xs border border-amber-300/60">
                         {(driver.fullName || "C").trim().charAt(0).toUpperCase() || "C"}
                       </div>
-                      <div className="flex flex-col">
-                        <span className="text-sm font-extrabold text-slate-900 leading-tight">
+                      <div className="flex flex-col min-w-0 flex-1">
+                        <span className="text-base font-extrabold text-slate-900 leading-snug break-words">
                           {driver.fullName || "Chofer"}
                         </span>
                         <span className="text-xs text-slate-500 font-medium">
@@ -291,43 +292,48 @@ export default function DriverList() {
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2 shrink-0">
-                      <button
-                        type="button"
-                        onClick={() => handleOpenEditModal(driver)}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs sm:text-sm font-bold text-slate-700 bg-slate-100 hover:bg-amber-50 hover:text-amber-800 hover:border-amber-300 border border-slate-200 rounded-xl transition-all active:scale-95 shadow-2xs cursor-pointer"
-                        title="Modificar datos o cambiar contraseña"
-                      >
-                        <FaKey className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-700" />
-                        <span>Editar</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => setDeleteDriverId(driver.id)}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs sm:text-sm font-bold text-rose-700 bg-rose-50 hover:bg-rose-100 hover:border-rose-300 border border-rose-200 rounded-xl transition-all active:scale-95 shadow-2xs cursor-pointer"
-                        title="Dar de baja chofer"
-                      >
-                        <FaTrash className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-rose-600" />
-                        <span>Baja</span>
-                      </button>
-                    </div>
+                    <span className="rounded-full bg-emerald-100 text-emerald-800 font-bold px-2.5 py-1 text-xs shrink-0 border border-emerald-200 shadow-2xs">
+                      Activo
+                    </span>
                   </div>
 
-                  <div className="flex items-center justify-between pt-2.5 border-t border-slate-100 text-xs text-slate-600 gap-2">
-                    <div className="flex flex-col gap-1.5 min-w-0">
-                      <span className="flex items-center gap-2 truncate">
-                        <FaPhone className="text-slate-400 text-xs sm:text-sm shrink-0" />
+                  {/* Datos de contacto */}
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pt-2.5 border-t border-slate-100 text-xs text-slate-600">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <FaPhone className="text-amber-600 text-xs shrink-0" />
+                      <span className="font-medium text-slate-700 truncate">
                         {driver.phone && driver.phone.replace(/[^0-9+]/g, "").length >= 3 ? driver.phone.trim() : "Sin teléfono"}
                       </span>
-                      <span className="flex items-center gap-2 truncate">
-                        <FaEnvelope className="text-slate-400 text-xs sm:text-sm shrink-0" />
+                    </div>
+                    <div className="flex items-center gap-2 min-w-0">
+                      <FaEnvelope className="text-amber-600 text-xs shrink-0" />
+                      <span className="font-medium text-slate-700 truncate">
                         {driver.email && !driver.email.endsWith("@driver.factuclient.local") ? driver.email : "Sin correo"}
                       </span>
                     </div>
-                    <span className="rounded-full bg-emerald-100 text-emerald-800 font-bold px-2.5 py-0.5 text-xs shrink-0 self-start sm:self-center">
-                      Activo
-                    </span>
+                  </div>
+
+                  {/* Fila de acciones */}
+                  <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+                    <button
+                      type="button"
+                      onClick={() => handleOpenEditModal(driver)}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs sm:text-sm font-bold text-slate-700 bg-slate-100 hover:bg-amber-50 hover:text-amber-800 hover:border-amber-300 border border-slate-200 rounded-xl transition-all active:scale-95 shadow-2xs cursor-pointer"
+                      title="Modificar datos o cambiar contraseña"
+                    >
+                      <FaKey className="w-3.5 h-3.5 text-amber-700" />
+                      <span>Editar</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setDeleteDriverId(driver.id)}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs sm:text-sm font-bold text-rose-700 bg-rose-50 hover:bg-rose-100 hover:border-rose-300 border border-rose-200 rounded-xl transition-all active:scale-95 shadow-2xs cursor-pointer"
+                      title="Dar de baja chofer"
+                    >
+                      <FaTrash className="w-3.5 h-3.5 text-rose-600" />
+                      <span>Baja</span>
+                    </button>
                   </div>
                 </div>
               ))}
