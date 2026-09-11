@@ -27,11 +27,17 @@ const styles = StyleSheet.create({
     flex: 0.8,
     alignItems: "flex-end"
   },
+  logoContainer: {
+    maxHeight: 65,
+    maxWidth: 220,
+    marginBottom: 6,
+    justifyContent: "center",
+    alignItems: "flex-start"
+  },
   logo: {
-    width: 100,
-    maxHeight: 45,
-    objectFit: "contain",
-    marginBottom: 6
+    height: 60,
+    maxWidth: 220,
+    objectFit: "contain"
   },
   companyMainTitle: {
     fontSize: 16,
@@ -274,7 +280,9 @@ export default function DeliveryNotePDF({ deliveryNote }) {
         <View style={styles.headerRow} wrap={false}>
           <View style={styles.headerLeft}>
             {deliveryNote?.company?.companyLogo ? (
-              <Image style={styles.logo} src={deliveryNote.company.companyLogo} />
+              <View style={styles.logoContainer}>
+                <Image style={styles.logo} src={deliveryNote.company.companyLogo} />
+              </View>
             ) : null}
             <Text style={styles.companyMainTitle}>{emisorName}</Text>
           </View>
