@@ -61,7 +61,7 @@
 /* Texto principal: Letra blanca en negrita con borde/contorno negro nítido */
 .ContainerHeader .Children,
 .ContainerHeader .CustomerName {
-  font-size: 1.15rem;
+  font-size: 1.25rem;
   font-weight: 900;
   color: #ffffff;
   letter-spacing: 0.01em;
@@ -91,7 +91,7 @@
 
   .ContainerHeader .Children,
   .ContainerHeader .CustomerName {
-    font-size: 1.4rem;
+    font-size: 1.5rem;
     max-width: 36rem;
     -webkit-text-stroke: 1.2px #000000;
     padding-bottom: 0.5rem;

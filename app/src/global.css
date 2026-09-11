@@ -3,10 +3,37 @@
 @tailwind utilities;
 
 @layer base {
+  html {
+    font-size: 16.5px;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  @media (min-width: 640px) {
+    html {
+      font-size: 16px;
+    }
+  }
+
   html, body {
     @apply min-h-screen w-full bg-slate-100 text-slate-800 antialiased overflow-x-hidden;
     margin: 0;
     padding: 0;
+  }
+
+  /* Evita texto diminuto en pantallas móviles para personas en movilidad / conduciendo */
+  .text-\[10px\],
+  .text-\[11px\] {
+    font-size: 0.825rem !important;
+    line-height: 1.2rem !important;
+  }
+
+  /* Mayor contraste para textos secundarios en condiciones de luz exterior */
+  .text-slate-500 {
+    color: #475569 !important;
+  }
+  .text-slate-400 {
+    color: #64748b !important;
   }
 
   /* Selector de fecha: toda el área abre el calendario nativo */

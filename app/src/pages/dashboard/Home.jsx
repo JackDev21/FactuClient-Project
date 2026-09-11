@@ -96,8 +96,8 @@ export default function Home() {
                     <FaPlus />
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-lg font-black leading-tight">Nuevo Albarán</span>
-                    <span className="text-xs text-amber-100 font-medium mt-0.5">Registrar entrega en ruta</span>
+                    <span className="text-xl font-black leading-tight">Nuevo Albarán</span>
+                    <span className="text-sm text-amber-100 font-semibold mt-0.5">Registrar entrega en ruta</span>
                   </div>
                 </div>
                 <FaChevronRight className="text-white/80" />
@@ -112,13 +112,13 @@ export default function Home() {
                     <GiStabbedNote />
                   </div>
                   <div className="flex flex-col text-left gap-0.5">
-                    <span className="text-base sm:text-lg font-extrabold text-slate-900">Mis Albaranes</span>
-                    <span className="text-xs sm:text-sm font-medium text-slate-500">
+                    <span className="text-lg sm:text-xl font-extrabold text-slate-900">Mis Albaranes</span>
+                    <span className="text-sm font-semibold text-slate-600">
                       {stats.loading ? "Cargando..." : `${stats.driverDeliveryCount} albaranes registrados`}
                     </span>
                   </div>
                 </div>
-                <FaChevronRight className="text-sm text-slate-400 shrink-0" />
+                <FaChevronRight className="text-base text-slate-400 shrink-0" />
               </div>
             </Link>
 
@@ -131,15 +131,15 @@ export default function Home() {
                   </div>
                   <div className="flex flex-col text-left gap-0.5">
                     <div className="flex items-center gap-2">
-                      <span className="text-base sm:text-lg font-extrabold text-slate-900">DeCA Digital</span>
-                      <span className="rounded-md bg-amber-100 text-amber-900 text-[10px] font-black px-1.5 py-0.5 border border-amber-300">
+                      <span className="text-lg sm:text-xl font-extrabold text-slate-900">DeCA Digital</span>
+                      <span className="rounded-md bg-amber-100 text-amber-900 text-xs font-black px-2 py-0.5 border border-amber-300">
                         QR
                       </span>
                     </div>
-                    <span className="text-xs sm:text-sm font-medium text-slate-500">Documento de control para inspección</span>
+                    <span className="text-sm font-semibold text-slate-600">Documento de control para inspección</span>
                   </div>
                 </div>
-                <FaChevronRight className="text-sm text-slate-400 shrink-0" />
+                <FaChevronRight className="text-base text-slate-400 shrink-0" />
               </div>
             </Link>
           </div>
@@ -161,14 +161,14 @@ export default function Home() {
           <div className="grid grid-cols-3 gap-2 sm:gap-2.5">
             <Link to="/customers" className="StatCard border-t-4 border-t-blue-500">
               <div className="flex flex-col items-center text-center">
-                <span className="text-xl sm:text-2xl font-black text-slate-900 flex items-center justify-center min-h-[28px] sm:min-h-[32px]">
+                <span className="text-2xl sm:text-3xl font-black text-slate-900 flex items-center justify-center min-h-[28px] sm:min-h-[32px]">
                   {stats.loading ? (
                     <FaSpinner className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500 animate-spin" />
                   ) : (
                     stats.customersCount
                   )}
                 </span>
-                <span className="text-[11px] sm:text-xs font-bold text-slate-500 mt-0.5">
+                <span className="text-xs sm:text-sm font-bold text-slate-600 mt-0.5">
                   Clientes
                 </span>
               </div>
@@ -176,14 +176,14 @@ export default function Home() {
 
             <Link to="/delivery-notes" className="StatCard border-t-4 border-t-amber-500">
               <div className="flex flex-col items-center text-center">
-                <span className="text-xl sm:text-2xl font-black text-amber-600 flex items-center justify-center min-h-[28px] sm:min-h-[32px]">
+                <span className="text-2xl sm:text-3xl font-black text-amber-600 flex items-center justify-center min-h-[28px] sm:min-h-[32px]">
                   {stats.loading ? (
                     <FaSpinner className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500 animate-spin" />
                   ) : (
                     stats.pendingDeliveryCount
                   )}
                 </span>
-                <span className="text-[11px] sm:text-xs font-bold text-slate-500 mt-0.5">
+                <span className="text-xs sm:text-sm font-bold text-slate-600 mt-0.5">
                   Pendientes
                 </span>
               </div>
@@ -191,14 +191,14 @@ export default function Home() {
 
             <Link to="/invoices" className="StatCard border-t-4 border-t-emerald-500">
               <div className="flex flex-col items-center text-center">
-                <span className="text-xl sm:text-2xl font-black text-emerald-600 flex items-center justify-center min-h-[28px] sm:min-h-[32px]">
+                <span className="text-2xl sm:text-3xl font-black text-emerald-600 flex items-center justify-center min-h-[28px] sm:min-h-[32px]">
                   {stats.loading ? (
                     <FaSpinner className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-500 animate-spin" />
                   ) : (
                     stats.invoicesCount
                   )}
                 </span>
-                <span className="text-[11px] sm:text-xs font-bold text-slate-500 mt-0.5">
+                <span className="text-xs sm:text-sm font-bold text-slate-600 mt-0.5">
                   Facturas
                 </span>
               </div>
@@ -213,11 +213,11 @@ export default function Home() {
                   <PiUsersThreeBold />
                 </div>
                 <div className="flex flex-col text-left gap-0.5">
-                  <span className="text-base sm:text-lg font-extrabold text-slate-900">Listado de Clientes</span>
-                  <span className="text-xs sm:text-sm font-medium text-slate-500">Gestiona tu cartera de clientes</span>
+                  <span className="text-lg sm:text-xl font-extrabold text-slate-900">Listado de Clientes</span>
+                  <span className="text-sm font-semibold text-slate-600">Gestiona tu cartera de clientes</span>
                 </div>
               </div>
-              <FaChevronRight className="text-sm text-slate-400 shrink-0" />
+              <FaChevronRight className="text-base text-slate-400 shrink-0" />
             </div>
           </Link>
 
@@ -229,11 +229,11 @@ export default function Home() {
                   <FaTruck />
                 </div>
                 <div className="flex flex-col text-left gap-0.5">
-                  <span className="text-base sm:text-lg font-extrabold text-slate-900">Choferes y Empleados</span>
-                  <span className="text-xs sm:text-sm font-medium text-slate-500">Gestiona tu equipo de conductores</span>
+                  <span className="text-lg sm:text-xl font-extrabold text-slate-900">Choferes y Empleados</span>
+                  <span className="text-sm font-semibold text-slate-600">Gestiona tu equipo de conductores</span>
                 </div>
               </div>
-              <FaChevronRight className="text-sm text-slate-400 shrink-0" />
+              <FaChevronRight className="text-base text-slate-400 shrink-0" />
             </div>
           </Link>
 
@@ -245,11 +245,11 @@ export default function Home() {
                   <LiaFileInvoiceDollarSolid />
                 </div>
                 <div className="flex flex-col text-left gap-0.5">
-                  <span className="text-base sm:text-lg font-extrabold text-slate-900">Facturas</span>
-                  <span className="text-xs sm:text-sm font-medium text-slate-500">Consulta y genera facturas en PDF</span>
+                  <span className="text-lg sm:text-xl font-extrabold text-slate-900">Facturas</span>
+                  <span className="text-sm font-semibold text-slate-600">Consulta y genera facturas en PDF</span>
                 </div>
               </div>
-              <FaChevronRight className="text-sm text-slate-400 shrink-0" />
+              <FaChevronRight className="text-base text-slate-400 shrink-0" />
             </div>
           </Link>
 
@@ -261,11 +261,11 @@ export default function Home() {
                   <GiStabbedNote />
                 </div>
                 <div className="flex flex-col text-left gap-0.5">
-                  <span className="text-base sm:text-lg font-extrabold text-slate-900">Albaranes</span>
-                  <span className="text-xs sm:text-sm font-medium text-slate-500">Control de servicios y entregas</span>
+                  <span className="text-lg sm:text-xl font-extrabold text-slate-900">Albaranes</span>
+                  <span className="text-sm font-semibold text-slate-600">Control de servicios y entregas</span>
                 </div>
               </div>
-              <FaChevronRight className="text-sm text-slate-400 shrink-0" />
+              <FaChevronRight className="text-base text-slate-400 shrink-0" />
             </div>
           </Link>
 
@@ -278,35 +278,35 @@ export default function Home() {
                 </div>
                 <div className="flex flex-col text-left gap-0.5">
                   <div className="flex items-center gap-2">
-                    <span className="text-base sm:text-lg font-extrabold text-slate-900">DeCA Digital</span>
-                    <span className="rounded-md bg-amber-100 text-amber-900 text-[10px] font-black px-1.5 py-0.5 border border-amber-300">
+                    <span className="text-lg sm:text-xl font-extrabold text-slate-900">DeCA Digital</span>
+                    <span className="rounded-md bg-amber-100 text-amber-900 text-xs font-black px-2 py-0.5 border border-amber-300">
                       OCT 2026
                     </span>
                   </div>
-                  <span className="text-xs sm:text-sm font-medium text-slate-500">Control administrativo y QR para transporte</span>
+                  <span className="text-sm font-semibold text-slate-600">Control administrativo y QR para transporte</span>
                 </div>
               </div>
-              <FaChevronRight className="text-sm text-slate-400 shrink-0" />
+              <FaChevronRight className="text-base text-slate-400 shrink-0" />
             </div>
           </Link>
 
           {/* Sección de Acciones Rápidas */}
           <div className="flex w-full flex-col gap-2">
-            <span className="text-left text-xs font-extrabold uppercase tracking-wider text-slate-500 px-1">
+            <span className="text-left text-xs sm:text-sm font-extrabold uppercase tracking-wider text-slate-600 px-1">
               Acciones Rápidas
             </span>
             <div className="grid grid-cols-2 gap-3">
               <Link to="/create/delivery-notes" className="QuickActionLink">
                 <div className="QuickActionButton bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md hover:from-orange-600 hover:to-amber-600">
-                  <FaPlus className="text-xs" />
-                  <span className="text-xs sm:text-sm font-bold">Crear Albarán</span>
+                  <FaPlus className="text-sm" />
+                  <span className="text-sm sm:text-base font-extrabold">Crear Albarán</span>
                 </div>
               </Link>
 
               <Link to="/create/invoices" className="QuickActionLink">
                 <div className="QuickActionButton bg-slate-900 text-white shadow-md hover:bg-slate-800">
-                  <FaPlus className="text-xs" />
-                  <span className="text-xs sm:text-sm font-bold">Crear Factura</span>
+                  <FaPlus className="text-sm" />
+                  <span className="text-sm sm:text-base font-extrabold">Crear Factura</span>
                 </div>
               </Link>
             </div>

@@ -36,10 +36,30 @@
   font-style: normal;
 }
 
+.Footer .Title,
+.Footer .FactuClient-Footer {
+  color: #ffffff !important;
+  font-size: 1.35rem;
+  line-height: 1;
+  -webkit-text-stroke: 1px #000000;
+  paint-order: stroke fill;
+  text-shadow:
+    -1.5px -1.5px 0 #000000,
+     1.5px -1.5px 0 #000000,
+    -1.5px  1.5px 0 #000000,
+     1.5px  1.5px 0 #000000,
+     0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
 @media (min-width: 640px) {
   .Footer {
     height: 3.5rem;
     width: 85%;
+    font-size: 1.5rem;
+  }
+
+  .Footer .Title,
+  .Footer .FactuClient-Footer {
     font-size: 1.5rem;
   }
 }
