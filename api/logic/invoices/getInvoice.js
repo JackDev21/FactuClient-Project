@@ -71,9 +71,10 @@ function getInvoice(userId, invoiceid) {
             invoice.fechaHoraHusoGenRegistro = getIsoDateTimeWithTimezone(invoice.date || new Date())
           }
 
-          if (!invoice.huella && invoice.number && invoice.date) {
-            const companyNif = invoice.company?.taxId || ""
-            const fechaExpedicion = formatDateAeat(invoice.date)
+          const companyNif = (invoice.company?.taxId || "").trim().toUpperCase()
+          const fechaExpedicion = formatDateAeat(invoice.date || new Date())
+
+          if ((!invoice.huella || invoice.verifactuStatus !== "ACCEPTED") && invoice.number && invoice.date && companyNif) {
             const huellaAnterior = invoice.huellaAnterior || ""
             invoice.huella = computeInvoiceHash({
               nif: companyNif,
@@ -87,17 +88,23 @@ function getInvoice(userId, invoiceid) {
             })
           }
 
-          if (!invoice.qrUrl && invoice.number && invoice.date) {
-            const companyNif = invoice.company?.taxId || ""
-            invoice.qrUrl = buildAeatQrUrl({
-              nif: companyNif,
-              numSerie: invoice.number,
-              fechaExpedicion: formatDateAeat(invoice.date),
-              importeTotal: total,
-            })
-          }
+          const expectedQrUrl = companyNif && invoice.number && invoice.date
+            ? buildAeatQrUrl({
+                nif: companyNif,
+                numSerie: invoice.number,
+                fechaExpedicion,
+                importeTotal: total,
+              })
+            : ""
 
-          if (!invoice.qrDataUrl && invoice.qrUrl) {
+          if (expectedQrUrl && (!invoice.qrUrl || invoice.qrUrl !== expectedQrUrl)) {
+            invoice.qrUrl = expectedQrUrl
+            invoice.qrDataUrl = await generateQrDataUrl(expectedQrUrl)
+            Invoice.updateOne(
+              { _id: invoice.id },
+              { $set: { qrUrl: invoice.qrUrl, qrDataUrl: invoice.qrDataUrl, huella: invoice.huella } }
+            ).catch(() => {})
+          } else if (!invoice.qrDataUrl && invoice.qrUrl) {
             invoice.qrDataUrl = await generateQrDataUrl(invoice.qrUrl)
           }
 

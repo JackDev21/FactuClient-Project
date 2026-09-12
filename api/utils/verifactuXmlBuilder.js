@@ -30,7 +30,15 @@ export const buildAltaFacturaXml = (invoice, options = {}) => {
   const customer = invoice.customer || {}
 
   const emisorNif = (company.taxId || "").trim().toUpperCase()
-  const emisorName = (company.companyName || company.fullName || company.username || "EMPRESA").trim()
+  const isDni = /^[0-9]{8}[A-Z]$/i.test(emisorNif) || /^[XYZ][0-9]{7}[A-Z]$/i.test(emisorNif)
+  let emisorName = options.emisorName
+  if (!emisorName) {
+    if (isDni && process.env.VERIFACTU_EMISOR_NAME) {
+      emisorName = process.env.VERIFACTU_EMISOR_NAME
+    } else {
+      emisorName = (company.companyName || company.fullName || company.username || "EMPRESA").trim()
+    }
+  }
 
   const clienteNif = (customer.taxId || "").trim().toUpperCase()
   const clienteName = (customer.companyName || customer.fullName || customer.username || "CLIENTE").trim()
@@ -55,7 +63,8 @@ export const buildAltaFacturaXml = (invoice, options = {}) => {
 
   // Productor del software (Declaración Responsable según Art. 15)
   const producerNif = (options.producerNif || process.env.VERIFACTU_PRODUCER_NIF || emisorNif || "B00000000").trim().toUpperCase()
-  const producerName = (options.producerName || process.env.VERIFACTU_PRODUCER_NAME || "FactuClient Software").trim()
+  const defaultProducerName = producerNif === emisorNif ? emisorName : "FactuClient Software"
+  const producerName = (options.producerName || process.env.VERIFACTU_PRODUCER_NAME || defaultProducerName).trim()
 
   // Bloque de destinatario (Cliente)
   let destinatarioXml = ""

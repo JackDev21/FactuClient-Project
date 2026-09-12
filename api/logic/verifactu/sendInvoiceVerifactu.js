@@ -77,9 +77,10 @@ const sendInvoiceVerifactu = (userId, invoiceId, options = {}) => {
             invoice.fechaHoraHusoGenRegistro = getIsoDateTimeWithTimezone(invoice.date || new Date())
           }
 
-          if (!invoice.huella && invoice.number && invoice.date) {
-            const companyNif = invoice.company?.taxId || ""
-            const fechaExpedicion = formatDateAeat(invoice.date)
+          const companyNif = (invoice.company?.taxId || "").trim().toUpperCase()
+          const fechaExpedicion = formatDateAeat(invoice.date || new Date())
+
+          if ((!invoice.huella || invoice.verifactuStatus !== "ACCEPTED") && invoice.number && invoice.date && companyNif) {
             const huellaAnterior = invoice.huellaAnterior || ""
             invoice.huella = computeInvoiceHash({
               nif: companyNif,
@@ -91,6 +92,20 @@ const sendInvoiceVerifactu = (userId, invoiceId, options = {}) => {
               huellaAnterior,
               fechaHoraHusoGenRegistro: invoice.fechaHoraHusoGenRegistro,
             })
+          }
+
+          const expectedQrUrl = companyNif && invoice.number && invoice.date
+            ? buildAeatQrUrl({
+                nif: companyNif,
+                numSerie: invoice.number,
+                fechaExpedicion,
+                importeTotal: invoice.totalAmount || 0,
+              })
+            : ""
+
+          if (expectedQrUrl && (!invoice.qrUrl || invoice.qrUrl !== expectedQrUrl)) {
+            invoice.qrUrl = expectedQrUrl
+            invoice.qrDataUrl = await generateQrDataUrl(expectedQrUrl)
           }
 
           // Generar el XML SOAP oficial de alta
@@ -109,10 +124,13 @@ const sendInvoiceVerifactu = (userId, invoiceId, options = {}) => {
           }
 
           if (result.success) {
-            invoice.verifactuStatus = result.estadoRegistro === "AceptadaConErrores" ? "ACCEPTED_WITH_ERRORS" : "ACCEPTED"
+            invoice.verifactuStatus =
+              result.estadoRegistro === "AceptadaConErrores" || result.estadoRegistro === "AceptadoConErrores"
+                ? "ACCEPTED_WITH_ERRORS"
+                : "ACCEPTED"
             invoice.verifactuCsv = result.csv
             invoice.verifactuSentAt = new Date()
-            invoice.verifactuErrors = []
+            invoice.verifactuErrors = result.descripcionError ? [result.descripcionError] : []
           } else {
             invoice.verifactuStatus = "REJECTED"
             const errorMsg = result.descripcionError || result.message || `Error AEAT código ${result.codigoError || 'desconocido'}`

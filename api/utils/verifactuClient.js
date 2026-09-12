@@ -141,7 +141,10 @@ export const parseAeatResponse = (xmlResponse = "") => {
   const isAccepted =
     estadoRegistro === "Correcta" ||
     estadoRegistro === "AceptadaConErrores" ||
-    (estadoEnvio === "Correcto" && !!csv)
+    estadoRegistro === "AceptadoConErrores" ||
+    (estadoEnvio === "Correcto" && !!csv) ||
+    (estadoEnvio === "ParcialmenteCorrecto" && !!csv) ||
+    !!csv
 
   return {
     success: isAccepted,

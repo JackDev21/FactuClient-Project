@@ -58,10 +58,18 @@ export default function InvoiceInfo() {
           verifactuSentAt: data.invoice.verifactuSentAt,
           verifactuErrors: data.invoice.verifactuErrors,
         }))
-        setVerifactuFeedback({
-          type: "success",
-          message: `Factura remitida con éxito a la AEAT. CSV asignado: ${data.invoice.verifactuCsv}`,
-        })
+        if (data.result?.success) {
+          setVerifactuFeedback({
+            type: "success",
+            message: `Factura admitida con éxito por la AEAT. CSV asignado: ${data.invoice.verifactuCsv}`,
+          })
+        } else {
+          const errorDetail = data.result?.message || (data.invoice.verifactuErrors && data.invoice.verifactuErrors[0]) || "Incidencia tributaria devuelta por la AEAT"
+          setVerifactuFeedback({
+            type: "error",
+            message: errorDetail,
+          })
+        }
       })
       .catch((error) => {
         setIsSendingVerifactu(false)
