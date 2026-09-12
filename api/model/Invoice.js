@@ -67,11 +67,27 @@ const invoice = new Schema({
   qrDataUrl: {
     type: String,
   },
+  facturaAnteriorNumber: {
+    type: String,
+    default: "",
+  },
+  facturaAnteriorDate: {
+    type: Date,
+  },
   verifactuStatus: {
     type: String,
     enum: ["GENERATED", "PENDING_SEND", "ACCEPTED", "ACCEPTED_WITH_ERRORS", "REJECTED"],
     default: "GENERATED",
-  }
+  },
+  verifactuCsv: {
+    type: String,
+  },
+  verifactuSentAt: {
+    type: Date,
+  },
+  verifactuErrors: [{
+    type: String,
+  }],
 })
 
 invoice.index({ company: 1, number: 1 }, { unique: true })

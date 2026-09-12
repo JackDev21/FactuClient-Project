@@ -10,6 +10,7 @@ router.get("/invoices/:invoiceId", invoiceHandlers.getInvoiceHandler)
 router.delete("/invoices/:invoiceId", invoiceHandlers.deleteInvoiceHandler)
 router.patch("/invoices/:invoiceId/date", jsonBodyParser, invoiceHandlers.updateInvoiceDateHandler)
 router.patch("/invoices/:invoiceId/payment-type", jsonBodyParser, invoiceHandlers.updateInvoicePaymentTypeHandler)
+router.post("/invoices/:invoiceId/verifactu/send", invoiceHandlers.sendInvoiceVerifactuHandler)
 router.get("/:customerId/invoices", invoiceHandlers.getAllInvoicesCustomerHandler)
 
 export default router

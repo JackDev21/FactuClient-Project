@@ -44,6 +44,7 @@ import createInvoice from "./invoices/createInvoice.js"
 import deleteInvoice from "./invoices/deleteInvoice.js"
 import updateInvoiceDate from "./invoices/updateInvoiceDate.js"
 import updateInvoicePaymentType from "./invoices/updateInvoicePaymentType.js"
+import sendInvoiceVerifactu from "./invoices/sendInvoiceVerifactu.js"
 
 // --- 7. DeCA (Documento Electrónico de Control Administrativo) ---
 import createDeca from "./deca/createDeca.js"
@@ -99,6 +100,7 @@ const logic = {
   deleteInvoice,
   updateInvoiceDate,
   updateInvoicePaymentType,
+  sendInvoiceVerifactu,
 
   // DeCA
   createDeca,

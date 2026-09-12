@@ -136,16 +136,18 @@ const createInvoice = (userId, customerId, deliveryNoteIds = [], invoiceDate) =>
         .then(amounts => {
           const attemptCreate = (retryCount = 0) => {
             return Invoice.find({ company: userId })
-              .select("number huella _id")
+              .select("number huella date _id")
               .sort({ _id: 1 })
               .lean()
               .then(async allInvoices => {
                 const nextSeq = getNextInvoiceSeq(allInvoices, currentYear)
                 const invoiceNumber = formatInvoiceNumber(currentYear, nextSeq)
 
-                // Obtener la huella de la última factura previa de esta empresa para el encadenamiento
+                // Obtener datos de la última factura previa de esta empresa para el encadenamiento
                 const lastInvoice = allInvoices.length > 0 ? allInvoices[allInvoices.length - 1] : null
                 const huellaAnterior = lastInvoice && lastInvoice.huella ? lastInvoice.huella : ""
+                const facturaAnteriorNumber = lastInvoice && lastInvoice.number ? lastInvoice.number : ""
+                const facturaAnteriorDate = lastInvoice && lastInvoice.date ? lastInvoice.date : null
 
                 const invDate = invoiceDate ? new Date(invoiceDate) : new Date()
                 const fechaExpedicion = formatDateAeat(invDate)
@@ -189,6 +191,8 @@ const createInvoice = (userId, customerId, deliveryNoteIds = [], invoiceDate) =>
                   totalAmount: amounts.totalAmount,
                   huella,
                   huellaAnterior,
+                  facturaAnteriorNumber,
+                  facturaAnteriorDate,
                   tipoFactura: "F1",
                   fechaHoraHusoGenRegistro,
                   qrUrl,

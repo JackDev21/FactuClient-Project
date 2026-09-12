@@ -5,6 +5,7 @@ import getAllInvoicesHandler from "./getAllInvoicesHandler.js"
 import getInvoiceHandler from "./getInvoiceHandler.js"
 import updateInvoiceDateHandler from "./updateInvoiceDateHandler.js"
 import updateInvoicePaymentTypeHandler from "./updateInvoicePaymentTypeHandler.js"
+import sendInvoiceVerifactuHandler from "./sendInvoiceVerifactuHandler.js"
 
 export {
   createInvoiceHandler,
@@ -14,6 +15,7 @@ export {
   getInvoiceHandler,
   updateInvoiceDateHandler,
   updateInvoicePaymentTypeHandler,
+  sendInvoiceVerifactuHandler,
 }
 
 export default {
@@ -24,4 +26,5 @@ export default {
   getInvoiceHandler,
   updateInvoiceDateHandler,
   updateInvoicePaymentTypeHandler,
+  sendInvoiceVerifactuHandler,
 }

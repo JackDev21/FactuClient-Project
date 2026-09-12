@@ -3,7 +3,7 @@ import { useEffect, useState, Fragment } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { PDFDownloadLink } from "@react-pdf/renderer"
-import { FaRegFilePdf, FaPencil, FaShieldHalved, FaArrowUpRightFromSquare, FaCopy, FaCheck } from "react-icons/fa6"
+import { FaRegFilePdf, FaPencil, FaShieldHalved, FaArrowUpRightFromSquare, FaCopy, FaCheck, FaPaperPlane } from "react-icons/fa6"
 import { FaSpinner } from "react-icons/fa"
 
 import { MdDeleteForever } from "react-icons/md"
@@ -34,11 +34,42 @@ export default function InvoiceInfo() {
   const [editedDate, setEditedDate] = useState("")
   const [copiedHash, setCopiedHash] = useState(false)
 
+  const [isSendingVerifactu, setIsSendingVerifactu] = useState(false)
+  const [verifactuFeedback, setVerifactuFeedback] = useState(null)
+
   const handleCopyHash = (hash) => {
     if (!hash) return
     navigator.clipboard.writeText(hash)
     setCopiedHash(true)
     setTimeout(() => setCopiedHash(false), 2000)
+  }
+
+  const handleSendVerifactu = () => {
+    setIsSendingVerifactu(true)
+    setVerifactuFeedback(null)
+    logic
+      .sendInvoiceVerifactu(invoiceId)
+      .then((data) => {
+        setIsSendingVerifactu(false)
+        setInvoice((prev) => ({
+          ...prev,
+          verifactuStatus: data.invoice.verifactuStatus,
+          verifactuCsv: data.invoice.verifactuCsv,
+          verifactuSentAt: data.invoice.verifactuSentAt,
+          verifactuErrors: data.invoice.verifactuErrors,
+        }))
+        setVerifactuFeedback({
+          type: "success",
+          message: `Factura remitida con éxito a la AEAT. CSV asignado: ${data.invoice.verifactuCsv}`,
+        })
+      })
+      .catch((error) => {
+        setIsSendingVerifactu(false)
+        setVerifactuFeedback({
+          type: "error",
+          message: error.message || "Error al remitir a la AEAT",
+        })
+      })
   }
 
   useEffect(() => {
@@ -408,16 +439,55 @@ export default function InvoiceInfo() {
 
           {/* Panel Oficial VERI*FACTU */}
           {invoice?.huella && (
-            <div className="flex flex-col gap-3 rounded-2xl border border-indigo-100 bg-linear-to-br from-slate-50 to-indigo-50/40 p-4 sm:p-5 shadow-xs text-sm">
-              <div className="flex items-center justify-between border-b border-indigo-100/80 pb-2.5">
+            <div className="flex flex-col gap-3.5 rounded-2xl border border-indigo-100 bg-linear-to-br from-slate-50 to-indigo-50/40 p-4 sm:p-5 shadow-xs text-sm">
+              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-indigo-100/80 pb-2.5">
                 <div className="flex items-center gap-2 text-indigo-950 font-extrabold">
                   <FaShieldHalved className="text-indigo-600 text-lg" />
                   <span className="text-sm sm:text-base tracking-wide">VERI*FACTU · AEAT</span>
                 </div>
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">
-                  Encadenada y Verificable
-                </span>
+                {invoice.verifactuStatus === "ACCEPTED" ? (
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200 shadow-2xs">
+                    ✅ Aceptada por AEAT
+                  </span>
+                ) : invoice.verifactuStatus === "ACCEPTED_WITH_ERRORS" ? (
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200 shadow-2xs">
+                    ⚠️ Aceptada con avisos
+                  </span>
+                ) : invoice.verifactuStatus === "REJECTED" ? (
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-100 text-rose-800 border border-rose-200 shadow-2xs">
+                    ❌ Rechazada por AEAT
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-sky-100 text-sky-800 border border-sky-200 shadow-2xs">
+                    ⏳ Pendiente de remisión
+                  </span>
+                )}
               </div>
+
+              {/* Mensaje de feedback temporal */}
+              {verifactuFeedback && (
+                <div
+                  className={`rounded-xl p-3 text-xs font-medium border ${
+                    verifactuFeedback.type === "success"
+                      ? "bg-emerald-50 text-emerald-900 border-emerald-200"
+                      : "bg-rose-50 text-rose-900 border-rose-200"
+                  }`}
+                >
+                  {verifactuFeedback.message}
+                </div>
+              )}
+
+              {/* Errores previos devueltos por AEAT */}
+              {invoice.verifactuErrors && invoice.verifactuErrors.length > 0 && !verifactuFeedback && (
+                <div className="rounded-xl bg-rose-50 border border-rose-200 p-3 text-xs text-rose-900 text-left">
+                  <span className="font-bold block mb-1">Incidencias de validación en AEAT:</span>
+                  <ul className="list-disc pl-4 space-y-0.5">
+                    {invoice.verifactuErrors.map((err, i) => (
+                      <li key={i}>{err}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
 
               <div className="flex flex-col sm:flex-row items-center gap-4">
                 {/* QR Tributario */}
@@ -433,8 +503,19 @@ export default function InvoiceInfo() {
                   </div>
                 )}
 
-                {/* Datos de la huella y encadenamiento */}
+                {/* Datos de la huella, encadenamiento y CSV */}
                 <div className="flex flex-col gap-2 flex-1 w-full text-left">
+                  {invoice.verifactuCsv && (
+                    <div className="rounded-xl bg-emerald-50/80 border border-emerald-200/80 p-2.5 flex flex-col gap-1">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-800">
+                        Código Seguro de Verificación (CSV AEAT):
+                      </span>
+                      <code className="text-xs font-mono font-bold text-emerald-900 select-all bg-white px-2 py-1 rounded border border-emerald-200">
+                        {invoice.verifactuCsv}
+                      </code>
+                    </div>
+                  )}
+
                   <div>
                     <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
                       Huella Criptográfica SHA-256 (64 hex)
@@ -469,18 +550,43 @@ export default function InvoiceInfo() {
                     </span>
                   )}
 
-                  {/* Enlace directo a la Sede Electrónica de la AEAT */}
-                  {invoice.qrUrl && (
-                    <a
-                      href={invoice.qrUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="mt-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-indigo-600 text-white text-xs font-semibold shadow-xs hover:bg-indigo-700 transition-all active:scale-98 text-center"
-                    >
-                      <FaArrowUpRightFromSquare className="text-xs" />
-                      <span>Cotejar Factura en Sede Electrónica AEAT</span>
-                    </a>
-                  )}
+                  {/* Acciones de Veri*factu */}
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 mt-1">
+                    {/* Botón de envío telemático a la AEAT si no está aceptada */}
+                    {logic.getInfo().role === "user" && invoice.verifactuStatus !== "ACCEPTED" && (
+                      <button
+                        type="button"
+                        onClick={handleSendVerifactu}
+                        disabled={isSendingVerifactu}
+                        className="flex-1 inline-flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-98 text-white text-xs font-bold shadow-xs transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {isSendingVerifactu ? (
+                          <>
+                            <FaSpinner className="animate-spin text-xs" />
+                            <span>Remitiendo a AEAT...</span>
+                          </>
+                        ) : (
+                          <>
+                            <FaPaperPlane className="text-xs" />
+                            <span>Enviar a AEAT (Veri*factu)</span>
+                          </>
+                        )}
+                      </button>
+                    )}
+
+                    {/* Enlace directo a la Sede Electrónica de la AEAT */}
+                    {invoice.qrUrl && (
+                      <a
+                        href={invoice.qrUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-indigo-600 text-white text-xs font-semibold shadow-xs hover:bg-indigo-700 transition-all active:scale-98 text-center"
+                      >
+                        <FaArrowUpRightFromSquare className="text-xs" />
+                        <span>Cotejar en Sede AEAT</span>
+                      </a>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
