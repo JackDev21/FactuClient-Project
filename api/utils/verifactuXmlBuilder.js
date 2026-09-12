@@ -33,15 +33,17 @@ export const buildAltaFacturaXml = (invoice, options = {}) => {
   const isDni = /^[0-9]{8}[A-Z]$/i.test(emisorNif) || /^[XYZ][0-9]{7}[A-Z]$/i.test(emisorNif)
   let emisorName = options.emisorName
   if (!emisorName) {
-    if (isDni && process.env.VERIFACTU_EMISOR_NAME) {
-      emisorName = process.env.VERIFACTU_EMISOR_NAME
+    if (isDni) {
+      emisorName = process.env.VERIFACTU_EMISOR_NAME || company.fullName || company.companyName || company.username || "EMPRESA"
     } else {
-      emisorName = (company.companyName || company.fullName || company.username || "EMPRESA").trim()
+      emisorName = company.companyName || company.fullName || company.username || "EMPRESA"
     }
+    emisorName = emisorName.trim()
   }
 
   const clienteNif = (customer.taxId || "").trim().toUpperCase()
-  const clienteName = (customer.companyName || customer.fullName || customer.username || "CLIENTE").trim()
+  const isClienteDni = /^[0-9]{8}[A-Z]$/i.test(clienteNif) || /^[XYZ][0-9]{7}[A-Z]$/i.test(clienteNif)
+  const clienteName = (isClienteDni && customer.fullName ? customer.fullName : (customer.companyName || customer.fullName || customer.username || "CLIENTE")).trim()
 
   const numSerie = (invoice.number || "").trim()
   const fechaExpedicion = formatDateAeat(invoice.date || new Date())
