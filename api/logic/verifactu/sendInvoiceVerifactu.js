@@ -3,6 +3,13 @@ import { User, Invoice } from "../../model/index.js"
 import { NotFoundError, MatchError, SystemError, CredentialsError } from "com/errors.js"
 import { buildAltaFacturaXml } from "../../utils/verifactuXmlBuilder.js"
 import { sendToAeat } from "../../utils/verifactuClient.js"
+import {
+  formatDateAeat,
+  buildAeatQrUrl,
+  generateQrDataUrl,
+  computeInvoiceHash,
+  getIsoDateTimeWithTimezone,
+} from "../../utils/verifactuCrypto.js"
 
 /**
  * Remite telemáticamente un registro de facturación de alta a la sede electrónica de la AEAT
@@ -40,6 +47,50 @@ const sendInvoiceVerifactu = (userId, invoiceId, options = {}) => {
           const isCompany = invoice.company && (invoice.company._id?.toString() === userId || invoice.company.toString() === userId)
           if (!isCompany) {
             throw new MatchError("Can not remit invoice from another company")
+          }
+
+          // Retrocompatibilidad: Asegurar que los datos Verifactu existen
+          if (!invoice.baseAmount && Array.isArray(invoice.deliveryNotes)) {
+            let base = 0
+            invoice.deliveryNotes.forEach((dn) => {
+              if (Array.isArray(dn?.works)) {
+                dn.works.forEach((w) => {
+                  base += (Number(w.quantity) || 0) * (Number(w.price) || 0)
+                })
+              }
+            })
+            const iva = base * 0.21
+            const irpfPercentage = Number(invoice.company?.irpf) || 0
+            const irpfAmount = base * (irpfPercentage / 100)
+            const total = base + iva - irpfAmount
+            invoice.baseAmount = base
+            invoice.taxAmount = iva
+            invoice.irpfAmount = irpfAmount
+            invoice.totalAmount = total
+          }
+
+          if (!invoice.tipoFactura) {
+            invoice.tipoFactura = "F1"
+          }
+
+          if (!invoice.fechaHoraHusoGenRegistro) {
+            invoice.fechaHoraHusoGenRegistro = getIsoDateTimeWithTimezone(invoice.date || new Date())
+          }
+
+          if (!invoice.huella && invoice.number && invoice.date) {
+            const companyNif = invoice.company?.taxId || ""
+            const fechaExpedicion = formatDateAeat(invoice.date)
+            const huellaAnterior = invoice.huellaAnterior || ""
+            invoice.huella = computeInvoiceHash({
+              nif: companyNif,
+              numSerie: invoice.number,
+              fechaExpedicion,
+              tipoFactura: invoice.tipoFactura || "F1",
+              cuotaTotal: invoice.taxAmount || 0,
+              importeTotal: invoice.totalAmount || 0,
+              huellaAnterior,
+              fechaHoraHusoGenRegistro: invoice.fechaHoraHusoGenRegistro,
+            })
           }
 
           // Generar el XML SOAP oficial de alta

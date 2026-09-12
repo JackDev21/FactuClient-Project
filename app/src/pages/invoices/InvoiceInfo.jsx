@@ -122,10 +122,13 @@ export default function InvoiceInfo() {
   const irpfPercentage = invoice?.company.irpf || 0 // Porcentaje de IRPF del perfil del usuario
   const irpfAmount = total * (irpfPercentage / 100) // Cálculo del IRPF
 
+  const userRole = logic.getInfo()?.role
+  const isCompanyOwner = userRole === "user" || userRole === "company" || (!["driver", "customer"].includes(userRole))
+
   return (
     <>
       <Header
-        iconLeftHeader={logic.getInfo().role === "user" && <MdDeleteForever className="shrink-0" />}
+        iconLeftHeader={isCompanyOwner && <MdDeleteForever className="shrink-0" />}
         iconUser={<LiaFileInvoiceSolid />}
         onDeleteInvoice={handleShowConfirmDelete}
       >
@@ -196,7 +199,7 @@ export default function InvoiceInfo() {
                 {/* En móvil mostramos la fecha a la derecha si no se está editando */}
                 {!isEditingDate && (
                   <div className="flex items-center sm:hidden">
-                    {logic.getInfo().role === "user" ? (
+                    {isCompanyOwner ? (
                       <button
                         type="button"
                         onClick={() => setIsEditingDate(true)}
@@ -267,7 +270,7 @@ export default function InvoiceInfo() {
                   </div>
                 ) : (
                   <div className="hidden sm:flex items-center justify-end">
-                    {logic.getInfo().role === "user" ? (
+                    {isCompanyOwner ? (
                       <button
                         type="button"
                         onClick={() => setIsEditingDate(true)}
@@ -346,7 +349,7 @@ export default function InvoiceInfo() {
                 </div>
               ) : (
                 <div className="flex items-center justify-between sm:justify-end">
-                  {logic.getInfo().role === "user" ? (
+                  {isCompanyOwner ? (
                     <button
                       type="button"
                       onClick={() => {
@@ -438,7 +441,7 @@ export default function InvoiceInfo() {
           </div>
 
           {/* Panel Oficial VERI*FACTU */}
-          {invoice?.huella && (
+          {invoice && (
             <div className="flex flex-col gap-3.5 rounded-2xl border border-indigo-100 bg-linear-to-br from-slate-50 to-indigo-50/40 p-4 sm:p-5 shadow-xs text-sm">
               <div className="flex flex-wrap items-center justify-between gap-2 border-b border-indigo-100/80 pb-2.5">
                 <div className="flex items-center gap-2 text-indigo-950 font-extrabold">
@@ -522,16 +525,18 @@ export default function InvoiceInfo() {
                     </span>
                     <div className="flex items-center gap-1.5 mt-0.5 bg-white px-2.5 py-1.5 rounded-lg border border-slate-200">
                       <code className="text-xs font-mono text-slate-800 break-all flex-1 select-all">
-                        {invoice.huella}
+                        {invoice.huella || "Generando huella tributaria..."}
                       </code>
-                      <button
-                        type="button"
-                        onClick={() => handleCopyHash(invoice.huella)}
-                        title="Copiar huella completa"
-                        className="p-1 rounded text-slate-500 hover:text-indigo-600 hover:bg-slate-100 transition-colors shrink-0"
-                      >
-                        {copiedHash ? <FaCheck className="text-emerald-600 text-xs" /> : <FaCopy className="text-xs" />}
-                      </button>
+                      {invoice.huella && (
+                        <button
+                          type="button"
+                          onClick={() => handleCopyHash(invoice.huella)}
+                          title="Copiar huella completa"
+                          className="p-1 rounded text-slate-500 hover:text-indigo-600 hover:bg-slate-100 transition-colors shrink-0"
+                        >
+                          {copiedHash ? <FaCheck className="text-emerald-600 text-xs" /> : <FaCopy className="text-xs" />}
+                        </button>
+                      )}
                     </div>
                   </div>
 
@@ -553,7 +558,7 @@ export default function InvoiceInfo() {
                   {/* Acciones de Veri*factu */}
                   <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 mt-1">
                     {/* Botón de envío telemático a la AEAT si no está aceptada */}
-                    {logic.getInfo().role === "user" && invoice.verifactuStatus !== "ACCEPTED" && (
+                    {isCompanyOwner && invoice.verifactuStatus !== "ACCEPTED" && (
                       <button
                         type="button"
                         onClick={handleSendVerifactu}
