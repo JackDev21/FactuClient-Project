@@ -174,5 +174,47 @@ describe("createInvoice", () => {
   })
 
 
+  it("generates Veri*factu SHA-256 hash and QR for the first invoice and chains the second invoice", () => {
+    return bcrypt.hash("1234", 10)
+      .then(hash => {
+        const user = new User({
+          username: "BruceCompany",
+          email: "bruce@company.es",
+          password: hash,
+          taxId: "B12345678",
+        })
+        const customer = new User({
+          username: "ClarkCustomer",
+          email: "clark@customer.es",
+          password: hash,
+        })
+
+        return Promise.all([user.save(), customer.save()])
+          .then(() => createInvoice(user.id, customer.id, []))
+          .then(firstInvoice => {
+            expect(firstInvoice.huella).to.be.a("string")
+            expect(firstInvoice.huella).to.have.lengthOf(64)
+            expect(firstInvoice.huellaAnterior).to.equal("")
+            expect(firstInvoice.qrUrl).to.include("ValidarQR")
+            expect(firstInvoice.qrUrl).to.include("nif=B12345678")
+            expect(firstInvoice.qrDataUrl).to.be.a("string")
+            expect(firstInvoice.qrDataUrl.startsWith("data:image/png;base64,")).to.be.true
+            expect(firstInvoice.verifactuStatus).to.equal("GENERATED")
+
+            // Crear la segunda factura encadenada
+            return createInvoice(user.id, customer.id, [])
+              .then(secondInvoice => {
+                expect(secondInvoice.huella).to.be.a("string")
+                expect(secondInvoice.huella).to.have.lengthOf(64)
+                expect(secondInvoice.huella).to.not.equal(firstInvoice.huella)
+                // Encadenamiento criptográfico obligatorio
+                expect(secondInvoice.huellaAnterior).to.equal(firstInvoice.huella)
+                expect(secondInvoice.qrUrl).to.include("ValidarQR")
+                expect(secondInvoice.qrDataUrl.startsWith("data:image/png;base64,")).to.be.true
+              })
+          })
+      })
+  })
+
   after(() => User.deleteMany().then(() => Invoice.deleteMany()).then(() => mongoose.disconnect()))
 })

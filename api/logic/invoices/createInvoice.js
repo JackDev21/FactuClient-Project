@@ -1,6 +1,13 @@
 import validate from "com/validate.js"
 import { User, Invoice, DeliveryNote } from "../../model/index.js"
-import { NotFoundError, SystemError, DuplicityError } from "com/errors.js"
+import { NotFoundError, SystemError, DuplicityError, CredentialsError } from "com/errors.js"
+import {
+  formatDateAeat,
+  getIsoDateTimeWithTimezone,
+  computeInvoiceHash,
+  buildAeatQrUrl,
+  generateQrDataUrl,
+} from "../../utils/verifactuCrypto.js"
 
 const MAX_RETRIES = 5
 
@@ -95,51 +102,132 @@ const createInvoice = (userId, customerId, deliveryNoteIds = [], invoiceDate) =>
         return Promise.resolve()
       }
 
-      return reserveDeliveryNotes().then(() => {
-        const attemptCreate = (retryCount = 0) => {
-          return Invoice.find({ company: userId }).select("number").lean()
-            .then(allInvoices => {
-              const nextSeq = getNextInvoiceSeq(allInvoices, currentYear)
-              const invoiceNumber = formatInvoiceNumber(currentYear, nextSeq)
-
-              const newInvoice = {
-                date: invoiceDate ? new Date(invoiceDate) : new Date(),
-                number: invoiceNumber,
-                company: userId,
-                customer: customerId,
-                deliveryNotes: deliveryNoteIds,
-                observations: "",
-                paymentType: "Transferencia",
-              }
-
-              return Invoice.create(newInvoice)
-                .then(invoice => {
-                  return Invoice.findById(invoice.id)
-                    .select("-__v")
-                    .populate("customer")
-                    .populate("company")
-                    .populate("deliveryNotes")
-                    .lean()
-                    .then(invoice => invoice)
-                })
-                .catch(error => {
-                  // Si es error de duplicado (11000) por colisión concurrente, reintentar con el siguiente número
-                  if (error.code === 11000 && retryCount < MAX_RETRIES) {
-                    return attemptCreate(retryCount + 1)
-                  }
-                  return rollbackDeliveryNotes().then(() => {
-                    throw new SystemError(error.message)
-                  })
-                })
-            })
+      // 2. Calcular importes a partir de los albaranes y sus trabajos
+      const calculateAmounts = () => {
+        if (!deliveryNoteIds || deliveryNoteIds.length === 0) {
+          return Promise.resolve({ baseAmount: 0, taxAmount: 0, irpfAmount: 0, totalAmount: 0 })
         }
 
-        return attemptCreate().catch(error => {
-          return rollbackDeliveryNotes().then(() => {
-            throw error
+        return DeliveryNote.find({ _id: { $in: deliveryNoteIds } })
+          .populate("works")
+          .lean()
+          .then(dnsWithWorks => {
+            const base = (dnsWithWorks || []).reduce((acc, dn) => {
+              return (
+                acc +
+                (dn.works || []).reduce(
+                  (sub, w) => sub + (Number(w.quantity) || 0) * (Number(w.price) || 0),
+                  0
+                )
+              )
+            }, 0)
+            const baseAmount = Number(base.toFixed(2))
+            const taxAmount = Number((baseAmount * 0.21).toFixed(2))
+            const irpfPercentage = typeof user.irpf === "number" ? user.irpf : 0
+            const irpfAmount = Number((baseAmount * (irpfPercentage / 100)).toFixed(2))
+            const totalAmount = Number((baseAmount + taxAmount - irpfAmount).toFixed(2))
+
+            return { baseAmount, taxAmount, irpfAmount, totalAmount }
+          })
+      }
+
+      return reserveDeliveryNotes()
+        .then(() => calculateAmounts())
+        .then(amounts => {
+          const attemptCreate = (retryCount = 0) => {
+            return Invoice.find({ company: userId })
+              .select("number huella _id")
+              .sort({ _id: 1 })
+              .lean()
+              .then(async allInvoices => {
+                const nextSeq = getNextInvoiceSeq(allInvoices, currentYear)
+                const invoiceNumber = formatInvoiceNumber(currentYear, nextSeq)
+
+                // Obtener la huella de la última factura previa de esta empresa para el encadenamiento
+                const lastInvoice = allInvoices.length > 0 ? allInvoices[allInvoices.length - 1] : null
+                const huellaAnterior = lastInvoice && lastInvoice.huella ? lastInvoice.huella : ""
+
+                const invDate = invoiceDate ? new Date(invoiceDate) : new Date()
+                const fechaExpedicion = formatDateAeat(invDate)
+                const fechaHoraHusoGenRegistro = getIsoDateTimeWithTimezone(new Date())
+
+                const nif = (user.taxId || "").trim().toUpperCase()
+
+                // Cálculo del hash SHA-256 según Orden HAC/1177/2024
+                const huella = computeInvoiceHash({
+                  nif,
+                  numSerie: invoiceNumber,
+                  fechaExpedicion,
+                  tipoFactura: "F1",
+                  cuotaTotal: amounts.taxAmount,
+                  importeTotal: amounts.totalAmount,
+                  huellaAnterior,
+                  fechaHoraHusoGenRegistro,
+                })
+
+                // Construcción de URL y generación de código QR oficial de la AEAT
+                const qrUrl = buildAeatQrUrl({
+                  nif,
+                  numSerie: invoiceNumber,
+                  fechaExpedicion,
+                  importeTotal: amounts.totalAmount,
+                })
+
+                const qrDataUrl = await generateQrDataUrl(qrUrl)
+
+                const newInvoice = {
+                  date: invDate,
+                  number: invoiceNumber,
+                  company: userId,
+                  customer: customerId,
+                  deliveryNotes: deliveryNoteIds,
+                  observations: "",
+                  paymentType: "Transferencia",
+                  baseAmount: amounts.baseAmount,
+                  taxAmount: amounts.taxAmount,
+                  irpfAmount: amounts.irpfAmount,
+                  totalAmount: amounts.totalAmount,
+                  huella,
+                  huellaAnterior,
+                  tipoFactura: "F1",
+                  fechaHoraHusoGenRegistro,
+                  qrUrl,
+                  qrDataUrl,
+                  verifactuStatus: "GENERATED",
+                }
+
+                return Invoice.create(newInvoice)
+                  .then(invoice => {
+                    return Invoice.findById(invoice.id)
+                      .select("-__v")
+                      .populate("customer")
+                      .populate("company")
+                      .populate({ path: "deliveryNotes", populate: { path: "works" } })
+                      .lean()
+                      .then(inv => {
+                        inv.id = inv._id.toString()
+                        delete inv._id
+                        return inv
+                      })
+                  })
+                  .catch(error => {
+                    // Si es error de duplicado (11000) por colisión concurrente, reintentar con el siguiente número
+                    if (error.code === 11000 && retryCount < MAX_RETRIES) {
+                      return attemptCreate(retryCount + 1)
+                    }
+                    return rollbackDeliveryNotes().then(() => {
+                      throw new SystemError(error.message)
+                    })
+                  })
+              })
+          }
+
+          return attemptCreate().catch(error => {
+            return rollbackDeliveryNotes().then(() => {
+              throw error
+            })
           })
         })
-      })
     })
 }
 

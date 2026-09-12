@@ -3,7 +3,7 @@ import { useEffect, useState, Fragment } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { PDFDownloadLink } from "@react-pdf/renderer"
-import { FaRegFilePdf, FaPencil } from "react-icons/fa6"
+import { FaRegFilePdf, FaPencil, FaShieldHalved, FaArrowUpRightFromSquare, FaCopy, FaCheck } from "react-icons/fa6"
 import { FaSpinner } from "react-icons/fa"
 
 import { MdDeleteForever } from "react-icons/md"
@@ -32,6 +32,14 @@ export default function InvoiceInfo() {
   const [iva, setIva] = useState(0)
   const [isEditingDate, setIsEditingDate] = useState(false)
   const [editedDate, setEditedDate] = useState("")
+  const [copiedHash, setCopiedHash] = useState(false)
+
+  const handleCopyHash = (hash) => {
+    if (!hash) return
+    navigator.clipboard.writeText(hash)
+    setCopiedHash(true)
+    setTimeout(() => setCopiedHash(false), 2000)
+  }
 
   useEffect(() => {
     if (invoice?.date) {
@@ -398,6 +406,86 @@ export default function InvoiceInfo() {
             </div>
           </div>
 
+          {/* Panel Oficial VERI*FACTU */}
+          {invoice?.huella && (
+            <div className="flex flex-col gap-3 rounded-2xl border border-indigo-100 bg-linear-to-br from-slate-50 to-indigo-50/40 p-4 sm:p-5 shadow-xs text-sm">
+              <div className="flex items-center justify-between border-b border-indigo-100/80 pb-2.5">
+                <div className="flex items-center gap-2 text-indigo-950 font-extrabold">
+                  <FaShieldHalved className="text-indigo-600 text-lg" />
+                  <span className="text-sm sm:text-base tracking-wide">VERI*FACTU · AEAT</span>
+                </div>
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">
+                  Encadenada y Verificable
+                </span>
+              </div>
+
+              <div className="flex flex-col sm:flex-row items-center gap-4">
+                {/* QR Tributario */}
+                {invoice.qrDataUrl && (
+                  <div className="flex flex-col items-center bg-white p-2.5 rounded-xl border border-slate-200 shadow-xs shrink-0">
+                    <span className="text-[10px] font-bold text-slate-500 uppercase mb-1">QR tributario</span>
+                    <img
+                      src={invoice.qrDataUrl}
+                      alt="Código QR Verifactu"
+                      className="w-24 h-24 sm:w-28 sm:h-28 object-contain"
+                    />
+                    <span className="text-[9px] font-extrabold text-slate-700 tracking-wider mt-1">VERI*FACTU</span>
+                  </div>
+                )}
+
+                {/* Datos de la huella y encadenamiento */}
+                <div className="flex flex-col gap-2 flex-1 w-full text-left">
+                  <div>
+                    <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">
+                      Huella Criptográfica SHA-256 (64 hex)
+                    </span>
+                    <div className="flex items-center gap-1.5 mt-0.5 bg-white px-2.5 py-1.5 rounded-lg border border-slate-200">
+                      <code className="text-xs font-mono text-slate-800 break-all flex-1 select-all">
+                        {invoice.huella}
+                      </code>
+                      <button
+                        type="button"
+                        onClick={() => handleCopyHash(invoice.huella)}
+                        title="Copiar huella completa"
+                        className="p-1 rounded text-slate-500 hover:text-indigo-600 hover:bg-slate-100 transition-colors shrink-0"
+                      >
+                        {copiedHash ? <FaCheck className="text-emerald-600 text-xs" /> : <FaCopy className="text-xs" />}
+                      </button>
+                    </div>
+                  </div>
+
+                  {invoice.huellaAnterior ? (
+                    <div>
+                      <span className="text-[11px] font-medium text-slate-500 block">
+                        Huella anterior encadenada:
+                      </span>
+                      <code className="text-[11px] font-mono text-slate-600 truncate block mt-0.5">
+                        {invoice.huellaAnterior.substring(0, 20)}...{invoice.huellaAnterior.substring(44)}
+                      </code>
+                    </div>
+                  ) : (
+                    <span className="text-[11px] text-amber-700 font-medium">
+                      ⭐ Primer registro de la serie en este sistema
+                    </span>
+                  )}
+
+                  {/* Enlace directo a la Sede Electrónica de la AEAT */}
+                  {invoice.qrUrl && (
+                    <a
+                      href={invoice.qrUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-indigo-600 text-white text-xs font-semibold shadow-xs hover:bg-indigo-700 transition-all active:scale-98 text-center"
+                    >
+                      <FaArrowUpRightFromSquare className="text-xs" />
+                      <span>Cotejar Factura en Sede Electrónica AEAT</span>
+                    </a>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Botón de Descarga PDF */}
           {invoice && (
             <PDFDownloadLink
@@ -409,6 +497,7 @@ export default function InvoiceInfo() {
                   iva={iva}
                   irpfAmount={irpfAmount}
                   irpfPercentage={irpfPercentage}
+                  qrDataUrl={invoice.qrDataUrl}
                 />
               }
               fileName={`Factura-${invoice.number}.pdf`}

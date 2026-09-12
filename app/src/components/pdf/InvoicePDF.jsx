@@ -21,11 +21,50 @@ const styles = StyleSheet.create({
     paddingBottom: 10
   },
   headerLeft: {
-    flex: 1.2
+    flex: 1,
   },
   headerRight: {
-    flex: 0.8,
-    alignItems: "flex-end"
+    flex: 1.2,
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    alignItems: "center",
+    gap: 10,
+  },
+  invoiceMetaBox: {
+    alignItems: "flex-end",
+  },
+  qrWrapper: {
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 3,
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+    borderRadius: 3,
+  },
+  qrTopLabel: {
+    fontSize: 5.5,
+    fontWeight: "bold",
+    color: "#475569",
+    marginBottom: 1,
+  },
+  qrCodeImage: {
+    width: 72,
+    height: 72,
+  },
+  qrBottomLabel: {
+    fontSize: 4.5,
+    color: "#64748B",
+    textAlign: "center",
+    lineHeight: 1.1,
+    maxWidth: 78,
+  },
+  qrBadgeVerifactu: {
+    fontSize: 6,
+    fontWeight: "bold",
+    color: "#0F172A",
+    marginTop: 1,
+    letterSpacing: 0.5,
   },
   logoContainer: {
     maxHeight: 65,
@@ -219,8 +258,10 @@ const styles = StyleSheet.create({
     bottom: 15,
     left: 25,
     right: 25,
-    textAlign: "center",
-    fontSize: 7.5,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    fontSize: 6.5,
     color: "#94A3B8",
     borderTopWidth: 1,
     borderTopColor: "#E2E8F0",
@@ -234,11 +275,12 @@ const formatDate = (dateString) => {
   return new Date(dateString).toLocaleDateString("es-ES", options)
 }
 
-const InvoicePDF = ({ invoice, total, iva, irpfAmount, irpfPercentage }) => {
+const InvoicePDF = ({ invoice, total, iva, irpfAmount, irpfPercentage, qrDataUrl }) => {
   const safeTotal = typeof total === "number" ? total : 0
   const safeIva = typeof iva === "number" ? iva : 0
   const safeIrpfAmount = typeof irpfAmount === "number" ? irpfAmount : 0
   const totalWithIva = safeTotal + safeIva - safeIrpfAmount
+  const finalQr = qrDataUrl || invoice?.qrDataUrl || null
 
   const emisorName =
     invoice?.company?.companyName ||
@@ -268,9 +310,21 @@ const InvoicePDF = ({ invoice, total, iva, irpfAmount, irpfPercentage }) => {
           </View>
 
           <View style={styles.headerRight}>
-            <Text style={styles.invoiceBadge}>FACTURA</Text>
-            <Text style={styles.invoiceMetaText}>Nº: {invoice?.number || ""}</Text>
-            <Text style={styles.invoiceMetaText}>Fecha: {formatDate(invoice?.date)}</Text>
+            <View style={styles.invoiceMetaBox}>
+              <Text style={styles.invoiceBadge}>FACTURA</Text>
+              <Text style={styles.invoiceMetaText}>Nº: {invoice?.number || ""}</Text>
+              <Text style={styles.invoiceMetaText}>Fecha: {formatDate(invoice?.date)}</Text>
+            </View>
+
+            {finalQr ? (
+              <View style={styles.qrWrapper}>
+                <Text style={styles.qrTopLabel}>QR tributario:</Text>
+                <Image style={styles.qrCodeImage} src={finalQr} />
+                <Text style={styles.qrBottomLabel}>Factura verificable en la</Text>
+                <Text style={styles.qrBottomLabel}>sede electrónica de la AEAT</Text>
+                <Text style={styles.qrBadgeVerifactu}>VERI*FACTU</Text>
+              </View>
+            ) : null}
           </View>
         </View>
 
@@ -369,12 +423,17 @@ const InvoicePDF = ({ invoice, total, iva, irpfAmount, irpfPercentage }) => {
           </View>
         </View>
 
-        {/* Pie de Página Dinámico con Paginación */}
-        <Text
-          style={styles.footer}
-          render={({ pageNumber, totalPages }) => `FactuClient APP · Página ${pageNumber} de ${totalPages}`}
-          fixed
-        />
+        {/* Pie de Página Dinámico con Paginación y Trazabilidad Veri*factu */}
+        <View style={styles.footer} fixed>
+          <Text>
+            {invoice?.huella
+              ? `VERI*FACTU SHA-256: ${invoice.huella.substring(0, 24)}...`
+              : "FactuClient APP"}
+          </Text>
+          <Text
+            render={({ pageNumber, totalPages }) => `Página ${pageNumber} de ${totalPages}`}
+          />
+        </View>
       </Page>
     </Document>
   )

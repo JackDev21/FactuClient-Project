@@ -28,6 +28,49 @@ const invoice = new Schema({
   },
   paymentType: {
     type: String,
+  },
+  // Importes calculados para trazabilidad inmutable y cotejo Veri*factu
+  baseAmount: {
+    type: Number,
+    default: 0,
+  },
+  taxAmount: {
+    type: Number,
+    default: 0,
+  },
+  irpfAmount: {
+    type: Number,
+    default: 0,
+  },
+  totalAmount: {
+    type: Number,
+    default: 0,
+  },
+  // Trazabilidad y encadenamiento SHA-256 (RD 1007/2023 y Orden HAC/1177/2024)
+  huella: {
+    type: String,
+  },
+  huellaAnterior: {
+    type: String,
+    default: "",
+  },
+  tipoFactura: {
+    type: String,
+    default: "F1",
+  },
+  fechaHoraHusoGenRegistro: {
+    type: String,
+  },
+  qrUrl: {
+    type: String,
+  },
+  qrDataUrl: {
+    type: String,
+  },
+  verifactuStatus: {
+    type: String,
+    enum: ["GENERATED", "PENDING_SEND", "ACCEPTED", "ACCEPTED_WITH_ERRORS", "REJECTED"],
+    default: "GENERATED",
   }
 })
 
