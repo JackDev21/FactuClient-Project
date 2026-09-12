@@ -19,6 +19,7 @@ import logic from "../../logic/index"
 
 import "./InvoiceInfo.css"
 import Time from "../../components/core/Time"
+import AutoFitText from "../../components/core/AutoFitText"
 
 export default function InvoiceInfo() {
   const navigate = useNavigate()
@@ -98,22 +99,35 @@ export default function InvoiceInfo() {
           {/* Tarjeta de Datos Emisor y Cliente */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 shadow-xs">
             {/* Datos Empresa */}
-            <div className="flex flex-col text-left gap-1 border-b sm:border-b-0 sm:border-r border-slate-100 pb-3 sm:pb-0 sm:pr-3">
+            <div className="flex flex-col text-left gap-1 border-b sm:border-b-0 sm:border-r border-slate-100 pb-3 sm:pb-0 sm:pr-3 min-w-0">
               <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
                 Emisor
               </span>
               {invoice?.company ? (
                 <>
-                  <span className="text-sm font-extrabold text-slate-900">
+                  <span className="text-sm font-extrabold text-slate-900 break-words">
                     {invoice.company.companyName}
                   </span>
                   <span className="text-xs text-slate-600 font-medium">
                     CIF/NIF: {invoice.company.taxId}
                   </span>
-                  <span className="text-xs text-slate-600">{invoice.company.address}</span>
-                  <span className="text-xs text-slate-500">{invoice.company.email}</span>
+                  <span className="text-xs text-slate-600 break-words">{invoice.company.address}</span>
+                  {invoice.company.email && (
+                    <AutoFitText
+                      as="a"
+                      href={`mailto:${invoice.company.email}`}
+                      className="text-slate-500 hover:text-blue-600 hover:underline transition-colors"
+                    >
+                      {invoice.company.email}
+                    </AutoFitText>
+                  )}
                   {invoice.company.phone && (
-                    <span className="text-xs text-slate-500">Tel: {invoice.company.phone}</span>
+                    <a
+                      href={`tel:${invoice.company.phone.replace(/[^0-9+]/g, "")}`}
+                      className="text-xs text-slate-500 hover:text-blue-600 transition-colors w-fit"
+                    >
+                      Tel: {invoice.company.phone}
+                    </a>
                   )}
                 </>
               ) : (
@@ -122,22 +136,35 @@ export default function InvoiceInfo() {
             </div>
 
             {/* Datos Cliente */}
-            <div className="flex flex-col text-left gap-1 sm:pl-2">
+            <div className="flex flex-col text-left gap-1 sm:pl-2 min-w-0">
               <span className="text-xs font-bold uppercase tracking-wider text-blue-600">
                 Cliente
               </span>
               {invoice?.customer ? (
                 <>
-                  <span className="text-sm font-extrabold text-slate-900">
+                  <span className="text-sm font-extrabold text-slate-900 break-words">
                     {invoice.customer.companyName}
                   </span>
                   <span className="text-xs text-slate-600 font-medium">
                     CIF/NIF: {invoice.customer.taxId}
                   </span>
-                  <span className="text-xs text-slate-600">{invoice.customer.address}</span>
-                  <span className="text-xs text-slate-500">{invoice.customer.email}</span>
+                  <span className="text-xs text-slate-600 break-words">{invoice.customer.address}</span>
+                  {invoice.customer.email && (
+                    <AutoFitText
+                      as="a"
+                      href={`mailto:${invoice.customer.email}`}
+                      className="text-slate-500 hover:text-blue-600 hover:underline transition-colors"
+                    >
+                      {invoice.customer.email}
+                    </AutoFitText>
+                  )}
                   {invoice.customer.phone && (
-                    <span className="text-xs text-slate-500">Tel: {invoice.customer.phone}</span>
+                    <a
+                      href={`tel:${invoice.customer.phone.replace(/[^0-9+]/g, "")}`}
+                      className="text-xs text-slate-500 hover:text-blue-600 transition-colors w-fit"
+                    >
+                      Tel: {invoice.customer.phone}
+                    </a>
                   )}
                 </>
               ) : (
